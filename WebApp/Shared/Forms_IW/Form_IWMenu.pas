@@ -120,9 +120,11 @@ Begin
       CONST_OPCION_PROCESO                      : UserSession.ShowForm_Proceso          ;
       CONST_OPCION_TERCERO                      : UserSession.ShowForm_Tercero          ;
       CONST_OPCION_PRODUCTO                     : UserSession.ShowForm_Producto         ;
-      CONST_OPCION_INVENTARIO_ENTRADA           : UserSession.ShowForm_Movto_Inventario(UserSession.DOCUMENTO_INVENTARIO_ENTRADA   );
-      CONST_OPCION_INVENTARIO_SALIDA            : UserSession.ShowForm_Movto_Inventario(UserSession.DOCUMENTO_INVENTARIO_SALIDA    );
-      CONST_OPCION_INVENTARIO_DEVOLUCION        : UserSession.ShowForm_Movto_Inventario(UserSession.DOCUMENTO_INVENTARIO_DEVOLUCION);
+      CONST_OPCION_PROYECTO                     : UserSession.ShowForm_Proyecto         ;
+      CONST_OPCION_ORDEN_PRODUCCION             : UserSession.ShowForm_Orden_Produccion(UserSession.DOCUMENTO_ORDEN_DE_PRODUCCION     );
+      CONST_OPCION_INVENTARIO_ENTRADA           : UserSession.ShowForm_Movto_Inventario(UserSession.DOCUMENTO_ENTRADA_DE_INVENTARIO   );
+      CONST_OPCION_INVENTARIO_SALIDA            : UserSession.ShowForm_Movto_Inventario(UserSession.DOCUMENTO_SALIDA_DE_INVENTARIO    );
+      CONST_OPCION_INVENTARIO_DEVOLUCION        : UserSession.ShowForm_Movto_Inventario(UserSession.DOCUMENTO_DEVOLUCION_AL_INVENTARIO);
       CONST_OPCION_SALIR                        : WebApplication.ShowConfirm('Está seguro(a) de salir?', Self.Name + '.Ejecutar_Salida', 'Salir', 'Sí', 'No');
       Else UserSession.SetMessage('Opcion no disponible', True);
     End;
@@ -280,8 +282,9 @@ Begin
       Validar_Carga_Opciones(pOptions, CONST_OPCION_ADMINISTRACION_DE_DOCUMENTOS);
       Validar_Carga_Opciones(pOptions, CONST_OPCION_AREA                        );
       Validar_Carga_Opciones(pOptions, CONST_OPCION_PROCESO                     );
-      Validar_Carga_Opciones(pOptions, CONST_OPCION_TERCERO                     );
       Validar_Carga_Opciones(pOptions, CONST_OPCION_PRODUCTO                    );
+      Validar_Carga_Opciones(pOptions, CONST_OPCION_TERCERO                     );
+      Validar_Carga_Opciones(pOptions, CONST_OPCION_PROYECTO                    );
       PAG_MAESTROS.Visible := RG_MAESTROS.Items.Count > 0;
     End;
 
@@ -292,6 +295,7 @@ Begin
 
     If pOptions = RG_MOVIMIENTOS Then
     Begin
+      Validar_Carga_Opciones(pOptions, CONST_OPCION_ORDEN_PRODUCCION            );
       Validar_Carga_Opciones(pOptions, CONST_OPCION_INVENTARIO_ENTRADA          );
       Validar_Carga_Opciones(pOptions, CONST_OPCION_INVENTARIO_SALIDA           );
       Validar_Carga_Opciones(pOptions, CONST_OPCION_INVENTARIO_DEVOLUCION       );

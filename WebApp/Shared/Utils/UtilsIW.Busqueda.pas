@@ -112,6 +112,17 @@ begin
                                           Self.SIZE_ORIGEN      := [0000000000000150         , 00000450                ];
                                           Self.CAMPOS_DESTINO   := ['CODIGO_PRODUCTO'];
                                         End;
+      Id_TBL_Proyecto                 : Begin
+                                          Self.TABLA            := gInfo_Tablas[pId].Name;
+                                          Self.TITULO_ORIGEN    := ['Código'                 , 'Nombre'                ];
+                                          Self.CAMPOS_ORIGEN    := ['CODIGO_PROYECTO'        , 'NOMBRE'                ];
+                                          Self.CAMPOS_LIKE      := ['CODIGO_PROYECTO'        , 'NOMBRE'                ];
+                                          Self.CAMPOS_ID        := ['S'                      , 'N'                     ];
+                                          Self.CAMPOS_ALIGNMENT := [TAlignment.taRightJustify, TAlignment.taLeftJustify];
+                                          Self.SIZE_ORIGEN      := [0000000000000150         , 00000450                ];
+                                          Self.CAMPOS_DESTINO   := ['CODIGO_PROYECTO'];
+                                        End;
+      Id_TBL_Orden_Produccion          ,
       Id_TBL_Movto_Inventario          : Begin
                                           Self.TABLA            := gInfo_Tablas[pId].Name;
                                           Self.TITULO_ORIGEN    := ['Numero'                 , 'Nombre'                ];
@@ -120,7 +131,7 @@ begin
                                           Self.CAMPOS_ID        := ['S'                      , 'N'                     ];
                                           Self.CAMPOS_ALIGNMENT := [TAlignment.taRightJustify, TAlignment.taLeftJustify];
                                           Self.SIZE_ORIGEN      := [0000000000000100         , 00000550                ];
-                                          Self.CAMPOS_DESTINO   := ['NUMERO'];
+                                          Self.CAMPOS_DESTINO   := ['CODIGO_DOCUMENTO', 'NUMERO'];
                                         End;
   End;
   Self.SetGrid;

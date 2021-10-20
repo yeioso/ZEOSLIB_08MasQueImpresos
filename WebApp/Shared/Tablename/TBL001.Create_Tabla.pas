@@ -19,7 +19,9 @@ Uses
   TBL008.Proceso,
   TBL009.Tercero,
   TBL010.Producto,
-  TBL030.Movto_Inventario,
+  TBL011.Proyecto,
+  TBL030.Orden_Produccion,
+  TBL031.Movto_Inventario,
   TBL999.Usuario_Reporte;
 
 Function TBL001_Create_Tabla_Execute(pCnx : TConexion) : Boolean;
@@ -40,9 +42,13 @@ Begin
       Result := TBL009_Tercero_Create(pCnx);
     If Result Then
       Result := TBL010_Producto_Create(pCnx);
-  If Result Then
-      Result := TBL030_Movto_Inventario_Create(pCnx);
-  If Result Then
+    If Result Then
+      Result := TBL011_Proyecto_Create(pCnx);
+    If Result Then
+      Result := TBL030_Orden_Produccion_Create(pCnx);
+    If Result Then
+      Result := TBL031_Movto_Inventario_Create(pCnx);
+    If Result Then
       Result := TBL999_Usuario_Reporte_Create(pCnx);
   Except
     On E: Exception Do

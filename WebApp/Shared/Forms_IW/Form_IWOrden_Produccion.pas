@@ -1,4 +1,4 @@
-unit Form_IWMovto_Inventario;
+unit Form_IWOrden_Produccion;
 
 interface
 
@@ -13,7 +13,7 @@ uses
   UtGrid_JQ, UtNavegador_ASE, UtilsIW.Busqueda;
 
 type
-  TFrIWMovto_Inventario = class(TIWAppForm)
+  TFrIWOrden_Produccion = class(TIWAppForm)
     RINFO: TIWRegion;
     lbInfo: TIWLabel;
     IWRegion1: TIWRegion;
@@ -24,43 +24,27 @@ type
     IWLabel1: TIWLabel;
     IWLabel8: TIWLabel;
     DATO: TIWEdit;
-    IWLabel3: TIWLabel;
     IWLabel7: TIWLabel;
     IWModalWindow1: TIWModalWindow;
     NUMERO: TIWDBLabel;
     BTNNOMBRE: TIWImage;
     NOMBRE: TIWDBLabel;
-    FECHA_VENCIMIENTO: TIWDBLabel;
-    BTNFECHA_VENCIMIENTO: TIWImage;
     lbNombre_Activo: TIWLabel;
     BTNACTIVO: TIWImage;
-    BTNCODIGO_AREA: TIWImage;
-    CODIGO_AREA: TIWDBLabel;
-    lbNombre_Area: TIWLabel;
+    BTNCODIGO_PROYECTO: TIWImage;
+    CODIGO_PROYECTO: TIWDBLabel;
+    lbNombre_Proyecto: TIWLabel;
     IWRegion_Navegador: TIWRegion;
-    lbTercero: TIWLabel;
+    IWLabel5: TIWLabel;
     BTNCODIGO_TERCERO: TIWImage;
     CODIGO_TERCERO: TIWDBLabel;
     lbNombre_Tercero: TIWLabel;
-    IWLabel6: TIWLabel;
-    BTNCODIGO_PRODUCTO: TIWImage;
-    CODIGO_PRODUCTO: TIWDBLabel;
-    lbNombre_Producto: TIWLabel;
     lbInfoRegistro: TIWLabel;
     DESCRIPCION: TIWDBMemo;
     BTNDESCRIPCION: TIWImage;
     IWLabel9: TIWLabel;
-    CANTIDAD: TIWDBLabel;
-    BTNCANTIDAD: TIWImage;
-    IWLabel11: TIWLabel;
-    BTNCREARAREA: TIWImage;
+    BTNCREARPROYECTO: TIWImage;
     BTNCREARTERCERO: TIWImage;
-    BTNCREARPRODUCTO: TIWImage;
-    IWLabel2: TIWLabel;
-    BTNOP: TIWImage;
-    CODIGO_DOCUMENTO_OP: TIWDBLabel;
-    NUMERO_OP: TIWDBLabel;
-    lbInfoOP: TIWLabel;
     procedure BTNBACKAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure IWAppFormCreate(Sender: TObject);
     procedure IWAppFormDestroy(Sender: TObject);
@@ -71,16 +55,15 @@ type
     procedure BTNEMAILAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNFECHA_VENCIMIENTOAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNACTIVOAsyncClick(Sender: TObject; EventParams: TStringList);
-    procedure BTNCODIGO_AREAAsyncClick(Sender: TObject; EventParams: TStringList);
+    procedure BTNCODIGO_PROYECTOAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BtnGridAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNCODIGO_TERCEROAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNCODIGO_PRODUCTOAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNDESCRIPCIONAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNCANTIDADAsyncClick(Sender: TObject; EventParams: TStringList);
-    procedure BTNCREARAREAAsyncClick(Sender: TObject; EventParams: TStringList);
+    procedure BTNCREARPROYECTOAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNCREARTERCEROAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNCREARPRODUCTOAsyncClick(Sender: TObject; EventParams: TStringList);
-    procedure BTNOPAsyncClick(Sender: TObject; EventParams: TStringList);
   private
     FCNX : TConexion;
     FINFO : String;
@@ -97,8 +80,7 @@ type
     Procedure Resultado_Perfil(Sender: TObject; EventParams: TStringList);
     procedure Buscar_Info(pSD : Integer; pEvent : TIWAsyncEvent);
 
-    Procedure Resultado_Orden_Produccion(Sender: TObject; EventParams: TStringList);
-    Procedure Resultado_Area(Sender: TObject; EventParams: TStringList);
+    Procedure Resultado_Proyecto(Sender: TObject; EventParams: TStringList);
     Procedure Resultado_Producto(Sender: TObject; EventParams: TStringList);
     Procedure Resultado_Tercero(Sender: TObject; EventParams: TStringList);
 
@@ -110,7 +92,7 @@ type
 
     Procedure Release_Me;
 
-    Function Existe_Movimiento(Const pNumero : String): Boolean;
+    Function Existe_Orden_Produccion(Const pNumero : String): Boolean;
 
     Procedure Validar_Campos_Master(pSender: TObject);
     Function Documento_Activo: Boolean;
@@ -120,7 +102,6 @@ type
     Procedure DsDataChangeMaster(pSender: TObject);
     Procedure DsStateMaster(Sender: TObject);
 
-    Function Info_OP : String;
     Procedure SetLabel;
     Procedure Estado_Controles;
     Function AbrirMaestro(Const pDato: String = ''): Boolean;
@@ -151,7 +132,7 @@ Uses
   UtIWBasicData_ASE,
   UtilsIW.Numero_Siguiente;
 
-procedure TFrIWMovto_Inventario.Resultado_BasicData(Sender: TObject; EventParams: TStringList);
+procedure TFrIWOrden_Produccion.Resultado_BasicData(Sender: TObject; EventParams: TStringList);
 Var
   lBD : TBasicData_ASE;
 Begin
@@ -173,11 +154,11 @@ Begin
     End;
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWMovto_Inventario.Resultado_BasicData, ' + e.Message);
+      UtLog_Execute('TFrIWOrden_Produccion.Resultado_BasicData, ' + e.Message);
   End;
 End;
 
-procedure TFrIWMovto_Inventario.Mostrar_BasicData(Const pId : Integer; Const pTitle, pCaptionCode, pFieldCode, pCaptionName, pFieldName, pFieldDestiny : String; pResult : TIWAsyncEvent);
+procedure TFrIWOrden_Produccion.Mostrar_BasicData(Const pId : Integer; Const pTitle, pCaptionCode, pFieldCode, pCaptionName, pFieldName, pFieldDestiny : String; pResult : TIWAsyncEvent);
 Var
   lRG : TBasicData_ASE;
 begin
@@ -199,38 +180,24 @@ begin
     IWModalWindow1.Show;
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWMovto_Inventario.Mostrar_BasicData, ' + e.Message);
+      UtLog_Execute('TFrIWOrden_Produccion.Mostrar_BasicData, ' + e.Message);
   End;
 End;
 
-Procedure TFrIWMovto_Inventario.Resultado_Orden_Produccion(Sender: TObject; EventParams: TStringList);
+Procedure TFrIWOrden_Produccion.Resultado_Proyecto(Sender: TObject; EventParams: TStringList);
 Begin
   Try
     If FQRMAESTRO.Mode_Edition Then
     Begin
-      FQRMAESTRO.QR.FieldByName('CODIGO_DOCUMENTO_OP').AsString := EventParams.Values ['CODIGO_DOCUMENTO'];
-      FQRMAESTRO.QR.FieldByName('NUMERO_OP'          ).AsString := EventParams.Values ['NUMERO'          ];
+      FQRMAESTRO.QR.FieldByName('CODIGO_PROYECTO').AsString := EventParams.Values ['CODIGO_PROYECTO' ];
     End;
   Except
    On E: Exception Do
-     UtLog_Execute('TFrIWMovto_Inventario.Resultado_Orden_Produccion, ' + e.Message);
+     UtLog_Execute('TFrIWOrden_Produccion.Resultado_Proyecto, ' + e.Message);
   End;
 End;
 
-Procedure TFrIWMovto_Inventario.Resultado_Area(Sender: TObject; EventParams: TStringList);
-Begin
-  Try
-    If FQRMAESTRO.Mode_Edition Then
-    Begin
-      FQRMAESTRO.QR.FieldByName('CODIGO_AREA').AsString := EventParams.Values ['CODIGO_AREA' ];
-    End;
-  Except
-   On E: Exception Do
-     UtLog_Execute('TFrIWMovto_Inventario.Resultado_Area, ' + e.Message);
-  End;
-End;
-
-Procedure TFrIWMovto_Inventario.Resultado_Producto(Sender: TObject; EventParams: TStringList);
+Procedure TFrIWOrden_Produccion.Resultado_Producto(Sender: TObject; EventParams: TStringList);
 Begin
   Try
     If FQRMAESTRO.Mode_Edition Then
@@ -239,11 +206,11 @@ Begin
     End;
   Except
    On E: Exception Do
-     UtLog_Execute('TFrIWMovto_Inventario.Resultado_Producto, ' + e.Message);
+     UtLog_Execute('TFrIWOrden_Produccion.Resultado_Producto, ' + e.Message);
   End;
 End;
 
-Procedure TFrIWMovto_Inventario.Resultado_Tercero(Sender: TObject; EventParams: TStringList);
+Procedure TFrIWOrden_Produccion.Resultado_Tercero(Sender: TObject; EventParams: TStringList);
 Begin
   Try
     If FQRMAESTRO.Mode_Edition Then
@@ -252,11 +219,11 @@ Begin
     End;
   Except
    On E: Exception Do
-     UtLog_Execute('TFrIWMovto_Inventario.Resultado_Tercero, ' + e.Message);
+     UtLog_Execute('TFrIWOrden_Produccion.Resultado_Tercero, ' + e.Message);
   End;
 End;
 
-Procedure TFrIWMovto_Inventario.Resultado_Perfil(Sender: TObject; EventParams: TStringList);
+Procedure TFrIWOrden_Produccion.Resultado_Perfil(Sender: TObject; EventParams: TStringList);
 Begin
   Try
     If FQRMAESTRO.Mode_Edition Then
@@ -265,11 +232,11 @@ Begin
     End;
   Except
    On E: Exception Do
-     UtLog_Execute('TFrIWMovto_Inventario.Resultado_Perfil, ' + e.Message);
+     UtLog_Execute('TFrIWOrden_Produccion.Resultado_Perfil, ' + e.Message);
   End;
 End;
 
-procedure TFrIWMovto_Inventario.Buscar_Info(pSD : Integer; pEvent : TIWAsyncEvent);
+procedure TFrIWOrden_Produccion.Buscar_Info(pSD : Integer; pEvent : TIWAsyncEvent);
 Var
   lBusqueda : TBusqueda_Ercol_WjQDBGrid;
 begin
@@ -297,11 +264,11 @@ begin
     End;
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWMovto_Inventario.Buscar_Info, ' + e.Message);
+      UtLog_Execute('TFrIWOrden_Produccion.Buscar_Info, ' + e.Message);
   End;
 End;
 
-procedure TFrIWMovto_Inventario.Resultado_Nombre(EventParams: TStringList);
+procedure TFrIWOrden_Produccion.Resultado_Nombre(EventParams: TStringList);
 Begin
   Try
     If FQRMAESTRO.Mode_Edition And (Result_Is_OK(EventParams.Values['RetValue'])) Then
@@ -310,11 +277,11 @@ Begin
     End;
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWMovto_Inventario.Resultado_Nombre, ' + e.Message);
+      UtLog_Execute('TFrIWOrden_Produccion.Resultado_Nombre, ' + e.Message);
   End;
 End;
 
-procedure TFrIWMovto_Inventario.Resultado_Descripcion(EventParams: TStringList);
+procedure TFrIWOrden_Produccion.Resultado_Descripcion(EventParams: TStringList);
 Begin
   Try
     If FQRMAESTRO.Mode_Edition And (Result_Is_OK(EventParams.Values['RetValue'])) Then
@@ -323,11 +290,11 @@ Begin
     End;
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWMovto_Inventario.Resultado_Descripcion, ' + e.Message);
+      UtLog_Execute('TFrIWOrden_Produccion.Resultado_Descripcion, ' + e.Message);
   End;
 End;
 
-procedure TFrIWMovto_Inventario.Resultado_Fecha_Vencimiento(EventParams: TStringList);
+procedure TFrIWOrden_Produccion.Resultado_Fecha_Vencimiento(EventParams: TStringList);
 Begin
   Try
     If FQRMAESTRO.Mode_Edition And (Result_Is_OK(EventParams.Values['RetValue'])) Then
@@ -336,11 +303,11 @@ Begin
     End;
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWMovto_Inventario.Resultado_Fecha_Vencimiento, ' + e.Message);
+      UtLog_Execute('TFrIWOrden_Produccion.Resultado_Fecha_Vencimiento, ' + e.Message);
   End;
 End;
 
-procedure TFrIWMovto_Inventario.Resultado_Cantidad(EventParams: TStringList);
+procedure TFrIWOrden_Produccion.Resultado_Cantidad(EventParams: TStringList);
 Begin
   Try
     If FQRMAESTRO.Mode_Edition And (Result_Is_OK(EventParams.Values['RetValue'])) Then
@@ -349,32 +316,32 @@ Begin
     End;
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWMovto_Inventario.Resultado_Cantidad, ' + e.Message);
+      UtLog_Execute('TFrIWOrden_Produccion.Resultado_Cantidad, ' + e.Message);
   End;
 End;
 
-procedure TFrIWMovto_Inventario.Resultado_Activo(EventParams: TStringList);
+procedure TFrIWOrden_Produccion.Resultado_Activo(EventParams: TStringList);
 Begin
   Try
     If FQRMAESTRO.Mode_Edition Then
       FQRMAESTRO.QR.FieldByName('ID_ACTIVO').AsString := IfThen(Result_Is_OK(EventParams.Values['RetValue']), 'S', 'N');
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWMovto_Inventario.Resultado_Activo, ' + e.Message);
+      UtLog_Execute('TFrIWOrden_Produccion.Resultado_Activo, ' + e.Message);
   End;
 End;
 
-Procedure TFrIWMovto_Inventario.Release_Me;
+Procedure TFrIWOrden_Produccion.Release_Me;
 Begin
   Self.Release;
 End;
 
-Function TFrIWMovto_Inventario.Existe_Movimiento(Const pNumero : String) : Boolean;
+Function TFrIWOrden_Produccion.Existe_Orden_Produccion(Const pNumero : String) : Boolean;
 Begin
-  Result := FCNX.Record_Exist(gInfo_Tablas[Id_TBL_Movto_Inventario].Name, ['CODIGO_DOCUMENTO', 'NUMERO'], [FCODIGO_DOCUMENTO, pNumero]);
+  Result := FCNX.Record_Exist(gInfo_Tablas[Id_TBL_Orden_Produccion].Name, ['CODIGO_DOCUMENTO', 'NUMERO'], [FCODIGO_DOCUMENTO, pNumero]);
 End;
 
-Procedure TFrIWMovto_Inventario.Validar_Campos_Master(pSender: TObject);
+Procedure TFrIWOrden_Produccion.Validar_Campos_Master(pSender: TObject);
 Var
   lMensaje: String;
 Begin
@@ -383,25 +350,23 @@ Begin
     lMensaje := '';
     NUMERO.BGColor := UserSession.COLOR_OK;
     NOMBRE.BGColor := UserSession.COLOR_OK;
-    CANTIDAD.BGColor := UserSession.COLOR_OK;
-    CODIGO_AREA.BGColor := UserSession.COLOR_OK;
+    CODIGO_PROYECTO.BGColor := UserSession.COLOR_OK;
     CODIGO_TERCERO.BGColor := UserSession.COLOR_OK;
-    CODIGO_PRODUCTO.BGColor := UserSession.COLOR_OK;
 
     If FQRMAESTRO.DS.State In [dsInsert] Then
     Begin
       If FQRMAESTRO.QR.FieldByName('NUMERO').AsInteger <= 0 Then
       Begin
-        lMensaje := lMensaje + IfThen(Not Vacio(lMensaje), ', ') + 'Movimiento invalido';
+        lMensaje := lMensaje + IfThen(Not Vacio(lMensaje), ', ') + 'Orden_Produccion invalido';
         NUMERO.BGColor := UserSession.COLOR_ERROR;
       End
       Else
       Begin
-        If Existe_Movimiento(IntToStr(FQRMAESTRO.QR.FieldByName('NUMERO').AsInteger)) Then
+        If Existe_Orden_Produccion(IntToStr(FQRMAESTRO.QR.FieldByName('NUMERO').AsInteger)) Then
           FQRMAESTRO.QR.FieldByName('NUMERO').AsInteger := UtilsIW_Numero_Siguiente_Get(FCNX, FCODIGO_DOCUMENTO);
-        If Existe_Movimiento(IntToStr(FQRMAESTRO.QR.FieldByName('NUMERO').AsInteger)) Or (FQRMAESTRO.QR.FieldByName('NUMERO').AsInteger <= 0) Then
+        If Existe_Orden_Produccion(IntToStr(FQRMAESTRO.QR.FieldByName('NUMERO').AsInteger)) Or (FQRMAESTRO.QR.FieldByName('NUMERO').AsInteger <= 0) Then
         Begin
-          lMensaje := lMensaje + IfThen(Not Vacio(lMensaje), ', ') + 'Movimiento ya existente';
+          lMensaje := lMensaje + IfThen(Not Vacio(lMensaje), ', ') + 'Orden_Produccion ya existente';
           NUMERO.BGColor := UserSession.COLOR_ERROR;
         End;
       End;
@@ -413,28 +378,16 @@ Begin
       NOMBRE.BGColor := UserSession.COLOR_ERROR;
     End;
 
-    If FQRMAESTRO.Mode_Edition And Vacio(FQRMAESTRO.QR.FieldByName('CODIGO_AREA').AsString) Then
+    If FQRMAESTRO.Mode_Edition And Vacio(FQRMAESTRO.QR.FieldByName('CODIGO_PROYECTO').AsString) Then
     Begin
-      lMensaje := lMensaje + IfThen(Not Vacio(lMensaje), ', ') + 'Area invalida';
-      CODIGO_AREA.BGColor := UserSession.COLOR_ERROR;
+      lMensaje := lMensaje + IfThen(Not Vacio(lMensaje), ', ') + 'Proyecto invalido';
+      CODIGO_PROYECTO.BGColor := UserSession.COLOR_ERROR;
     End;
 
     If FQRMAESTRO.Mode_Edition And Vacio(FQRMAESTRO.QR.FieldByName('CODIGO_TERCERO').AsString) Then
     Begin
       lMensaje := lMensaje + IfThen(Not Vacio(lMensaje), ', ') + 'Tercero invalido';
       CODIGO_TERCERO.BGColor := UserSession.COLOR_ERROR;
-    End;
-
-    If FQRMAESTRO.Mode_Edition And Vacio(FQRMAESTRO.QR.FieldByName('CODIGO_PRODUCTO').AsString) Then
-    Begin
-      lMensaje := lMensaje + IfThen(Not Vacio(lMensaje), ', ') + 'Producto invalido';
-      CODIGO_PRODUCTO.BGColor := UserSession.COLOR_ERROR;
-    End;
-
-    If FQRMAESTRO.Mode_Edition And (FQRMAESTRO.QR.FieldByName('CANTIDAD').AsInteger <= 0) Then
-    Begin
-      lMensaje := lMensaje + IfThen(Not Vacio(lMensaje), ', ') + 'Cantidad no valida';
-      CANTIDAD.BGColor := UserSession.COLOR_ERROR;
     End;
 
     FQRMAESTRO.ERROR := IfThen(Vacio(lMensaje), 0, -1);
@@ -445,74 +398,45 @@ Begin
     End;
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWMovto_Inventario.Validar_Campos_Master, ' + E.Message);
+      UtLog_Execute('TFrIWOrden_Produccion.Validar_Campos_Master, ' + E.Message);
   End;
 End;
 
-Procedure TFrIWMovto_Inventario.Estado_Controles;
+Procedure TFrIWOrden_Produccion.Estado_Controles;
 Begin
   NUMERO.Enabled               := False;
-  BTNOP.Visible                := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  BTNCODIGO_AREA.Visible       := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  BTNCODIGO_PROYECTO.Visible   := FQRMAESTRO.Mode_Edition And Documento_Activo;
   BTNCODIGO_TERCERO.Visible    := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  BTNCODIGO_PRODUCTO.Visible   := FQRMAESTRO.Mode_Edition And Documento_Activo;
   BTNNOMBRE.Visible            := FQRMAESTRO.Mode_Edition And Documento_Activo;
   BTNDESCRIPCION.Visible       := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  BTNFECHA_VENCIMIENTO.Visible := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  BTNCANTIDAD.Visible          := FQRMAESTRO.Mode_Edition And Documento_Activo;
   BTNACTIVO.Visible            := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  BTNCREARAREA.Visible         := FQRMAESTRO.Mode_Edition And Documento_Activo;
   BTNCREARTERCERO.Visible      := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  BTNCREARPRODUCTO.Visible     := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  BTNCREARPROYECTO.Visible     := FQRMAESTRO.Mode_Edition And Documento_Activo;
   DATO.Visible                 := (Not FQRMAESTRO.Mode_Edition);
   PAG_00.Visible               := (Not FQRMAESTRO.Mode_Edition);
   PAG_01.Visible               := True;
 End;
 
-Function TFrIWMovto_Inventario.Info_OP : String;
-Var
-  ltmp : String;
-Begin
-  Result := '';
-  Try
-    ltmp := FCNX.GetValue(gInfo_Tablas[Id_TBL_Orden_Produccion].Name, ['CODIGO_DOCUMENTO', 'NUMERO'], [FQRMAESTRO.QR.FieldByName('CODIGO_DOCUMENTO_OP').AsString, FQRMAESTRO.QR.FieldByName('NUMERO_OP').AsString], ['NOMBRE']);
-    Result := Result + IfThen(Not Vacio(Result), ', ') + 'Orden de Produción: ' + ltmp;
-    ltmp := FCNX.GetValue(gInfo_Tablas[Id_TBL_Orden_Produccion].Name, ['CODIGO_DOCUMENTO', 'NUMERO'], [FQRMAESTRO.QR.FieldByName('CODIGO_DOCUMENTO_OP').AsString, FQRMAESTRO.QR.FieldByName('NUMERO_OP').AsString], ['CODIGO_PROYECTO']);
-    ltmp := FCNX.GetValue(gInfo_Tablas[Id_TBL_Proyecto].Name, ['CODIGO_PROYECTO'], [ltmp], ['NOMBRE']);
-    Result := Result + IfThen(Not Vacio(Result), ', ') + 'Proyecto: ' + ltmp;
-    ltmp := FCNX.GetValue(gInfo_Tablas[Id_TBL_Orden_Produccion].Name, ['CODIGO_DOCUMENTO', 'NUMERO'], [FQRMAESTRO.QR.FieldByName('CODIGO_DOCUMENTO_OP').AsString, FQRMAESTRO.QR.FieldByName('NUMERO_OP').AsString], ['CODIGO_TERCERO']);
-    ltmp := FCNX.GetValue(gInfo_Tablas[Id_TBL_Tercero].Name, ['CODIGO_TERCERO'], [ltmp], ['NOMBRE']);
-    Result := Result + IfThen(Not Vacio(Result), ', ') + 'Tercero, ' + ltmp;
-  Except
-    On E: Exception Do
-    Begin
-      UtLog_Execute('TFrIWMovto_Inventario.Info_OP, ' + E.Message);
-    End;
-  End;
-End;
-
-Procedure TFrIWMovto_Inventario.SetLabel;
+Procedure TFrIWOrden_Produccion.SetLabel;
 Begin
   If Not FQRMAESTRO.Active Then
     Exit;
   Try
-    lbInfoOP.Caption := Info_OP;
     lbNombre_Activo.Caption := IfThen(FQRMAESTRO.QR.FieldByName('ID_ACTIVO').AsString = 'S', 'Esta activo', 'No esta activo');
-    lbNombre_Area.Caption := FCNX.GetValue(gInfo_Tablas[Id_TBL_Area].Name, ['CODIGO_AREA'], [FQRMAESTRO.QR.FieldByName('CODIGO_AREA').AsString], ['NOMBRE']);
     lbNombre_Tercero.Caption := FCNX.GetValue(gInfo_Tablas[Id_TBL_Tercero].Name, ['CODIGO_TERCERO'], [FQRMAESTRO.QR.FieldByName('CODIGO_TERCERO').AsString], ['NOMBRE']);
-    lbNombre_Producto.Caption := FCNX.GetValue(gInfo_Tablas[Id_TBL_Producto].Name, ['CODIGO_PRODUCTO'], [FQRMAESTRO.QR.FieldByName('CODIGO_PRODUCTO').AsString], ['NOMBRE']);
+    lbNombre_Proyecto.Caption := FCNX.GetValue(gInfo_Tablas[Id_TBL_Proyecto].Name, ['CODIGO_PROYECTO'], [FQRMAESTRO.QR.FieldByName('CODIGO_PROYECTO').AsString], ['NOMBRE']);
     lbInfoRegistro.Caption := 'Usuario: ' + FCNX.GetValue(gInfo_Tablas[Id_TBL_Usuario].Name, ['CODIGO_USUARIO'], [FQRMAESTRO.QR.FieldByName('CODIGO_USUARIO').AsString], ['NOMBRE']);
     lbInfoRegistro.Caption := lbInfoRegistro.Caption + ', Fecha: ' + FQRMAESTRO.QR.FieldByName('FECHA_REGISTRO').AsString;
     lbInfoRegistro.Caption := lbInfoRegistro.Caption + ', Hora: ' + FQRMAESTRO.QR.FieldByName('HORA_REGISTRO').AsString;
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrIWMovto_Inventario.SetLabel, ' + E.Message);
+      UtLog_Execute('TFrIWOrden_Produccion.SetLabel, ' + E.Message);
     End;
   End;
 End;
 
-Function TFrIWMovto_Inventario.Documento_Activo: Boolean;
+Function TFrIWOrden_Produccion.Documento_Activo: Boolean;
 Begin
   Try
     Result := True;
@@ -520,12 +444,12 @@ Begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrIWMovto_Inventario.Documento_Activo, ' + E.Message);
+      UtLog_Execute('TFrIWOrden_Produccion.Documento_Activo, ' + E.Message);
     End;
   End;
 End;
 
-procedure TFrIWMovto_Inventario.DsDataChangeMaster(pSender: TObject);
+procedure TFrIWOrden_Produccion.DsDataChangeMaster(pSender: TObject);
 begin
 
   FNAVEGADOR.UpdateState;
@@ -545,12 +469,12 @@ begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrIWMovto_Inventario.DsDataChangeMaster, ' + E.Message);
+      UtLog_Execute('TFrIWOrden_Produccion.DsDataChangeMaster, ' + E.Message);
     End;
   End;
 end;
 
-Procedure TFrIWMovto_Inventario.DsStateMaster(Sender: TObject);
+Procedure TFrIWOrden_Produccion.DsStateMaster(Sender: TObject);
 Begin
   If Not FQRMAESTRO.Active Then
     Exit;
@@ -567,14 +491,14 @@ Begin
   End;
 End;
 
-Function TFrIWMovto_Inventario.AbrirMaestro(Const pDato: String = ''): Boolean;
+Function TFrIWOrden_Produccion.AbrirMaestro(Const pDato: String = ''): Boolean;
 Begin
-  FGRID_MAESTRO.Caption := gInfo_Tablas[Id_TBL_Movto_Inventario].Caption;
+  FGRID_MAESTRO.Caption := gInfo_Tablas[Id_TBL_Orden_Produccion].Caption;
   Result := False;
   Try
     FQRMAESTRO.Active := False;
     FQRMAESTRO.WHERE    := '';
-    FQRMAESTRO.SENTENCE := ' SELECT * FROM ' + gInfo_Tablas[Id_TBL_Movto_Inventario].Name + FCNX.No_Lock;
+    FQRMAESTRO.SENTENCE := ' SELECT * FROM ' + gInfo_Tablas[Id_TBL_Orden_Produccion].Name + FCNX.No_Lock;
     FQRMAESTRO.WHERE := ' WHERE ' + FCNX.Trim_Sentence('CODIGO_DOCUMENTO') + ' = ' + QuotedStr(Trim(FCODIGO_DOCUMENTO)) + #13;
     If Trim(pDato) <> '' Then
     Begin
@@ -586,7 +510,7 @@ Begin
       FQRMAESTRO.WHERE := FQRMAESTRO.WHERE + ' OR CODIGO_USUARIO LIKE '  + QuotedStr('%' + Trim(pDato) + '%') + #13;
       FQRMAESTRO.WHERE := FQRMAESTRO.WHERE + ' OR FECHA_REGISTRO LIKE '  + QuotedStr('%' + Trim(pDato) + '%') + #13;
       FQRMAESTRO.WHERE := FQRMAESTRO.WHERE + ' OR HORA_REGISTRO LIKE '   + QuotedStr('%' + Trim(pDato) + '%') + #13;
-      FQRMAESTRO.WHERE := FQRMAESTRO.WHERE + ' OR CODIGO_AREA LIKE '     + QuotedStr('%' + Trim(pDato) + '%') + #13;
+      FQRMAESTRO.WHERE := FQRMAESTRO.WHERE + ' OR CODIGO_PROYECTO LIKE '     + QuotedStr('%' + Trim(pDato) + '%') + #13;
       FQRMAESTRO.WHERE := FQRMAESTRO.WHERE + ' ) ';
     End;
     FQRMAESTRO.ORDER := ' ORDER BY NUMERO DESC ';
@@ -598,13 +522,13 @@ Begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrIWMovto_Inventario.AbrirMaestro, ' + E.Message);
+      UtLog_Execute('TFrIWOrden_Produccion.AbrirMaestro, ' + E.Message);
     End;
   End;
   FGRID_MAESTRO.RefreshData;
 End;
 
-constructor TFrIWMovto_Inventario.Create(AOwner: TComponent; Const pCodigo_Documento : String);
+constructor TFrIWOrden_Produccion.Create(AOwner: TComponent; Const pCodigo_Documento : String);
 begin
   Inherited Create(AOwner);
   Try
@@ -617,20 +541,15 @@ begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrIWMovto_Inventario.IWAppFormCreate, ' + E.Message);
+      UtLog_Execute('TFrIWOrden_Produccion.IWAppFormCreate, ' + E.Message);
     End;
   End;
 end;
 
-procedure TFrIWMovto_Inventario.IWAppFormCreate(Sender: TObject);
+procedure TFrIWOrden_Produccion.IWAppFormCreate(Sender: TObject);
 begin
   Randomize;
   Self.Name := 'USUARIO' + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000));
-  If (Trim(FCODIGO_DOCUMENTO) = Trim(UserSession.DOCUMENTO_ENTRADA_DE_INVENTARIO)) Then
-    lbTercero.Caption := 'Proveedor'
-  Else
-    If (Trim(FCODIGO_DOCUMENTO) = Trim(UserSession.DOCUMENTO_SALIDA_DE_INVENTARIO )) Then
-      lbTercero.Caption := 'Solicitante';
   FCNX := UserSession.CNX;
   WebApplication.RegisterCallBack(Self.Name + '.Resultado_Nombre'           , Resultado_Nombre           );
   WebApplication.RegisterCallBack(Self.Name + '.Resultado_Descripcion'      , Resultado_Descripcion      );
@@ -638,7 +557,7 @@ begin
   WebApplication.RegisterCallBack(Self.Name + '.Resultado_Cantidad'         , Resultado_Cantidad         );
   WebApplication.RegisterCallBack(Self.Name + '.Resultado_Activo'           , Resultado_Activo           );
   FCODIGO_ACTUAL := '';
-  FINFO := UserSession.FULL_INFO + gInfo_Tablas[Id_TBL_Movto_Inventario].Caption;
+  FINFO := UserSession.FULL_INFO + gInfo_Tablas[Id_TBL_Orden_Produccion].Caption;
   Try
     FGRID_MAESTRO        := TGRID_JQ.Create(PAG_00);
     FGRID_MAESTRO.Parent := PAG_00;
@@ -647,7 +566,7 @@ begin
     FGRID_MAESTRO.Width  := 700;
     FGRID_MAESTRO.Height := 500;
 
-    FQRMAESTRO := UserSession.Create_Manager_Data(gInfo_Tablas[Id_TBL_Movto_Inventario].Name, gInfo_Tablas[Id_TBL_Movto_Inventario].Caption);
+    FQRMAESTRO := UserSession.Create_Manager_Data(gInfo_Tablas[Id_TBL_Orden_Produccion].Name, gInfo_Tablas[Id_TBL_Orden_Produccion].Caption);
 
     FQRMAESTRO.ON_NEW_RECORD   := NewRecordMaster;
     FQRMAESTRO.ON_AFTER_POST   := AfterPostMaster;
@@ -655,22 +574,17 @@ begin
     FQRMAESTRO.ON_STATE_CHANGE := DsStateMaster;
     FQRMAESTRO.ON_BEFORE_POST  := Validar_Campos_Master;
 
-    NUMERO.DataSource              := FQRMAESTRO.DS;
-    CODIGO_DOCUMENTO_OP.DataSource := FQRMAESTRO.DS;
-    NUMERO_OP.DataSource           := FQRMAESTRO.DS;
-    NOMBRE.DataSource              := FQRMAESTRO.DS;
-    CODIGO_AREA.DataSource         := FQRMAESTRO.DS;
-    CODIGO_TERCERO.DataSource      := FQRMAESTRO.DS;
-    CODIGO_PRODUCTO.DataSource     := FQRMAESTRO.DS;
-    DESCRIPCION.DataSource         := FQRMAESTRO.DS;
-    FECHA_VENCIMIENTO.DataSource   := FQRMAESTRO.DS;
-    CANTIDAD.DataSource            := FQRMAESTRO.DS;
+    NUMERO.DataSource            := FQRMAESTRO.DS;
+    NOMBRE.DataSource            := FQRMAESTRO.DS;
+    CODIGO_PROYECTO.DataSource   := FQRMAESTRO.DS;
+    CODIGO_TERCERO.DataSource    := FQRMAESTRO.DS;
+    DESCRIPCION.DataSource       := FQRMAESTRO.DS;
 
-    FGRID_MAESTRO.SetGrid(FQRMAESTRO.DS, ['NUMERO'        , 'NOMBRE'     , 'CANTIDAD'    , 'FECHA_VENCIMIENTO'],
-                                         ['numero'        , 'Nombre'     , 'Cantidad'    , 'Vencimiento'      ],
-                                         ['S'             , 'N'          , 'N'           , 'N'                ],
-                                         [100             , 200          , 100           , 100                ],
-                                         [taRightJustify  , taLeftJustify, taRightJustify, taLeftJustify      ]);
+    FGRID_MAESTRO.SetGrid(FQRMAESTRO.DS, ['NUMERO'        , 'NOMBRE'     ],
+                                         ['numero'        , 'Nombre'     ],
+                                         ['S'             , 'N'          ],
+                                         [150             , 450          ],
+                                         [taRightJustify  , taLeftJustify]);
 
     FNAVEGADOR               := TNavegador_ASE.Create(IWRegion_Navegador);
     FNAVEGADOR.Parent        := IWRegion_Navegador;
@@ -686,12 +600,12 @@ begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrIWMovto_Inventario.IWAppFormCreate, ' + E.Message);
+      UtLog_Execute('TFrIWOrden_Produccion.IWAppFormCreate, ' + E.Message);
     End;
   End;
 end;
 
-procedure TFrIWMovto_Inventario.IWAppFormDestroy(Sender: TObject);
+procedure TFrIWOrden_Produccion.IWAppFormDestroy(Sender: TObject);
 begin
   Try
     If Assigned(FQRMAESTRO) Then
@@ -708,11 +622,11 @@ begin
 
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWMovto_Inventario.IWAppFormDestroy, ' + E.Message);
+      UtLog_Execute('TFrIWOrden_Produccion.IWAppFormDestroy, ' + E.Message);
   End;
 end;
 
-procedure TFrIWMovto_Inventario.NewRecordMaster(pSender: TObject);
+procedure TFrIWOrden_Produccion.NewRecordMaster(pSender: TObject);
 begin
   Inherited;
   Try
@@ -721,17 +635,16 @@ begin
     FQRMAESTRO.QR.FieldByName('CODIGO_USUARIO'   ).AsString  := UserSession.USER_CODE            ;
     FQRMAESTRO.QR.FieldByName('FECHA_REGISTRO'   ).AsString  := FormatDateTime('YYYY-MM-DD', Now);
     FQRMAESTRO.QR.FieldByName('HORA_REGISTRO'    ).AsString  := FormatDateTime('HH:NN:SS'  , Now);
-    FQRMAESTRO.QR.FieldByName('FECHA_VENCIMIENTO').AsString  := FormatDateTime('YYYY-MM-DD', Now);
     FQRMAESTRO.QR.FieldByName('ID_ACTIVO'        ).AsString  := 'S';
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrIWMovto_Inventario.NewRecordMaster, ' + E.Message);
+      UtLog_Execute('TFrIWOrden_Produccion.NewRecordMaster, ' + E.Message);
     End;
   End;
 end;
 
-procedure TFrIWMovto_Inventario.AfterPostMaster(pSender : TObject);
+procedure TFrIWOrden_Produccion.AfterPostMaster(pSender : TObject);
 begin
   Try
     FCODIGO_ACTUAL := '';
@@ -740,46 +653,46 @@ begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrIWMovto_Inventario.AfterPostMaster, ' + E.Message);
+      UtLog_Execute('TFrIWOrden_Produccion.AfterPostMaster, ' + E.Message);
     End;
   End;
 end;
 
-procedure TFrIWMovto_Inventario.BtnAcarreoAsyncClick(Sender: TObject;  EventParams: TStringList);
+procedure TFrIWOrden_Produccion.BtnAcarreoAsyncClick(Sender: TObject;  EventParams: TStringList);
 begin
   FQRMAESTRO.SetAcarreo(Not FQRMAESTRO.ACARREO, ['CODIGO_DOCUMENTO', 'NUMERO'], [FQRMAESTRO.QR.FieldByName('CODIGO_DOCUMENTO').AsString, FQRMAESTRO.QR.FieldByName('NUMERO').AsString]);
 end;
 
-procedure TFrIWMovto_Inventario.BTNACTIVOAsyncClick(Sender: TObject; EventParams: TStringList);
+procedure TFrIWOrden_Produccion.BTNACTIVOAsyncClick(Sender: TObject; EventParams: TStringList);
 begin
   WebApplication.ShowConfirm('Esta activo?', Self.Name + '.Resultado_Activo', 'Activo', 'Sí', 'No')
 end;
 
-procedure TFrIWMovto_Inventario.BTNBACKAsyncClick(Sender: TObject;  EventParams: TStringList);
+procedure TFrIWOrden_Produccion.BTNBACKAsyncClick(Sender: TObject;  EventParams: TStringList);
 begin
   If FQRMAESTRO.Mode_Edition Then
     FQRMAESTRO.QR.Cancel;
   Release_Me;
 end;
 
-Procedure TFrIWMovto_Inventario.Localizar_Registro(Sender: TObject; EventParams: TStringList);
+Procedure TFrIWOrden_Produccion.Localizar_Registro(Sender: TObject; EventParams: TStringList);
 Begin
   Try
     AbrirMaestro(EventParams.Values['NUMERO']);
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWMovto_Inventario.Localizar_Registro, ' + e.Message);
+      UtLog_Execute('TFrIWOrden_Produccion.Localizar_Registro, ' + e.Message);
   End;
 End;
 
-procedure TFrIWMovto_Inventario.BTNBUSCARAsyncClick(Sender: TObject;  EventParams: TStringList);
+procedure TFrIWOrden_Produccion.BTNBUSCARAsyncClick(Sender: TObject;  EventParams: TStringList);
 Var
   lBusqueda : TBusqueda_Ercol_WjQDBGrid;
 begin
   Try
     If Vacio(DATO.Text) Then
     Begin
-      Buscar_Info(Id_TBL_Movto_Inventario, Localizar_Registro);
+      Buscar_Info(Id_TBL_Orden_Produccion, Localizar_Registro);
     End
     Else
     Begin
@@ -791,25 +704,20 @@ begin
   End;
 end;
 
-procedure TFrIWMovto_Inventario.BTNNOMBREAsyncClick(Sender: TObject; EventParams: TStringList);
+procedure TFrIWOrden_Produccion.BTNNOMBREAsyncClick(Sender: TObject; EventParams: TStringList);
 begin
   Try
     If FQRMAESTRO.Mode_Edition Then
     Begin
-      WebApplication.ShowPrompt('Ingrese el nombre del Movimiento', Self.Name + '.Resultado_Nombre', 'Nombre', FQRMAESTRO.QR.FieldByName('NOMBRE').AsString);
+      WebApplication.ShowPrompt('Ingrese el nombre del Orden_Produccion', Self.Name + '.Resultado_Nombre', 'Nombre', FQRMAESTRO.QR.FieldByName('NOMBRE').AsString);
     End;
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWMovto_Inventario.BTNNOMBREAsyncClick, ' + e.Message);
+      UtLog_Execute('TFrIWOrden_Produccion.BTNNOMBREAsyncClick, ' + e.Message);
   End;
 end;
 
-procedure TFrIWMovto_Inventario.BTNOPAsyncClick(Sender: TObject; EventParams: TStringList);
-begin
-  Buscar_Info(Id_TBL_Orden_Produccion, Resultado_Orden_Produccion);
-end;
-
-procedure TFrIWMovto_Inventario.BTNFECHA_VENCIMIENTOAsyncClick(Sender: TObject; EventParams: TStringList);
+procedure TFrIWOrden_Produccion.BTNFECHA_VENCIMIENTOAsyncClick(Sender: TObject; EventParams: TStringList);
 begin
   Try
     If FQRMAESTRO.Mode_Edition Then
@@ -818,11 +726,11 @@ begin
     End;
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWMovto_Inventario.BTNFECHA_VENCIMIENTOAsyncClick, ' + e.Message);
+      UtLog_Execute('TFrIWOrden_Produccion.BTNFECHA_VENCIMIENTOAsyncClick, ' + e.Message);
   End;
 end;
 
-procedure TFrIWMovto_Inventario.BTNCANTIDADAsyncClick(Sender: TObject; EventParams: TStringList);
+procedure TFrIWOrden_Produccion.BTNCANTIDADAsyncClick(Sender: TObject; EventParams: TStringList);
 begin
   Try
     If FQRMAESTRO.Mode_Edition Then
@@ -831,54 +739,54 @@ begin
     End;
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWMovto_Inventario.BTNCANTIDADAsyncClick, ' + e.Message);
+      UtLog_Execute('TFrIWOrden_Produccion.BTNCANTIDADAsyncClick, ' + e.Message);
   End;
 end;
 
-procedure TFrIWMovto_Inventario.BTNCODIGO_AREAAsyncClick(Sender: TObject; EventParams: TStringList);
+procedure TFrIWOrden_Produccion.BTNCODIGO_PROYECTOAsyncClick(Sender: TObject; EventParams: TStringList);
 begin
-  Buscar_Info(Id_TBL_Area, Resultado_Area);
+  Buscar_Info(Id_TBL_Proyecto, Resultado_Proyecto);
 end;
 
-procedure TFrIWMovto_Inventario.BTNCODIGO_PRODUCTOAsyncClick(Sender: TObject; EventParams: TStringList);
+procedure TFrIWOrden_Produccion.BTNCODIGO_PRODUCTOAsyncClick(Sender: TObject; EventParams: TStringList);
 begin
   Buscar_Info(Id_TBL_Producto, Resultado_Producto);
 end;
 
-procedure TFrIWMovto_Inventario.BTNCODIGO_TERCEROAsyncClick(Sender: TObject; EventParams: TStringList);
+procedure TFrIWOrden_Produccion.BTNCODIGO_TERCEROAsyncClick(Sender: TObject; EventParams: TStringList);
 begin
   Buscar_Info(Id_TBL_Tercero, Resultado_Tercero);
 end;
 
-procedure TFrIWMovto_Inventario.BTNCREARAREAAsyncClick(Sender: TObject; EventParams: TStringList);
+procedure TFrIWOrden_Produccion.BTNCREARPROYECTOAsyncClick(Sender: TObject; EventParams: TStringList);
 begin
-  Mostrar_BasicData(Id_TBL_Area, 'Ingreso del Area', 'Código', 'CODIGO_AREA', 'Nombre' , 'NOMBRE', 'CODIGO_AREA', Resultado_BasicData);
+  Mostrar_BasicData(Id_TBL_Proyecto, 'Ingreso del Proyecto', 'Código', 'CODIGO_PROYECTO', 'Nombre' , 'NOMBRE', 'CODIGO_PROYECTO', Resultado_BasicData);
 end;
 
-procedure TFrIWMovto_Inventario.BTNCREARPRODUCTOAsyncClick(Sender: TObject; EventParams: TStringList);
+procedure TFrIWOrden_Produccion.BTNCREARPRODUCTOAsyncClick(Sender: TObject; EventParams: TStringList);
 begin
   Mostrar_BasicData(Id_TBL_Producto, 'Ingreso del Producto', 'Codigo', 'CODIGO_PRODUCTO', 'Nombre' , 'NOMBRE', 'CODIGO_PRODUCTO', Resultado_BasicData);
 end;
 
-procedure TFrIWMovto_Inventario.BTNCREARTERCEROAsyncClick(Sender: TObject; EventParams: TStringList);
+procedure TFrIWOrden_Produccion.BTNCREARTERCEROAsyncClick(Sender: TObject; EventParams: TStringList);
 begin
   Mostrar_BasicData(Id_TBL_Tercero, 'Ingreso del Tercero', 'Identificación', 'CODIGO_TERCERO', 'Nombre' , 'NOMBRE', 'CODIGO_TERCERO', Resultado_BasicData);
 end;
 
-procedure TFrIWMovto_Inventario.BTNDESCRIPCIONAsyncClick(Sender: TObject; EventParams: TStringList);
+procedure TFrIWOrden_Produccion.BTNDESCRIPCIONAsyncClick(Sender: TObject; EventParams: TStringList);
 begin
   Try
     If FQRMAESTRO.Mode_Edition Then
     Begin
-      WebApplication.ShowPrompt('Ingrese el descripcion del Movimiento', Self.Name + '.Resultado_Descripcion', 'Descripcion', FQRMAESTRO.QR.FieldByName('DESCRIPCION').AsString);
+      WebApplication.ShowPrompt('Ingrese el descripcion de la orden produccion', Self.Name + '.Resultado_Descripcion', 'Descripcion', FQRMAESTRO.QR.FieldByName('DESCRIPCION').AsString);
     End;
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWMovto_Inventario.BTNDESCRIPCIONAsyncClick, ' + e.Message);
+      UtLog_Execute('TFrIWOrden_Produccion.BTNDESCRIPCIONAsyncClick, ' + e.Message);
   End;
 end;
 
-procedure TFrIWMovto_Inventario.BTNDIRECCIONAsyncClick(Sender: TObject; EventParams: TStringList);
+procedure TFrIWOrden_Produccion.BTNDIRECCIONAsyncClick(Sender: TObject; EventParams: TStringList);
 Var
   ltmp : String;
 begin
@@ -890,11 +798,11 @@ begin
     End;
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWMovto_Inventario.BTNDIRECCIONAsyncClick, ' + e.Message);
+      UtLog_Execute('TFrIWOrden_Produccion.BTNDIRECCIONAsyncClick, ' + e.Message);
   End;
 end;
 
-procedure TFrIWMovto_Inventario.BTNEMAILAsyncClick(Sender: TObject; EventParams: TStringList);
+procedure TFrIWOrden_Produccion.BTNEMAILAsyncClick(Sender: TObject; EventParams: TStringList);
 begin
   Try
     If FQRMAESTRO.Mode_Edition Then
@@ -903,12 +811,12 @@ begin
     End;
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWMovto_Inventario.BTNEMAILAsyncClick, ' + e.Message);
+      UtLog_Execute('TFrIWOrden_Produccion.BTNEMAILAsyncClick, ' + e.Message);
   End;
 end;
 
 
-procedure TFrIWMovto_Inventario.BtnGridAsyncClick(Sender: TObject; EventParams: TStringList);
+procedure TFrIWOrden_Produccion.BtnGridAsyncClick(Sender: TObject; EventParams: TStringList);
 begin
   UserSession.ShowForm_Perfil_Enc(FQRMAESTRO.QR.FieldByName('CODIGO_PERFIL').AsString);
 end;

@@ -397,9 +397,10 @@ begin
   Self.Name := gInfo_Tablas[Id_TBL_Administrador_Documento].Name + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000) );
   FINFO := UserSession.FULL_INFO + gInfo_Tablas[Id_TBL_Administrador_Documento].Caption;
   FCNX := UserSession.CNX;
-  CODIGO_DOCUMENTO.Items.Add(UserSession.DOCUMENTO_INVENTARIO_ENTRADA   );
-  CODIGO_DOCUMENTO.Items.Add(UserSession.DOCUMENTO_INVENTARIO_SALIDA    );
-  CODIGO_DOCUMENTO.Items.Add(UserSession.DOCUMENTO_INVENTARIO_DEVOLUCION);
+  CODIGO_DOCUMENTO.Items.Add(UserSession.DOCUMENTO_ENTRADA_DE_INVENTARIO   );
+  CODIGO_DOCUMENTO.Items.Add(UserSession.DOCUMENTO_SALIDA_DE_INVENTARIO    );
+  CODIGO_DOCUMENTO.Items.Add(UserSession.DOCUMENTO_DEVOLUCION_AL_INVENTARIO);
+  CODIGO_DOCUMENTO.Items.Add(UserSession.DOCUMENTO_ORDEN_DE_PRODUCCION     );
   WebApplication.RegisterCallBack(Self.Name + '.Resultado_Codigo'           , Resultado_Codigo           );
   WebApplication.RegisterCallBack(Self.Name + '.Resultado_Nombre'           , Resultado_Nombre           );
   WebApplication.RegisterCallBack(Self.Name + '.Resultado_Documento_Inicial', Resultado_Documento_Inicial);

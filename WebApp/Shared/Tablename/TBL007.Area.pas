@@ -23,7 +23,7 @@ Begin
       pCnx.TMP.SQL.Clear;
       pCnx.TMP.SQL.Add('   CREATE TABLE ' + gInfo_Tablas[Id_TBL_Area].Name + ' '                        );
       pCnx.TMP.SQL.Add('   (  '                                                                         );
-      pCnx.TMP.SQL.Add('      CODIGO_AREA ' + pCNX.Return_Type(TYPE_VARCHAR) + ' (006) ' + ' NOT NULL, ');
+      pCnx.TMP.SQL.Add('      CODIGO_AREA ' + pCNX.Return_Type(TYPE_VARCHAR) + ' (010) ' + ' NOT NULL, ');
       pCnx.TMP.SQL.Add('      NOMBRE '      + pCNX.Return_Type(TYPE_VARCHAR) + ' (255) ' + ' NULL, '    );
       pCnx.TMP.SQL.Add('      DESCRIPCION ' + pCNX.Return_Type(TYPE_TEXT   ) + ' '       + ' NULL, '    );
       pCnx.TMP.SQL.Add('      ID_ACTIVO '   + pCNX.Return_Type(TYPE_VARCHAR) + ' (001) ' + ' NULL, '    );

@@ -25,8 +25,11 @@ Begin
       pCnx.TMP.SQL.Add('   (  '                                                                             );
       pCnx.TMP.SQL.Add('      CODIGO_PRODUCTO ' + pCNX.Return_Type(TYPE_VARCHAR) + ' (020) ' + ' NOT NULL, ');
       pCnx.TMP.SQL.Add('      NOMBRE '          + pCNX.Return_Type(TYPE_VARCHAR) + ' (255) ' + ' NULL, '    );
+      pCnx.TMP.SQL.Add('      UNIDAD_MEDIDA '   + pCNX.Return_Type(TYPE_VARCHAR) + ' (050) ' + ' NULL, '    );
       pCnx.TMP.SQL.Add('      DESCRIPCION '     + pCNX.Return_Type(TYPE_TEXT   ) + ' '       + ' NULL, '    );
+      pCnx.TMP.SQL.Add('      VALOR_UNITARIO '  + pCNX.Return_Type(TYPE_FLOAT  ) + ' '       + ' NULL, '    );
       pCnx.TMP.SQL.Add('      STOCK_MINIMO '    + pCNX.Return_Type(TYPE_FLOAT  ) + ' '       + ' NULL, '    );
+      pCnx.TMP.SQL.Add('      STOCK_MAXIMO '    + pCNX.Return_Type(TYPE_FLOAT  ) + ' '       + ' NULL, '    );
       pCnx.TMP.SQL.Add('      ID_ACTIVO '       + pCNX.Return_Type(TYPE_VARCHAR) + ' (001) ' + ' NULL, '    );
       pCnx.TMP.SQL.Add('      TAG_INFO  '       + pCNX.Return_Type(TYPE_INT    ) + ' '       + ' NULL, '    );
       pCnx.TMP.SQL.Add('      PRIMARY KEY (CODIGO_PRODUCTO) '                                + '  '         );

@@ -33,6 +33,7 @@ Begin
       pCnx.TMP.SQL.Add('      EMAIL '          + pCNX.Return_Type(TYPE_VARCHAR) + ' (255)  ' + ' NULL, '    );
       pCnx.TMP.SQL.Add('      ID_CLIENTE '     + pCNX.Return_Type(TYPE_VARCHAR) + ' (001)  ' + ' NULL, '    );
       pCnx.TMP.SQL.Add('      ID_PROVEEDOR '   + pCNX.Return_Type(TYPE_VARCHAR) + ' (001)  ' + ' NULL, '    );
+      pCnx.TMP.SQL.Add('      ID_EMPLEADO '    + pCNX.Return_Type(TYPE_VARCHAR) + ' (001)  ' + ' NULL, '    );
       pCnx.TMP.SQL.Add('      CONTRASENA '     + pCNX.Return_Type(TYPE_VARCHAR) + ' (100)  ' + ' NULL, '    );
       pCnx.TMP.SQL.Add('      ID_ACTIVO '      + pCNX.Return_Type(TYPE_VARCHAR) + ' (001)  ' + ' NULL, '    );
       pCnx.TMP.SQL.Add('      TAG_INFO '       + pCNX.Return_Type(TYPE_INT    ) + ' '        + ' NULL, '    );

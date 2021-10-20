@@ -18,12 +18,14 @@ Const
   CONST_OPCION_ADMINISTRACION_DE_DOCUMENTOS   = 0011;
   CONST_OPCION_AREA                           = 0012;
   CONST_OPCION_PROCESO                        = 0013;
-  CONST_OPCION_TERCERO                        = 0014;
-  CONST_OPCION_PRODUCTO                       = 0015;
-  CONST_OPCION_INVENTARIO_ENTRADA             = 0016;
-  CONST_OPCION_INVENTARIO_SALIDA              = 0017;
-  CONST_OPCION_INVENTARIO_DEVOLUCION          = 0018;
-  CONST_OPCION_SALIR                          = 0019;
+  CONST_OPCION_PROYECTO                       = 0014;
+  CONST_OPCION_TERCERO                        = 0015;
+  CONST_OPCION_PRODUCTO                       = 0016;
+  CONST_OPCION_ORDEN_PRODUCCION               = 0017;
+  CONST_OPCION_INVENTARIO_ENTRADA             = 0018;
+  CONST_OPCION_INVENTARIO_SALIDA              = 0019;
+  CONST_OPCION_INVENTARIO_DEVOLUCION          = 0020;
+  CONST_OPCION_SALIR                          = 0021;
 
 Type
   TItem_App = Class
@@ -116,8 +118,10 @@ Begin
                          CONST_OPCION_ADMINISTRACION_DE_DOCUMENTOS,
                          CONST_OPCION_AREA,
                          CONST_OPCION_PROCESO,
+                         CONST_OPCION_PROYECTO,
                          CONST_OPCION_TERCERO,
                          CONST_OPCION_PRODUCTO,
+                         CONST_OPCION_ORDEN_PRODUCCION,
                          CONST_OPCION_INVENTARIO_ENTRADA,
                          CONST_OPCION_INVENTARIO_SALIDA,
                          CONST_OPCION_INVENTARIO_DEVOLUCION,
@@ -186,6 +190,8 @@ Begin
   Add(CONST_OPCION_PROCESO                     , 'OPCION_PROCESO'                     );
   Add(CONST_OPCION_TERCERO                     , 'OPCION_TERCERO'                     );
   Add(CONST_OPCION_PRODUCTO                    , 'OPCION_PRODUCTO'                    );
+  Add(CONST_OPCION_PROYECTO                    , 'OPCION_PROYECTO'                    );
+  Add(CONST_OPCION_ORDEN_PRODUCCION            , 'OPCION_ORDEN_PRODUCCION'            );
   Add(CONST_OPCION_INVENTARIO_ENTRADA          , 'OPCION_INVENTARIO_ENTRADA'          );
   Add(CONST_OPCION_INVENTARIO_SALIDA           , 'OPCION_INVENTARIO_SALIDA'           );
   Add(CONST_OPCION_INVENTARIO_DEVOLUCION       , 'OPCION_INVENTARIO_DEVOLUCION'       );

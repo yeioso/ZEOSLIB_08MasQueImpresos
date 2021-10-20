@@ -39,6 +39,15 @@ type
     IWLabel11: TIWLabel;
     BTNSTOCK_MINIMO: TIWImage;
     STOCK_MINIMO: TIWDBLabel;
+    IWLabel3: TIWLabel;
+    BTNSTOCK_MAXIMO: TIWImage;
+    STOCK_MAXIMO: TIWDBLabel;
+    IWLabel4: TIWLabel;
+    BTNVALOR_UNITARIO: TIWImage;
+    VALOR_UNITARIO: TIWDBLabel;
+    IWLabel5: TIWLabel;
+    BTNUNIDAD_MEDIDA: TIWImage;
+    UNIDAD_MEDIDA: TIWDBLabel;
     procedure BTNBACKAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure IWAppFormCreate(Sender: TObject);
     procedure IWAppFormDestroy(Sender: TObject);
@@ -49,8 +58,10 @@ type
     procedure BTNNOMBREAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNDESCRIPCIONAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNACTIVOAsyncClick(Sender: TObject; EventParams: TStringList);
-    procedure BTNSTOCK_MINIMOAsyncClick(Sender: TObject;
-      EventParams: TStringList);
+    procedure BTNSTOCK_MINIMOAsyncClick(Sender: TObject; EventParams: TStringList);
+    procedure BTNUNIDAD_MEDIDAAsyncClick(Sender: TObject; EventParams: TStringList);
+    procedure BTNSTOCK_MAXIMOAsyncClick(Sender: TObject; EventParams: TStringList);
+    procedure BTNVALOR_UNITARIOAsyncClick(Sender: TObject; EventParams: TStringList);
   private
     FCNX : TConexion;
     FINFO : String;
@@ -70,7 +81,10 @@ type
     procedure Resultado_Codigo(EventParams: TStringList);
     procedure Resultado_Nombre(EventParams: TStringList);
     procedure Resultado_Descripcion(EventParams: TStringList);
+    procedure Resultado_Unidad_Medida(EventParams: TStringList);
+    procedure Resultado_Valor_Unitario(EventParams: TStringList);
     procedure Resultado_Stock_Minimo(EventParams: TStringList);
+    procedure Resultado_Stock_Maximo(EventParams: TStringList);
     procedure Resultado_Activo(EventParams: TStringList);
 
     Function Documento_Activo : Boolean;
@@ -192,6 +206,32 @@ Begin
   End;
 End;
 
+procedure TFrIWProducto.Resultado_Unidad_Medida(EventParams: TStringList);
+Begin
+  Try
+    If FQRMAESTRO.Mode_Edition And (Result_Is_OK(EventParams.Values['RetValue'])) Then
+    Begin
+      FQRMAESTRO.QR.FieldByName('UNIDAD_MEDIDA').AsString := AnsiUpperCase(Trim(EventParams.Values['InputStr']));
+    End;
+  Except
+    On E: Exception Do
+      UtLog_Execute('TFrIWProducto.Resultado_Unidad_Medida, ' + e.Message);
+  End;
+End;
+
+procedure TFrIWProducto.Resultado_Valor_Unitario(EventParams: TStringList);
+Begin
+  Try
+    If FQRMAESTRO.Mode_Edition And (Result_Is_OK(EventParams.Values['RetValue'])) Then
+    Begin
+      FQRMAESTRO.QR.FieldByName('VALOR_UNITARIO').AsFloat := SetToFloat(EventParams.Values['InputStr']);
+    End;
+  Except
+    On E: Exception Do
+      UtLog_Execute('TFrIWProducto.Resultado_Valor_Unitario, ' + e.Message);
+  End;
+End;
+
 procedure TFrIWProducto.Resultado_Stock_Minimo(EventParams: TStringList);
 Begin
   Try
@@ -202,6 +242,19 @@ Begin
   Except
     On E: Exception Do
       UtLog_Execute('TFrIWProducto.Resultado_Stock_Minimo, ' + e.Message);
+  End;
+End;
+
+procedure TFrIWProducto.Resultado_Stock_Maximo(EventParams: TStringList);
+Begin
+  Try
+    If FQRMAESTRO.Mode_Edition And (Result_Is_OK(EventParams.Values['RetValue'])) Then
+    Begin
+      FQRMAESTRO.QR.FieldByName('STOCK_MAXIMO').AsFloat := SetToFloat(EventParams.Values['InputStr']);
+    End;
+  Except
+    On E: Exception Do
+      UtLog_Execute('TFrIWProducto.Resultado_Stock_Maximo, ' + e.Message);
   End;
 End;
 
@@ -260,14 +313,17 @@ end;
 
 Procedure TFrIWProducto.Estado_Controles;
 Begin
-  BTNCODIGO.Visible       := (FQRMAESTRO.DS.State In [dsInsert]) And Documento_Activo;
-  BTNNOMBRE.Visible       := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  BTNDESCRIPCION.Visible  := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  BTNSTOCK_MINIMO.Visible := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  BTNACTIVO.Visible       := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  DATO.Visible            := (Not FQRMAESTRO.Mode_Edition);
-  PAG_00.Visible          := (Not FQRMAESTRO.Mode_Edition);
-  PAG_01.Visible          := True;
+  BTNCODIGO.Visible         := (FQRMAESTRO.DS.State In [dsInsert]) And Documento_Activo;
+  BTNNOMBRE.Visible         := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  BTNDESCRIPCION.Visible    := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  BTNUNIDAD_MEDIDA.Visible  := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  BTNVALOR_UNITARIO.Visible := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  BTNSTOCK_MINIMO.Visible   := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  BTNSTOCK_MAXIMO.Visible   := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  BTNACTIVO.Visible         := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  DATO.Visible              := (Not FQRMAESTRO.Mode_Edition);
+  PAG_00.Visible            := (Not FQRMAESTRO.Mode_Edition);
+  PAG_01.Visible            := True;
 End;
 
 Procedure TFrIWProducto.SetLabel;
@@ -367,11 +423,14 @@ begin
   Randomize;
   Self.Name := gInfo_Tablas[Id_TBL_Producto].Name + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000) );
   FCNX := UserSession.CNX;
-  WebApplication.RegisterCallBack(Self.Name + '.Resultado_Codigo'      , Resultado_Codigo      );
-  WebApplication.RegisterCallBack(Self.Name + '.Resultado_Nombre'      , Resultado_Nombre      );
-  WebApplication.RegisterCallBack(Self.Name + '.Resultado_Descripcion' , Resultado_Descripcion );
-  WebApplication.RegisterCallBack(Self.Name + '.Resultado_Stock_Minimo', Resultado_Stock_Minimo);
-  WebApplication.RegisterCallBack(Self.Name + '.Resultado_Activo'      , Resultado_Activo      );
+  WebApplication.RegisterCallBack(Self.Name + '.Resultado_Codigo'        , Resultado_Codigo        );
+  WebApplication.RegisterCallBack(Self.Name + '.Resultado_Nombre'        , Resultado_Nombre        );
+  WebApplication.RegisterCallBack(Self.Name + '.Resultado_Descripcion'   , Resultado_Descripcion   );
+  WebApplication.RegisterCallBack(Self.Name + '.Resultado_Unidad_Medida' , Resultado_Unidad_Medida );
+  WebApplication.RegisterCallBack(Self.Name + '.Resultado_Valor_Unitario', Resultado_Valor_Unitario);
+  WebApplication.RegisterCallBack(Self.Name + '.Resultado_Stock_Minimo'  , Resultado_Stock_Minimo  );
+  WebApplication.RegisterCallBack(Self.Name + '.Resultado_Stock_Maximo'  , Resultado_Stock_Maximo  );
+  WebApplication.RegisterCallBack(Self.Name + '.Resultado_Activo'        , Resultado_Activo        );
   Try
     FGRID_MAESTRO        := TGRID_JQ.Create(PAG_00);
     FGRID_MAESTRO.Parent := PAG_00;
@@ -390,7 +449,10 @@ begin
     CODIGO_Producto.DataSource := FQRMAESTRO.DS;
     NOMBRE.DataSource               := FQRMAESTRO.DS;
     DESCRIPCION.DataSource          := FQRMAESTRO.DS;
+    UNIDAD_MEDIDA.DataSource        := FQRMAESTRO.DS;
+    VALOR_UNITARIO.DataSource       := FQRMAESTRO.DS;
     STOCK_MINIMO.DataSource         := FQRMAESTRO.DS;
+    STOCK_MAXIMO.DataSource         := FQRMAESTRO.DS;
 
     FGRID_MAESTRO.SetGrid(FQRMAESTRO.DS, ['CODIGO_PRODUCTO', 'NOMBRE'     ],
                                          ['Código'         , 'Nombre'     ],
@@ -509,6 +571,19 @@ begin
   End;
 end;
 
+procedure TFrIWProducto.BTNNOMBREAsyncClick(Sender: TObject; EventParams: TStringList);
+begin
+  Try
+    If FQRMAESTRO.Mode_Edition Then
+    Begin
+      WebApplication.ShowPrompt('Ingrese el nombre del Producto', Self.Name + '.Resultado_Nombre', 'Nombre', FQRMAESTRO.QR.FieldByName('NOMBRE').AsString);
+    End;
+  Except
+    On E: Exception Do
+      UtLog_Execute('TFrIWProducto.BTNNOMBREAsyncClick, ' + e.Message);
+  End;
+end;
+
 procedure TFrIWProducto.BTNDESCRIPCIONAsyncClick(Sender: TObject; EventParams: TStringList);
 Var
   ltmp : String;
@@ -525,16 +600,30 @@ begin
   End;
 end;
 
-procedure TFrIWProducto.BTNNOMBREAsyncClick(Sender: TObject; EventParams: TStringList);
+procedure TFrIWProducto.BTNUNIDAD_MEDIDAAsyncClick(Sender: TObject; EventParams: TStringList);
 begin
   Try
     If FQRMAESTRO.Mode_Edition Then
     Begin
-      WebApplication.ShowPrompt('Ingrese el nombre del Producto', Self.Name + '.Resultado_Nombre', 'Nombre', FQRMAESTRO.QR.FieldByName('NOMBRE').AsString);
+      WebApplication.ShowPrompt('Ingrese la unidad de medida', Self.Name + '.Resultado_Unidad_Medida', 'Unidad de Medida', FQRMAESTRO.QR.FieldByName('UNIDAD_MEDIDA').AsString);
     End;
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWProducto.BTNNOMBREAsyncClick, ' + e.Message);
+      UtLog_Execute('TFrIWProducto.BTNUNIDAD_MEDIDAAsyncClick, ' + e.Message);
+  End;
+end;
+
+
+procedure TFrIWProducto.BTNVALOR_UNITARIOAsyncClick(Sender: TObject; EventParams: TStringList);
+begin
+  Try
+    If FQRMAESTRO.Mode_Edition Then
+    Begin
+      WebApplication.ShowPrompt('Ingrese el valor unitario del producto', Self.Name + '.Resultado_Valor_Unitario', 'Stock Minimo', FQRMAESTRO.QR.FieldByName('VALOR_UNITARIO').AsString);
+    End;
+  Except
+    On E: Exception Do
+      UtLog_Execute('TFrIWProducto.BTNVALOR_UNITARIOAsyncClick, ' + e.Message);
   End;
 end;
 
@@ -550,5 +639,20 @@ begin
       UtLog_Execute('TFrIWProducto.BTNSTOCK_MINIMOAsyncClick, ' + e.Message);
   End;
 end;
+
+procedure TFrIWProducto.BTNSTOCK_MAXIMOAsyncClick(Sender: TObject; EventParams: TStringList);
+begin
+  Try
+    If FQRMAESTRO.Mode_Edition Then
+    Begin
+      WebApplication.ShowPrompt('Ingrese el stock maximo del Producto', Self.Name + '.Resultado_Stock_Maximo', 'Stock Maximo', FQRMAESTRO.QR.FieldByName('STOCK_MAXIMO').AsString);
+    End;
+  Except
+    On E: Exception Do
+      UtLog_Execute('TFrIWProducto.BTNSTOCK_MAXIMOAsyncClick, ' + e.Message);
+  End;
+end;
+
+
 
 end.

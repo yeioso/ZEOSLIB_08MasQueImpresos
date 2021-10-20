@@ -42,6 +42,8 @@ Uses
   Form_IWProceso,
   Form_IWTercero_Enc,
   Form_IWProducto,
+  Form_IWProyecto,
+  Form_IWOrden_Produccion,
   Form_IWMovto_Inventario,
 
   IWBaseComponent,
@@ -68,6 +70,8 @@ Type
     FProceso                    : TFrIWProceso;
     FTercero                    : TFrIWTercero_Enc;
     FProducto                   : TFrIWProducto;
+    FProyecto                   : TFrIWProyecto;
+    FOrden_Produccion           : TFrIWOrden_Produccion;
     FMovto_Inventario           : TFrIWMovto_Inventario;
 
     FCNX                        : TConexion    ;
@@ -98,9 +102,10 @@ Type
     { Public declarations }
     Const COLOR_OK = cl3DLight;
     Const COLOR_ERROR = IWColor.clWebAQUA;
-    Const DOCUMENTO_INVENTARIO_ENTRADA    = 'INVENTARIO ENTRADA';
-    Const DOCUMENTO_INVENTARIO_SALIDA     = 'INVENTARIO SALIDA';
-    Const DOCUMENTO_INVENTARIO_DEVOLUCION = 'INVENTARIO DEVOLUCION';
+    Const DOCUMENTO_ENTRADA_DE_INVENTARIO    = 'ENTRADA DE INVENTARIO'   ;
+    Const DOCUMENTO_SALIDA_DE_INVENTARIO     = 'SALIDA DE INVENTARIO'    ;
+    Const DOCUMENTO_DEVOLUCION_AL_INVENTARIO = 'DEVOLUCION AL INVENTARIO';
+    Const DOCUMENTO_ORDEN_DE_PRODUCCION      = 'ORDEN DE PRODUCCION'     ;
     Property CNX                        : TConexion     Read FCNX                    Write FCNX;
     Property DB                         : TDB           Read FDB                    ;
     Property RESUMEN                    : TStringList   Read FRESUMEN               ;
@@ -138,6 +143,8 @@ Type
     Procedure ShowForm_Proceso;
     Procedure ShowForm_Tercero;
     Procedure ShowForm_Producto;
+    Procedure ShowForm_Proyecto;
+    Procedure ShowForm_Orden_Produccion(Const pCodigo_Documento : String);
     Procedure ShowForm_Movto_Inventario(Const pCodigo_Documento : String);
 
     Procedure Update_Menu;
@@ -314,6 +321,18 @@ Procedure TIWUserSession.ShowForm_Producto;
 Begin
   FProducto := TFrIWProducto.Create(WebApplication);
   FProducto.Show;
+End;
+
+Procedure TIWUserSession.ShowForm_Proyecto;
+Begin
+  FProyecto := TFrIWProyecto.Create(WebApplication);
+  FProyecto.Show;
+End;
+
+Procedure TIWUserSession.ShowForm_Orden_Produccion(Const pCodigo_Documento : String);
+Begin
+  FOrden_Produccion := TFrIWOrden_Produccion.Create(WebApplication, pCodigo_Documento);
+  FOrden_Produccion.Show;
 End;
 
 Procedure TIWUserSession.ShowForm_Movto_Inventario(Const pCodigo_Documento : String);
