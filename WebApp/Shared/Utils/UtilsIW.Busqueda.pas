@@ -82,25 +82,15 @@ begin
                                           Self.SIZE_ORIGEN      := [0000000000000100         , 00000550                ];
                                           Self.CAMPOS_DESTINO   := ['CODIGO_AREA'];
                                         End;
-      Id_TBL_Proceso                  : Begin
+      Id_TBL_Unidad_Medida            : Begin
                                           Self.TABLA            := gInfo_Tablas[pId].Name;
                                           Self.TITULO_ORIGEN    := ['Código'                 , 'Nombre'                ];
-                                          Self.CAMPOS_ORIGEN    := ['CODIGO_PROCESO'         , 'NOMBRE'                ];
-                                          Self.CAMPOS_LIKE      := ['CODIGO_PROCESO'         , 'NOMBRE'                ];
+                                          Self.CAMPOS_ORIGEN    := ['CODIGO_UNIDAD_MEDIDA'   , 'NOMBRE'                ];
+                                          Self.CAMPOS_LIKE      := ['CODIGO_UNIDAD_MEDIDA'   , 'NOMBRE'                ];
                                           Self.CAMPOS_ID        := ['S'                      , 'N'                     ];
                                           Self.CAMPOS_ALIGNMENT := [TAlignment.taRightJustify, TAlignment.taLeftJustify];
                                           Self.SIZE_ORIGEN      := [0000000000000100         , 00000550                ];
-                                          Self.CAMPOS_DESTINO   := ['CODIGO_PROCESO'];
-                                        End;
-      Id_TBL_Tercero                  : Begin
-                                          Self.TABLA            := gInfo_Tablas[pId].Name;
-                                          Self.TITULO_ORIGEN    := ['Código'                 , 'Nombre'                ];
-                                          Self.CAMPOS_ORIGEN    := ['CODIGO_TERCERO'         , 'NOMBRE'                ];
-                                          Self.CAMPOS_LIKE      := ['CODIGO_TERCERO'         , 'NOMBRE'                ];
-                                          Self.CAMPOS_ID        := ['S'                      , 'N'                     ];
-                                          Self.CAMPOS_ALIGNMENT := [TAlignment.taRightJustify, TAlignment.taLeftJustify];
-                                          Self.SIZE_ORIGEN      := [0000000000000150         , 00000450                ];
-                                          Self.CAMPOS_DESTINO   := ['CODIGO_TERCERO'];
+                                          Self.CAMPOS_DESTINO   := ['CODIGO_UNIDAD_MEDIDA'];
                                         End;
       Id_TBL_Producto                 : Begin
                                           Self.TABLA            := gInfo_Tablas[pId].Name;
@@ -111,6 +101,16 @@ begin
                                           Self.CAMPOS_ALIGNMENT := [TAlignment.taRightJustify, TAlignment.taLeftJustify];
                                           Self.SIZE_ORIGEN      := [0000000000000150         , 00000450                ];
                                           Self.CAMPOS_DESTINO   := ['CODIGO_PRODUCTO'];
+                                        End;
+      Id_TBL_Tercero                  : Begin
+                                          Self.TABLA            := gInfo_Tablas[pId].Name;
+                                          Self.TITULO_ORIGEN    := ['Código'                 , 'Nombre'                ];
+                                          Self.CAMPOS_ORIGEN    := ['CODIGO_TERCERO'         , 'NOMBRE'                ];
+                                          Self.CAMPOS_LIKE      := ['CODIGO_TERCERO'         , 'NOMBRE'                ];
+                                          Self.CAMPOS_ID        := ['S'                      , 'N'                     ];
+                                          Self.CAMPOS_ALIGNMENT := [TAlignment.taRightJustify, TAlignment.taLeftJustify];
+                                          Self.SIZE_ORIGEN      := [0000000000000150         , 00000450                ];
+                                          Self.CAMPOS_DESTINO   := ['CODIGO_TERCERO'];
                                         End;
       Id_TBL_Proyecto                 : Begin
                                           Self.TABLA            := gInfo_Tablas[pId].Name;

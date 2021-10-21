@@ -1,10 +1,10 @@
-unit TBL009.Tercero;
+unit TBL010.Tercero;
 
 interface
 Uses
   UtConexion;
 
-Function TBL009_Tercero_Create(pCnx : TConexion) : Boolean;
+Function TBL010_Tercero_Create(pCnx : TConexion) : Boolean;
 
 implementation
 
@@ -14,7 +14,7 @@ Uses
   SysUtils,
   TBL000.Info_Tabla;
 
-Function TBL009_Tercero_Create(pCnx : TConexion) : Boolean;
+Function TBL010_Tercero_Create(pCnx : TConexion) : Boolean;
 Begin
   Result := True;
 
@@ -44,7 +44,7 @@ Begin
       On E: Exception Do
       Begin
         Result := False;
-        UtLog_Execute(MessageError(IE_ERROR_CREATE) + ' Tabla ' + gInfo_Tablas[Id_TBL_Tercero].Name + ', TBL009_Tercero_Create, ' + E.Message);
+        UtLog_Execute(MessageError(IE_ERROR_CREATE) + ' Tabla ' + gInfo_Tablas[Id_TBL_Tercero].Name + ', TBL010_Tercero_Create, ' + E.Message);
       End;
     End;
   End;

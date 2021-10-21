@@ -39,7 +39,7 @@ Uses
 
   Form_IWAdministrador_Documento,
   Form_IWArea,
-  Form_IWProceso,
+  Form_IWUnidad_Medida,
   Form_IWTercero_Enc,
   Form_IWProducto,
   Form_IWProyecto,
@@ -67,7 +67,7 @@ Type
 
     FAdministrador_Documento    : TFrIWAdministrador_Documento;
     FArea                       : TFrIWArea;
-    FProceso                    : TFrIWProceso;
+    FUnidad_Medida              : TFrIWUnidad_Medida;
     FTercero                    : TFrIWTercero_Enc;
     FProducto                   : TFrIWProducto;
     FProyecto                   : TFrIWProyecto;
@@ -140,7 +140,7 @@ Type
     Procedure ShowForm_Cambio_Password;
     Procedure ShowForm_Administrador_Documento;
     Procedure ShowForm_Area;
-    Procedure ShowForm_Proceso;
+    Procedure ShowForm_Unidad_Medida;
     Procedure ShowForm_Tercero;
     Procedure ShowForm_Producto;
     Procedure ShowForm_Proyecto;
@@ -305,10 +305,10 @@ Begin
   FArea.Show;
 End;
 
-Procedure TIWUserSession.ShowForm_Proceso;
+Procedure TIWUserSession.ShowForm_Unidad_Medida;
 Begin
-  FProceso := TFrIWProceso.Create(WebApplication);
-  FProceso.Show;
+  FUnidad_Medida := TFrIWUnidad_Medida.Create(WebApplication);
+  FUnidad_Medida.Show;
 End;
 
 Procedure TIWUserSession.ShowForm_Tercero;

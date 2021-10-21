@@ -46,8 +46,15 @@ type
     BTNVALOR_UNITARIO: TIWImage;
     VALOR_UNITARIO: TIWDBLabel;
     IWLabel5: TIWLabel;
-    BTNUNIDAD_MEDIDA: TIWImage;
-    UNIDAD_MEDIDA: TIWDBLabel;
+    CODIGO_UNIDAD_MEDIDA: TIWDBLabel;
+    IWLabel7: TIWLabel;
+    BTNCODIGO_AREA: TIWImage;
+    CODIGO_AREA: TIWDBLabel;
+    BTNCREARAREA: TIWImage;
+    lbNombre_Area: TIWLabel;
+    BTNCODIGO_UNIDAD_MEDIDA: TIWImage;
+    BTNCREARUNIDAD_MEDIDA: TIWImage;
+    lbNombre_Unidad_Medida: TIWLabel;
     procedure BTNBACKAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure IWAppFormCreate(Sender: TObject);
     procedure IWAppFormDestroy(Sender: TObject);
@@ -62,6 +69,12 @@ type
     procedure BTNUNIDAD_MEDIDAAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNSTOCK_MAXIMOAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNVALOR_UNITARIOAsyncClick(Sender: TObject; EventParams: TStringList);
+    procedure BTNCODIGO_AREAAsyncClick(Sender: TObject; EventParams: TStringList);
+    procedure BTNCREARAREAAsyncClick(Sender: TObject; EventParams: TStringList);
+    procedure BTNCODIGO_UNIDAD_MEDIDAAsyncClick(Sender: TObject;
+      EventParams: TStringList);
+    procedure BTNCREARUNIDAD_MEDIDAAsyncClick(Sender: TObject;
+      EventParams: TStringList);
   private
     FCNX : TConexion;
     FINFO : String;
@@ -69,6 +82,10 @@ type
     FNAVEGADOR : TNavegador_ASE;
     FGRID_MAESTRO : TGRID_JQ;
 
+    Procedure Resultado_Area(Sender: TObject; EventParams: TStringList);
+    Procedure Resultado_Unidad_Medida(Sender: TObject; EventParams: TStringList);
+    procedure Resultado_BasicData(Sender: TObject; EventParams: TStringList);
+    procedure Mostrar_BasicData(Const pId : Integer; Const pTitle, pCaptionCode, pFieldCode, pCaptionName, pFieldName, pFieldDestiny : String; pResult : TIWAsyncEvent);
     Procedure Localizar_Registro(Sender: TObject; EventParams: TStringList);
     procedure Buscar_Info(pSD : Integer; pEvent : TIWAsyncEvent);
     Procedure Release_Me;
@@ -81,7 +98,6 @@ type
     procedure Resultado_Codigo(EventParams: TStringList);
     procedure Resultado_Nombre(EventParams: TStringList);
     procedure Resultado_Descripcion(EventParams: TStringList);
-    procedure Resultado_Unidad_Medida(EventParams: TStringList);
     procedure Resultado_Valor_Unitario(EventParams: TStringList);
     procedure Resultado_Stock_Minimo(EventParams: TStringList);
     procedure Resultado_Stock_Maximo(EventParams: TStringList);
@@ -112,7 +128,87 @@ Uses
   System.UITypes,
   System.StrUtils,
   ServerController,
-  TBL000.Info_Tabla;
+  UtIWBasicData_ASE,
+  TBL000.Info_Tabla,
+  Process.Inventario;
+
+Procedure TFrIWProducto.Resultado_Area(Sender: TObject; EventParams: TStringList);
+Begin
+  Try
+    If FQRMAESTRO.Mode_Edition Then
+    Begin
+      FQRMAESTRO.QR.FieldByName('CODIGO_AREA').AsString := EventParams.Values ['CODIGO_AREA' ];
+    End;
+  Except
+   On E: Exception Do
+     UtLog_Execute('TFrIWProducto.Resultado_Area, ' + e.Message);
+  End;
+End;
+
+Procedure TFrIWProducto.Resultado_Unidad_Medida(Sender: TObject; EventParams: TStringList);
+Begin
+  Try
+    If FQRMAESTRO.Mode_Edition Then
+    Begin
+      FQRMAESTRO.QR.FieldByName('CODIGO_UNIDAD_MEDIDA').AsString := EventParams.Values ['CODIGO_UNIDAD_MEDIDA'];
+    End;
+  Except
+   On E: Exception Do
+     UtLog_Execute('TFrIWProducto.Resultado_Unidad_Medida, ' + e.Message);
+  End;
+End;
+
+procedure TFrIWProducto.Resultado_BasicData(Sender: TObject; EventParams: TStringList);
+Var
+  lBD : TBasicData_ASE;
+Begin
+  Try
+    If FQRMAESTRO.Mode_Edition And (IWModalWindow1.ButtonIndex = 1) Then
+    Begin
+       If IWModalWindow1.ContentElement Is TBasicData_ASE Then
+       Begin
+         lBD := (IWModalWindow1.ContentElement As TBasicData_ASE);
+         lBD.VALUECODE := Justificar(lBD.VALUECODE, ' ', FQRMAESTRO.QR.FieldByName(lBD.FIELDCODE).Size);
+         If lBD.FIELDCODE <> 'CODIGO_TERCERO' Then
+           lBD.VALUECODE := Justificar(lBD.VALUECODE, '0', FQRMAESTRO.QR.FieldByName(lBD.FIELDCODE).Size);
+         lBD.VALUECODE := AnsiUpperCase(lBD.VALUECODE);
+         If FCNX.Record_Insert(lBD.TABLENAME, lBD.FIELDCODE, lBD.FIELDNAME, lBD.VALUECODE, lBD.VALUENAME, [],[]) Then
+           FQRMAESTRO.QR.FieldByName(lBD.DESTINY).AsString := lBD.VALUECODE;
+         IWModalWindow1.ContentElement := Nil;
+         lBD.Free;
+       End;
+    End;
+  Except
+    On E: Exception Do
+      UtLog_Execute('TFrIWProducto.Resultado_BasicData, ' + e.Message);
+  End;
+End;
+
+procedure TFrIWProducto.Mostrar_BasicData(Const pId : Integer; Const pTitle, pCaptionCode, pFieldCode, pCaptionName, pFieldName, pFieldDestiny : String; pResult : TIWAsyncEvent);
+Var
+  lRG : TBasicData_ASE;
+begin
+  Try
+    lRG := TBasicData_ASE.Create(Self);
+    lRG.Parent := Self;
+    lRG.SetBasicData(pCaptionCode, pFieldCode, pCaptionName, pFieldName, gInfo_Tablas[pId].Name, pFieldDestiny);
+    IWModalWindow1.Reset;
+    IWModalWindow1.Buttons.CommaText := '&Aceptar,&Cancelar';
+    IWModalWindow1.Title := pTitle;
+    IWModalWindow1.Autosize := False;
+    IWModalWindow1.WindowWidth := lRG.Width + 20;
+    IWModalWindow1.WindowHeight := lRG.Height + 80;
+    IWModalWindow1.SizeUnit := suPixel;
+    IWModalWindow1.Draggable := True;
+    IWModalWindow1.ContentElement := lRG;
+    IWModalWindow1.OnAsyncClick := pResult;
+    IWModalWindow1.OnAsyncClose := pResult;
+    IWModalWindow1.Show;
+  Except
+    On E: Exception Do
+      UtLog_Execute('TFrIWProducto.Mostrar_BasicData, ' + e.Message);
+  End;
+End;
 
 Procedure TFrIWProducto.Localizar_Registro(Sender: TObject; EventParams: TStringList);
 Begin
@@ -203,19 +299,6 @@ Begin
   Except
     On E: Exception Do
       UtLog_Execute('TFrIWProducto.Resultado_Descripcion, ' + e.Message);
-  End;
-End;
-
-procedure TFrIWProducto.Resultado_Unidad_Medida(EventParams: TStringList);
-Begin
-  Try
-    If FQRMAESTRO.Mode_Edition And (Result_Is_OK(EventParams.Values['RetValue'])) Then
-    Begin
-      FQRMAESTRO.QR.FieldByName('UNIDAD_MEDIDA').AsString := AnsiUpperCase(Trim(EventParams.Values['InputStr']));
-    End;
-  Except
-    On E: Exception Do
-      UtLog_Execute('TFrIWProducto.Resultado_Unidad_Medida, ' + e.Message);
   End;
 End;
 
@@ -313,17 +396,20 @@ end;
 
 Procedure TFrIWProducto.Estado_Controles;
 Begin
-  BTNCODIGO.Visible         := (FQRMAESTRO.DS.State In [dsInsert]) And Documento_Activo;
-  BTNNOMBRE.Visible         := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  BTNDESCRIPCION.Visible    := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  BTNUNIDAD_MEDIDA.Visible  := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  BTNVALOR_UNITARIO.Visible := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  BTNSTOCK_MINIMO.Visible   := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  BTNSTOCK_MAXIMO.Visible   := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  BTNACTIVO.Visible         := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  DATO.Visible              := (Not FQRMAESTRO.Mode_Edition);
-  PAG_00.Visible            := (Not FQRMAESTRO.Mode_Edition);
-  PAG_01.Visible            := True;
+  BTNCODIGO.Visible               := (FQRMAESTRO.DS.State In [dsInsert]) And Documento_Activo;
+  BTNNOMBRE.Visible               := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  BTNDESCRIPCION.Visible          := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  BTNCODIGO_AREA.Visible          := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  BTNCODIGO_UNIDAD_MEDIDA.Visible := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  BTNVALOR_UNITARIO.Visible       := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  BTNSTOCK_MINIMO.Visible         := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  BTNSTOCK_MAXIMO.Visible         := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  BTNACTIVO.Visible               := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  BTNCREARAREA.Visible            := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  BTNCREARUNIDAD_MEDIDA.Visible   := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  DATO.Visible                    := (Not FQRMAESTRO.Mode_Edition);
+  PAG_00.Visible                  := (Not FQRMAESTRO.Mode_Edition);
+  PAG_01.Visible                  := True;
 End;
 
 Procedure TFrIWProducto.SetLabel;
@@ -331,7 +417,10 @@ Begin
   If Not FQRMAESTRO.Active Then
     Exit;
   Try
+    lbNombre_Area.Caption := FCNX.GetValue(gInfo_Tablas[Id_TBL_Area].Name, ['CODIGO_AREA'], [FQRMAESTRO.QR.FieldByName('CODIGO_AREA').AsString], ['NOMBRE']);
+    lbNombre_Unidad_Medida.Caption := FCNX.GetValue(gInfo_Tablas[Id_TBL_Unidad_Medida].Name, ['CODIGO_UNIDAD_MEDIDA'], [FQRMAESTRO.QR.FieldByName('CODIGO_UNIDAD_MEDIDA').AsString], ['NOMBRE']);
     lbNombre_Activo.Caption := IfThen(FQRMAESTRO.QR.FieldByName('ID_ACTIVO').AsString = 'S', 'Producto activa', 'Producto inactivo');
+    lbNombre_Unidad_Medida.Caption := lbNombre_Unidad_Medida.Caption +  ', Existencia: ' + FormatFloat('###,###,##0.#0', Process_Inventario_Saldo(FQRMAESTRO.QR.FieldByName('CODIGO_PRODUCTO').AsString, -1, '', 0));
   Except
     On E: Exception Do
     Begin
@@ -426,7 +515,6 @@ begin
   WebApplication.RegisterCallBack(Self.Name + '.Resultado_Codigo'        , Resultado_Codigo        );
   WebApplication.RegisterCallBack(Self.Name + '.Resultado_Nombre'        , Resultado_Nombre        );
   WebApplication.RegisterCallBack(Self.Name + '.Resultado_Descripcion'   , Resultado_Descripcion   );
-  WebApplication.RegisterCallBack(Self.Name + '.Resultado_Unidad_Medida' , Resultado_Unidad_Medida );
   WebApplication.RegisterCallBack(Self.Name + '.Resultado_Valor_Unitario', Resultado_Valor_Unitario);
   WebApplication.RegisterCallBack(Self.Name + '.Resultado_Stock_Minimo'  , Resultado_Stock_Minimo  );
   WebApplication.RegisterCallBack(Self.Name + '.Resultado_Stock_Maximo'  , Resultado_Stock_Maximo  );
@@ -446,10 +534,11 @@ begin
     FQRMAESTRO.ON_BEFORE_POST  := Validar_Campos_Master;
     FQRMAESTRO.ON_STATE_CHANGE := DsStateMaster;
 
-    CODIGO_Producto.DataSource := FQRMAESTRO.DS;
+    CODIGO_Producto.DataSource      := FQRMAESTRO.DS;
     NOMBRE.DataSource               := FQRMAESTRO.DS;
     DESCRIPCION.DataSource          := FQRMAESTRO.DS;
-    UNIDAD_MEDIDA.DataSource        := FQRMAESTRO.DS;
+    CODIGO_AREA.DataSource          := FQRMAESTRO.DS;
+    CODIGO_UNIDAD_MEDIDA.DataSource := FQRMAESTRO.DS;
     VALOR_UNITARIO.DataSource       := FQRMAESTRO.DS;
     STOCK_MINIMO.DataSource         := FQRMAESTRO.DS;
     STOCK_MAXIMO.DataSource         := FQRMAESTRO.DS;
@@ -569,6 +658,26 @@ begin
     On E: Exception Do
       UtLog_Execute('TFrIWProducto.BTNCODIGOAsyncClick, ' + e.Message);
   End;
+end;
+
+procedure TFrIWProducto.BTNCODIGO_AREAAsyncClick(Sender: TObject; EventParams: TStringList);
+begin
+  Buscar_Info(Id_TBL_Area, Resultado_Area);
+end;
+
+procedure TFrIWProducto.BTNCODIGO_UNIDAD_MEDIDAAsyncClick(Sender: TObject; EventParams: TStringList);
+begin
+  Buscar_Info(Id_TBL_Unidad_Medida, Resultado_Unidad_Medida);
+end;
+
+procedure TFrIWProducto.BTNCREARAREAAsyncClick(Sender: TObject; EventParams: TStringList);
+begin
+  Mostrar_BasicData(Id_TBL_Area, 'Ingreso del Area', 'Código', 'CODIGO_AREA', 'Nombre' , 'NOMBRE', 'CODIGO_AREA', Resultado_BasicData);
+end;
+
+procedure TFrIWProducto.BTNCREARUNIDAD_MEDIDAAsyncClick(Sender: TObject; EventParams: TStringList);
+begin
+  Mostrar_BasicData(Id_TBL_Unidad_Medida, 'Ingreso de la unidad medida', 'Código', 'CODIGO_UNIDAD_MEDIDA', 'Nombre' , 'NOMBRE', 'CODIGO_UNIDAD_MEDIDA', Resultado_BasicData);
 end;
 
 procedure TFrIWProducto.BTNNOMBREAsyncClick(Sender: TObject; EventParams: TStringList);

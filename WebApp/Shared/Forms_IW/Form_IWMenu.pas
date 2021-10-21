@@ -117,9 +117,9 @@ Begin
       CONST_OPCION_VER_SESIONES_ACTIVAS         : UtilsIW_Sesiones_Activas_Execute(WebApplication, UserSession.CNX, UserSession.USER_CODE);
       CONST_OPCION_ADMINISTRACION_DE_DOCUMENTOS : UserSession.ShowForm_Administrador_Documento;
       CONST_OPCION_AREA                         : UserSession.ShowForm_Area             ;
-      CONST_OPCION_PROCESO                      : UserSession.ShowForm_Proceso          ;
-      CONST_OPCION_TERCERO                      : UserSession.ShowForm_Tercero          ;
+      CONST_OPCION_UNIDAD_MEDIDA                : UserSession.ShowForm_Unidad_Medida    ;
       CONST_OPCION_PRODUCTO                     : UserSession.ShowForm_Producto         ;
+      CONST_OPCION_TERCERO                      : UserSession.ShowForm_Tercero          ;
       CONST_OPCION_PROYECTO                     : UserSession.ShowForm_Proyecto         ;
       CONST_OPCION_ORDEN_PRODUCCION             : UserSession.ShowForm_Orden_Produccion(UserSession.DOCUMENTO_ORDEN_DE_PRODUCCION     );
       CONST_OPCION_INVENTARIO_ENTRADA           : UserSession.ShowForm_Movto_Inventario(UserSession.DOCUMENTO_ENTRADA_DE_INVENTARIO   );
@@ -281,7 +281,7 @@ Begin
     Begin
       Validar_Carga_Opciones(pOptions, CONST_OPCION_ADMINISTRACION_DE_DOCUMENTOS);
       Validar_Carga_Opciones(pOptions, CONST_OPCION_AREA                        );
-      Validar_Carga_Opciones(pOptions, CONST_OPCION_PROCESO                     );
+      Validar_Carga_Opciones(pOptions, CONST_OPCION_UNIDAD_MEDIDA               );
       Validar_Carga_Opciones(pOptions, CONST_OPCION_PRODUCTO                    );
       Validar_Carga_Opciones(pOptions, CONST_OPCION_TERCERO                     );
       Validar_Carga_Opciones(pOptions, CONST_OPCION_PROYECTO                    );

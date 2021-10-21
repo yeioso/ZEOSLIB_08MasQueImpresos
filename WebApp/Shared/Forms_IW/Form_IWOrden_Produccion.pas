@@ -45,18 +45,26 @@ type
     IWLabel9: TIWLabel;
     BTNCREARPROYECTO: TIWImage;
     BTNCREARTERCERO: TIWImage;
+    IWLabel3: TIWLabel;
+    BTNFECHA_INICIAL: TIWImage;
+    FECHA_INICIAL: TIWDBLabel;
+    BTNFECHA_FINAL: TIWImage;
+    IWLabel2: TIWLabel;
+    FECHA_FINAL: TIWDBLabel;
+    BTNREFERENCIA: TIWImage;
+    IWLabel4: TIWLabel;
+    DOCUMENTO_REFERENCIA: TIWDBLabel;
+    CANTIDAD: TIWDBLabel;
+    BTNCANTIDAD: TIWImage;
+    IWLabel11: TIWLabel;
     procedure BTNBACKAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure IWAppFormCreate(Sender: TObject);
     procedure IWAppFormDestroy(Sender: TObject);
     procedure BTNBUSCARAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BtnAcarreoAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNNOMBREAsyncClick(Sender: TObject; EventParams: TStringList);
-    procedure BTNDIRECCIONAsyncClick(Sender: TObject; EventParams: TStringList);
-    procedure BTNEMAILAsyncClick(Sender: TObject; EventParams: TStringList);
-    procedure BTNFECHA_VENCIMIENTOAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNACTIVOAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNCODIGO_PROYECTOAsyncClick(Sender: TObject; EventParams: TStringList);
-    procedure BtnGridAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNCODIGO_TERCEROAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNCODIGO_PRODUCTOAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNDESCRIPCIONAsyncClick(Sender: TObject; EventParams: TStringList);
@@ -64,6 +72,9 @@ type
     procedure BTNCREARPROYECTOAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNCREARTERCEROAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNCREARPRODUCTOAsyncClick(Sender: TObject; EventParams: TStringList);
+    procedure BTNREFERENCIAAsyncClick(Sender: TObject; EventParams: TStringList);
+    procedure BTNFECHA_INICIALAsyncClick(Sender: TObject; EventParams: TStringList);
+    procedure BTNFECHA_FINALAsyncClick(Sender: TObject; EventParams: TStringList);
   private
     FCNX : TConexion;
     FINFO : String;
@@ -85,7 +96,10 @@ type
     Procedure Resultado_Tercero(Sender: TObject; EventParams: TStringList);
 
     procedure Resultado_Nombre(EventParams: TStringList);
+    procedure Resultado_Referencia(EventParams: TStringList);
     procedure Resultado_Descripcion(EventParams: TStringList);
+    procedure Resultado_Fecha_Inicial(EventParams: TStringList);
+    procedure Resultado_Fecha_Final(EventParams: TStringList);
     procedure Resultado_Fecha_Vencimiento(EventParams: TStringList);
     procedure Resultado_Cantidad(EventParams: TStringList);
     procedure Resultado_Activo(EventParams: TStringList);
@@ -281,6 +295,19 @@ Begin
   End;
 End;
 
+procedure TFrIWOrden_Produccion.Resultado_Referencia(EventParams: TStringList);
+Begin
+  Try
+    If FQRMAESTRO.Mode_Edition And (Result_Is_OK(EventParams.Values['RetValue'])) Then
+    Begin
+      FQRMAESTRO.QR.FieldByName('DOCUMENTO_REFERENCIA').AsString := AnsiUpperCase(Trim(EventParams.Values['InputStr']));
+    End;
+  Except
+    On E: Exception Do
+      UtLog_Execute('TFrIWOrden_Produccion.Resultado_Referencia, ' + e.Message);
+  End;
+End;
+
 procedure TFrIWOrden_Produccion.Resultado_Descripcion(EventParams: TStringList);
 Begin
   Try
@@ -291,6 +318,32 @@ Begin
   Except
     On E: Exception Do
       UtLog_Execute('TFrIWOrden_Produccion.Resultado_Descripcion, ' + e.Message);
+  End;
+End;
+
+procedure TFrIWOrden_Produccion.Resultado_Fecha_Inicial(EventParams: TStringList);
+Begin
+  Try
+    If FQRMAESTRO.Mode_Edition And (Result_Is_OK(EventParams.Values['RetValue'])) Then
+    Begin
+      FQRMAESTRO.QR.FieldByName('FECHA_INICIAL').AsString := AnsiUpperCase(Trim(EventParams.Values['InputStr']));
+    End;
+  Except
+    On E: Exception Do
+      UtLog_Execute('TFrIWOrden_Produccion.Resultado_Fecha_Inicial, ' + e.Message);
+  End;
+End;
+
+procedure TFrIWOrden_Produccion.Resultado_Fecha_Final(EventParams: TStringList);
+Begin
+  Try
+    If FQRMAESTRO.Mode_Edition And (Result_Is_OK(EventParams.Values['RetValue'])) Then
+    Begin
+      FQRMAESTRO.QR.FieldByName('FECHA_FINAL').AsString := AnsiUpperCase(Trim(EventParams.Values['InputStr']));
+    End;
+  Except
+    On E: Exception Do
+      UtLog_Execute('TFrIWOrden_Produccion.Resultado_Fecha_Final, ' + e.Message);
   End;
 End;
 
@@ -408,7 +461,11 @@ Begin
   BTNCODIGO_PROYECTO.Visible   := FQRMAESTRO.Mode_Edition And Documento_Activo;
   BTNCODIGO_TERCERO.Visible    := FQRMAESTRO.Mode_Edition And Documento_Activo;
   BTNNOMBRE.Visible            := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  BTNREFERENCIA.Visible        := FQRMAESTRO.Mode_Edition And Documento_Activo;
   BTNDESCRIPCION.Visible       := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  BTNFECHA_INICIAL.Visible     := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  BTNFECHA_FINAL.Visible       := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  BTNCANTIDAD.Visible          := FQRMAESTRO.Mode_Edition And Documento_Activo;
   BTNACTIVO.Visible            := FQRMAESTRO.Mode_Edition And Documento_Activo;
   BTNCREARTERCERO.Visible      := FQRMAESTRO.Mode_Edition And Documento_Activo;
   BTNCREARPROYECTO.Visible     := FQRMAESTRO.Mode_Edition And Documento_Activo;
@@ -500,6 +557,7 @@ Begin
     FQRMAESTRO.WHERE    := '';
     FQRMAESTRO.SENTENCE := ' SELECT * FROM ' + gInfo_Tablas[Id_TBL_Orden_Produccion].Name + FCNX.No_Lock;
     FQRMAESTRO.WHERE := ' WHERE ' + FCNX.Trim_Sentence('CODIGO_DOCUMENTO') + ' = ' + QuotedStr(Trim(FCODIGO_DOCUMENTO)) + #13;
+    FQRMAESTRO.WHERE := FQRMAESTRO.WHERE + ' AND NUMERO > 0';
     If Trim(pDato) <> '' Then
     Begin
       FQRMAESTRO.WHERE := FQRMAESTRO.WHERE + ' AND ' + #13;
@@ -552,7 +610,10 @@ begin
   Self.Name := 'USUARIO' + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000));
   FCNX := UserSession.CNX;
   WebApplication.RegisterCallBack(Self.Name + '.Resultado_Nombre'           , Resultado_Nombre           );
+  WebApplication.RegisterCallBack(Self.Name + '.Resultado_Referencia'       , Resultado_Referencia       );
   WebApplication.RegisterCallBack(Self.Name + '.Resultado_Descripcion'      , Resultado_Descripcion      );
+  WebApplication.RegisterCallBack(Self.Name + '.Resultado_Fecha_Inicial'    , Resultado_Fecha_Inicial    );
+  WebApplication.RegisterCallBack(Self.Name + '.Resultado_Fecha_Final'      , Resultado_Fecha_Final      );
   WebApplication.RegisterCallBack(Self.Name + '.Resultado_Fecha_Vencimiento', Resultado_Fecha_Vencimiento);
   WebApplication.RegisterCallBack(Self.Name + '.Resultado_Cantidad'         , Resultado_Cantidad         );
   WebApplication.RegisterCallBack(Self.Name + '.Resultado_Activo'           , Resultado_Activo           );
@@ -574,17 +635,20 @@ begin
     FQRMAESTRO.ON_STATE_CHANGE := DsStateMaster;
     FQRMAESTRO.ON_BEFORE_POST  := Validar_Campos_Master;
 
-    NUMERO.DataSource            := FQRMAESTRO.DS;
-    NOMBRE.DataSource            := FQRMAESTRO.DS;
-    CODIGO_PROYECTO.DataSource   := FQRMAESTRO.DS;
-    CODIGO_TERCERO.DataSource    := FQRMAESTRO.DS;
-    DESCRIPCION.DataSource       := FQRMAESTRO.DS;
-
-    FGRID_MAESTRO.SetGrid(FQRMAESTRO.DS, ['NUMERO'        , 'NOMBRE'     ],
-                                         ['numero'        , 'Nombre'     ],
-                                         ['S'             , 'N'          ],
-                                         [150             , 450          ],
-                                         [taRightJustify  , taLeftJustify]);
+    NUMERO.DataSource               := FQRMAESTRO.DS;
+    NOMBRE.DataSource               := FQRMAESTRO.DS;
+    CODIGO_PROYECTO.DataSource      := FQRMAESTRO.DS;
+    CODIGO_TERCERO.DataSource       := FQRMAESTRO.DS;
+    DOCUMENTO_REFERENCIA.DataSource := FQRMAESTRO.DS;
+    DESCRIPCION.DataSource          := FQRMAESTRO.DS;
+    FECHA_INICIAL.DataSource        := FQRMAESTRO.DS;
+    FECHA_FINAL.DataSource          := FQRMAESTRO.DS;
+    CANTIDAD.DataSource             := FQRMAESTRO.DS;
+    FGRID_MAESTRO.SetGrid(FQRMAESTRO.DS, ['NUMERO'      , 'NOMBRE'     , 'FECHA_INICIAL', 'FECHA_FINAL'  ],
+                                         ['numero'      , 'Nombre'     , 'Inicio'       , 'Final'        ],
+                                         ['S'           , 'N'          , 'N'            , 'N'            ],
+                                         [100           , 380          , 100            , 100            ],
+                                         [taRightJustify, taLeftJustify, taLeftJustify  , taLeftJustify  ]);
 
     FNAVEGADOR               := TNavegador_ASE.Create(IWRegion_Navegador);
     FNAVEGADOR.Parent        := IWRegion_Navegador;
@@ -626,6 +690,19 @@ begin
   End;
 end;
 
+procedure TFrIWOrden_Produccion.BTNFECHA_FINALAsyncClick(Sender: TObject; EventParams: TStringList);
+begin
+  Try
+    If FQRMAESTRO.Mode_Edition Then
+    Begin
+      WebApplication.ShowPrompt('Ingrese la fecha final de la orden de prodcucción', Self.Name + '.Resultado_Fecha_Final', 'Fecha Final', FQRMAESTRO.QR.FieldByName('FECHA_FINAL').AsString);
+    End;
+  Except
+    On E: Exception Do
+      UtLog_Execute('TFrIWOrden_Produccion.BTNFECHA_FINALAsyncClick, ' + e.Message);
+  End;
+end;
+
 procedure TFrIWOrden_Produccion.NewRecordMaster(pSender: TObject);
 begin
   Inherited;
@@ -634,6 +711,8 @@ begin
     FQRMAESTRO.QR.FieldByName('NUMERO'           ).AsInteger := UtilsIW_Numero_Siguiente_Get(FCNX, FCODIGO_DOCUMENTO);
     FQRMAESTRO.QR.FieldByName('CODIGO_USUARIO'   ).AsString  := UserSession.USER_CODE            ;
     FQRMAESTRO.QR.FieldByName('FECHA_REGISTRO'   ).AsString  := FormatDateTime('YYYY-MM-DD', Now);
+    FQRMAESTRO.QR.FieldByName('FECHA_INICIAL'    ).AsString  := FormatDateTime('YYYY-MM-DD', Now);
+    FQRMAESTRO.QR.FieldByName('FECHA_FINAL'      ).AsString  := FormatDateTime('YYYY-MM-DD', Now);
     FQRMAESTRO.QR.FieldByName('HORA_REGISTRO'    ).AsString  := FormatDateTime('HH:NN:SS'  , Now);
     FQRMAESTRO.QR.FieldByName('ID_ACTIVO'        ).AsString  := 'S';
   Except
@@ -717,16 +796,29 @@ begin
   End;
 end;
 
-procedure TFrIWOrden_Produccion.BTNFECHA_VENCIMIENTOAsyncClick(Sender: TObject; EventParams: TStringList);
+procedure TFrIWOrden_Produccion.BTNREFERENCIAAsyncClick(Sender: TObject; EventParams: TStringList);
 begin
   Try
     If FQRMAESTRO.Mode_Edition Then
     Begin
-      WebApplication.ShowPrompt('Ingrese la fecha de vencimiento ', Self.Name + '.Resultado_Fecha_Vencimiento', 'Fecha de vencimiento', FQRMAESTRO.QR.FieldByName('FECHA_VENCIMIENTO').AsString);
+      WebApplication.ShowPrompt('Ingrese el documento referencia de la orden de producción', Self.Name + '.Resultado_Referencia', 'Documento Referencia', FQRMAESTRO.QR.FieldByName('DOCUMENTO_REFERENCIA').AsString);
     End;
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWOrden_Produccion.BTNFECHA_VENCIMIENTOAsyncClick, ' + e.Message);
+      UtLog_Execute('TFrIWOrden_Produccion.BTNREFERENCIAAsyncClick, ' + e.Message);
+  End;
+end;
+
+procedure TFrIWOrden_Produccion.BTNFECHA_INICIALAsyncClick(Sender: TObject; EventParams: TStringList);
+begin
+  Try
+    If FQRMAESTRO.Mode_Edition Then
+    Begin
+      WebApplication.ShowPrompt('Ingrese la fecha inicial de la orden de prodcucción', Self.Name + '.Resultado_Fecha_Inicial', 'Fecha Inicial', FQRMAESTRO.QR.FieldByName('FECHA_INICIAL').AsString);
+    End;
+  Except
+    On E: Exception Do
+      UtLog_Execute('TFrIWOrden_Produccion.BTNFECHA_INICIALAsyncClick, ' + e.Message);
   End;
 end;
 
@@ -786,39 +878,5 @@ begin
   End;
 end;
 
-procedure TFrIWOrden_Produccion.BTNDIRECCIONAsyncClick(Sender: TObject; EventParams: TStringList);
-Var
-  ltmp : String;
-begin
-  Try
-    If FQRMAESTRO.Mode_Edition Then
-    Begin
-      ltmp := FQRMAESTRO.QR.FieldByName('DIRECCION').AsString;
-      WebApplication.ShowPrompt('Ingrese la dirección', Self.Name + '.Resultado_Direccion', 'Dirección', ltmp);
-    End;
-  Except
-    On E: Exception Do
-      UtLog_Execute('TFrIWOrden_Produccion.BTNDIRECCIONAsyncClick, ' + e.Message);
-  End;
-end;
-
-procedure TFrIWOrden_Produccion.BTNEMAILAsyncClick(Sender: TObject; EventParams: TStringList);
-begin
-  Try
-    If FQRMAESTRO.Mode_Edition Then
-    Begin
-      WebApplication.ShowPrompt('Ingrese el correo electronico', Self.Name + '.Resultado_Email', 'Correo electronico', FQRMAESTRO.QR.FieldByName('EMAIL').AsString);
-    End;
-  Except
-    On E: Exception Do
-      UtLog_Execute('TFrIWOrden_Produccion.BTNEMAILAsyncClick, ' + e.Message);
-  End;
-end;
-
-
-procedure TFrIWOrden_Produccion.BtnGridAsyncClick(Sender: TObject; EventParams: TStringList);
-begin
-  UserSession.ShowForm_Perfil_Enc(FQRMAESTRO.QR.FieldByName('CODIGO_PERFIL').AsString);
-end;
 
 end.

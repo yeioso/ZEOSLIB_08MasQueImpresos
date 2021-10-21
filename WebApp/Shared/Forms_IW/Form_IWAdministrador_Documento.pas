@@ -261,7 +261,7 @@ Begin
     NOMBRE.BGColor := UserSession.COLOR_OK;
     CODIGO_DOCUMENTO.BGColor := UserSession.COLOR_OK;
 
-    If FQRMAESTRO.Mode_Edition And (Vacio(FQRMAESTRO.QR.FieldByName('CODIGO_DOCUMENTO').AsString) Or Existe_Codigo_Documento(FQRMAESTRO.QR.FieldByName('CODIGO_DOCUMENTO').AsString)) Then
+    If (FQRMAESTRO.DS.State In [dsInsert]) And (Vacio(FQRMAESTRO.QR.FieldByName('CODIGO_DOCUMENTO').AsString) Or Existe_Codigo_Documento(FQRMAESTRO.QR.FieldByName('CODIGO_DOCUMENTO').AsString)) Then
     Begin
       lMensaje := lMensaje + IfThen(Not Vacio(lMensaje), ', ') + 'Codigo de documento no valido o ya existe';
       CODIGO_DOCUMENTO.BGColor := UserSession.COLOR_ERROR;
@@ -433,8 +433,8 @@ begin
     FGRID_MAESTRO.SetGrid(FQRMAESTRO.DS, ['CODIGO_DOCUMENTO', 'NOMBRE'     ],
                                          ['Código'          , 'Nombre'     ],
                                          ['S'               , 'N'          ],
-                                         [150               , 400          ],
-                                         [taRightJustify, taLeftJustify]);
+                                         [200               , 400          ],
+                                         [taLeftJustify     , taLeftJustify]);
 
     FNAVEGADOR               := TNavegador_ASE.Create(IWRegion_Navegador);
     FNAVEGADOR.Parent        := IWRegion_Navegador;

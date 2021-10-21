@@ -16,9 +16,9 @@ Uses
   TBL005.Usuario,
   TBL006.Administrador_Documento,
   TBL007.Area,
-  TBL008.Proceso,
-  TBL009.Tercero,
-  TBL010.Producto,
+  TBL008.Unidad_Medida,
+  TBL009.Producto,
+  TBL010.Tercero,
   TBL011.Proyecto,
   TBL030.Orden_Produccion,
   TBL031.Movto_Inventario,
@@ -36,13 +36,13 @@ Begin
       Result := TBL006_Administrador_Documento_Execute(pCnx);
     If Result Then
       Result := TBL007_Area_Create(pCnx);
+   If Result Then
+      Result := TBL008_Unidad_Medida_Create(pCnx);
+   If Result Then
+      Result := TBL009_Producto_Create(pCnx);
     If Result Then
-      Result := TBL008_Proceso_Create(pCnx);
-    If Result Then
-      Result := TBL009_Tercero_Create(pCnx);
-    If Result Then
-      Result := TBL010_Producto_Create(pCnx);
-    If Result Then
+      Result := TBL010_Tercero_Create(pCnx);
+     If Result Then
       Result := TBL011_Proyecto_Create(pCnx);
     If Result Then
       Result := TBL030_Orden_Produccion_Create(pCnx);

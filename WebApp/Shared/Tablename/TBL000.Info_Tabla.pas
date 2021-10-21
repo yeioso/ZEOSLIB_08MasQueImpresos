@@ -11,9 +11,9 @@ Const
   Id_TBL_Usuario                 = 002;
   Id_TBL_Administrador_Documento = 003;
   Id_TBL_Area                    = 004;
-  Id_TBL_Proceso                 = 005;
-  Id_TBL_Tercero                 = 006;
-  Id_TBL_Producto                = 007;
+  Id_TBL_Unidad_Medida           = 005;
+  Id_TBL_Producto                = 006;
+  Id_TBL_Tercero                 = 007;
   Id_TBL_Proyecto                = 008;
   Id_TBL_Orden_Produccion        = 009;
   Id_TBL_Movto_Inventario        = 010;
@@ -61,7 +61,7 @@ Begin
   Cargar_Tablas(Id_TBL_Usuario                , '003', 'USUARIO'      , 'Usuario'                   , ['CODIGO_USUARIO']);
   Cargar_Tablas(Id_TBL_Administrador_Documento, '004', 'ADM_DOCUMENTO', 'Administrador de Documento', ['PREFIJO']);
   Cargar_Tablas(Id_TBL_Area                   , '005', 'AREA'         , 'Area'                      , ['CODIGO_AREA']);
-  Cargar_Tablas(Id_TBL_Proceso                , '006', 'PROCESO'      , 'Proceso'                   , ['CODIGO_PROCESO']);
+  Cargar_Tablas(Id_TBL_Unidad_Medida          , '006', 'UNIDAD_MEDIDA', 'Unidad de Medida'          , ['CODIGO_UNIDAD_MEDIDA']);
   Cargar_Tablas(Id_TBL_Producto               , '007', 'PRODUCTO'     , 'Producto'                  , ['CODIGO_PRODUCTO']);
   Cargar_Tablas(Id_TBL_Tercero                , '008', 'TERCERO'      , 'Tercero'                   , ['CODIGO_TERCERO']);
   Cargar_Tablas(Id_TBL_Proyecto               , '009', 'PROYECTO'     , 'Proyecto'                  , ['CODIGO_PROYECTO']);
