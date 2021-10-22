@@ -10,7 +10,7 @@ uses
   IWCompTabControl, IWBaseComponent, IWBaseHTMLComponent, IWBaseHTML40Component,
   UtConexion, Data.DB, IWCompGrids, IWDBStdCtrls, IWCompEdit,
   IWCompCheckbox, IWCompMemo, IWDBExtCtrls, IWCompButton, IWCompListbox,
-  UtGrid_JQ, UtNavegador_ASE, UtilsIW.Busqueda;
+  UtGrid_JQ, UtNavegador_ASE;
 
 type
   TFrIWMovto_Inventario = class(TIWAppForm)
@@ -50,7 +50,6 @@ type
     BTNCANTIDAD: TIWImage;
     IWLabel11: TIWLabel;
     BTNCREARTERCERO: TIWImage;
-    BTNCREARPRODUCTO: TIWImage;
     IWLabel2: TIWLabel;
     BTNOP: TIWImage;
     CODIGO_DOCUMENTO_OP: TIWDBLabel;
@@ -151,9 +150,10 @@ Uses
   System.UITypes,
   System.StrUtils,
   ServerController,
+  UtilsIW.Busqueda,
   TBL000.Info_Tabla,
   UtIWBasicData_ASE,
-  Process.Inventario,
+  Report.Saldo_Inventario,
   UtilsIW.Numero_Siguiente;
 
 Procedure TFrIWMovto_Inventario.Preparar_Numero_Cero;
@@ -312,10 +312,10 @@ End;
 
 procedure TFrIWMovto_Inventario.Buscar_Info(pSD : Integer; pEvent : TIWAsyncEvent);
 Var
-  lBusqueda : TBusqueda_Ercol_WjQDBGrid;
+  lBusqueda : TBusqueda_MQI_WjQDBGrid;
 begin
   Try
-    lBusqueda := TBusqueda_Ercol_WjQDBGrid.Create(Self);
+    lBusqueda := TBusqueda_MQI_WjQDBGrid.Create(Self);
     lBusqueda.Parent := Self;
     lBusqueda.SetComponents(FCNX, pEvent);
     lBusqueda.SetTSD(pSD);
@@ -525,7 +525,7 @@ Begin
   BTNVALOR_UNITARIO.Visible    := FQRMAESTRO.Mode_Edition And Documento_Activo;
   BTNACTIVO.Visible            := FQRMAESTRO.Mode_Edition And Documento_Activo;
   BTNCREARTERCERO.Visible      := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  BTNCREARPRODUCTO.Visible     := FQRMAESTRO.Mode_Edition And Documento_Activo;
+//BTNCREARPRODUCTO.Visible     := FQRMAESTRO.Mode_Edition And Documento_Activo;
   DATO.Visible                 := (Not FQRMAESTRO.Mode_Edition);
   PAG_00.Visible               := (Not FQRMAESTRO.Mode_Edition);
   PAG_01.Visible               := True;
@@ -565,6 +565,8 @@ Begin
 End;
 
 Function TFrIWMovto_Inventario.Info_Producto(Const pCodigo_Producto : String) : String;
+Var
+  lExistencia : Double;
 Begin
   Result :=  '';
   If Vacio(pCodigo_Producto) Then
@@ -590,7 +592,8 @@ Begin
                 ', stock minimo: ' + FormatFloat('###,###,##0.#0', FCNX.TMP.FieldByName('STOCK_MINIMO').AsFloat);
     FCNX.TMP.Active := False;
     FCNX.TMP.SQL.Clear;
-    Result := Result +  ', Existencia: ' + FormatFloat('###,###,##0.#0', Process_Inventario_Saldo(pCodigo_Producto, FQRMAESTRO.QR.FieldByName('NUMERO').AsInteger, FQRMAESTRO.QR.FieldByName('CODIGO_DOCUMENTO').AsString, FQRMAESTRO.QR.FieldByName('CANTIDAD').AsFloat));
+    lExistencia := Report_Saldo_Inventario_Saldo(FCNX, pCodigo_Producto, pCodigo_Producto);
+    Result := Result +  ', Existencia: ' + FormatFloat('###,###,##0.#0', lExistencia);
   Except
     On E: Exception Do
     Begin
@@ -895,8 +898,6 @@ Begin
 End;
 
 procedure TFrIWMovto_Inventario.BTNBUSCARAsyncClick(Sender: TObject;  EventParams: TStringList);
-Var
-  lBusqueda : TBusqueda_Ercol_WjQDBGrid;
 begin
   Try
     If Vacio(DATO.Text) Then

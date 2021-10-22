@@ -125,6 +125,7 @@ Begin
       CONST_OPCION_INVENTARIO_ENTRADA           : UserSession.ShowForm_Movto_Inventario(UserSession.DOCUMENTO_ENTRADA_DE_INVENTARIO   );
       CONST_OPCION_INVENTARIO_SALIDA            : UserSession.ShowForm_Movto_Inventario(UserSession.DOCUMENTO_SALIDA_DE_INVENTARIO    );
       CONST_OPCION_INVENTARIO_DEVOLUCION        : UserSession.ShowForm_Movto_Inventario(UserSession.DOCUMENTO_DEVOLUCION_AL_INVENTARIO);
+      CONST_OPCION_REPORTE                      : UserSession.ShowForm_Reporte;
       CONST_OPCION_SALIR                        : WebApplication.ShowConfirm('Está seguro(a) de salir?', Self.Name + '.Ejecutar_Salida', 'Salir', 'Sí', 'No');
       Else UserSession.SetMessage('Opcion no disponible', True);
     End;
@@ -319,6 +320,7 @@ Begin
 
     If pOptions = RG_INFORMES Then
     Begin
+      Validar_Carga_Opciones(pOptions, CONST_OPCION_REPORTE);
       PAG_INFORMES.Visible := RG_INFORMES.Items.Count > 0;
     End;
 

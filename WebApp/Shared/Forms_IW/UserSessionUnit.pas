@@ -46,6 +46,8 @@ Uses
   Form_IWOrden_Produccion,
   Form_IWMovto_Inventario,
 
+  Form_IWReporte,
+
   IWBaseComponent,
   IWBaseHTMLComponent,
   IWBaseHTML40Component,
@@ -73,6 +75,7 @@ Type
     FProyecto                   : TFrIWProyecto;
     FOrden_Produccion           : TFrIWOrden_Produccion;
     FMovto_Inventario           : TFrIWMovto_Inventario;
+    FReporte                    : TFrIWReporte;
 
     FCNX                        : TConexion    ;
     FDB                         : TDB          ;
@@ -146,6 +149,7 @@ Type
     Procedure ShowForm_Proyecto;
     Procedure ShowForm_Orden_Produccion(Const pCodigo_Documento : String);
     Procedure ShowForm_Movto_Inventario(Const pCodigo_Documento : String);
+    Procedure ShowForm_Reporte;
 
     Procedure Update_Menu;
 
@@ -339,6 +343,12 @@ Procedure TIWUserSession.ShowForm_Movto_Inventario(Const pCodigo_Documento : Str
 Begin
   FMovto_Inventario := TFrIWMovto_Inventario.Create(WebApplication, pCodigo_Documento);
   FMovto_Inventario.Show;
+End;
+
+Procedure TIWUserSession.ShowForm_Reporte;
+Begin
+  FReporte := TFrIWReporte.Create(WebApplication);
+  FReporte.Show;
 End;
 
 Procedure TIWUserSession.Update_Menu;

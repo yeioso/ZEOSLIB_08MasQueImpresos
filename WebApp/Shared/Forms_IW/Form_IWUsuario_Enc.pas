@@ -152,10 +152,10 @@ End;
 
 procedure TFrIWUsuario_Enc.Buscar_Info(pSD : Integer; pEvent : TIWAsyncEvent);
 Var
-  lBusqueda : TBusqueda_Ercol_WjQDBGrid;
+  lBusqueda : TBusqueda_MQI_WjQDBGrid;
 begin
   Try
-    lBusqueda := TBusqueda_Ercol_WjQDBGrid.Create(Self);
+    lBusqueda := TBusqueda_MQI_WjQDBGrid.Create(Self);
     lBusqueda.Parent := Self;
     lBusqueda.SetComponents(FCNX, pEvent);
     lBusqueda.SetTSD(pSD);
@@ -660,8 +660,6 @@ Begin
 End;
 
 procedure TFrIWUsuario_Enc.BTNBUSCARAsyncClick(Sender: TObject;  EventParams: TStringList);
-Var
-  lBusqueda : TBusqueda_Ercol_WjQDBGrid;
 begin
   Try
     If Vacio(DATO.Text) Then

@@ -458,12 +458,12 @@ End;
 
 procedure TFrIWPerfil_Enc.BTNBUSCARAsyncClick(Sender: TObject;  EventParams: TStringList);
 Var
-  lBusqueda : TBusqueda_Ercol_WjQDBGrid;
+  lBusqueda : TBusqueda_MQI_WjQDBGrid;
 begin
   Try
     If Vacio(DATO.Text) Then
     Begin
-      lBusqueda := TBusqueda_Ercol_WjQDBGrid.Create(Self);
+      lBusqueda := TBusqueda_MQI_WjQDBGrid.Create(Self);
       lBusqueda.Parent := Self;
       lBusqueda.SetComponents(FCNX, Localizar_Registro);
       lBusqueda.SetTSD(Id_TBL_Perfil);

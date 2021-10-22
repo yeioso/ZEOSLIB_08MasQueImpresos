@@ -90,7 +90,7 @@ Uses
   IWMimeTypes,
   IW.CacheStream,
   ServerController,
-  TBL00.Info_Tabla,
+  TBL000.Info_Tabla,
   DelphiZXIngQRCode;
 
 Function TFrPlantilla_Documento.CUFE_QR_Format_Value(Const pValue : Double) : String;

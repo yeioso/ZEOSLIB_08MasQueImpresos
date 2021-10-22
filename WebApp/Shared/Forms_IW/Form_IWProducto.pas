@@ -71,10 +71,8 @@ type
     procedure BTNVALOR_UNITARIOAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNCODIGO_AREAAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNCREARAREAAsyncClick(Sender: TObject; EventParams: TStringList);
-    procedure BTNCODIGO_UNIDAD_MEDIDAAsyncClick(Sender: TObject;
-      EventParams: TStringList);
-    procedure BTNCREARUNIDAD_MEDIDAAsyncClick(Sender: TObject;
-      EventParams: TStringList);
+    procedure BTNCODIGO_UNIDAD_MEDIDAAsyncClick(Sender: TObject; EventParams: TStringList);
+    procedure BTNCREARUNIDAD_MEDIDAAsyncClick(Sender: TObject;  EventParams: TStringList);
   private
     FCNX : TConexion;
     FINFO : String;
@@ -130,7 +128,7 @@ Uses
   ServerController,
   UtIWBasicData_ASE,
   TBL000.Info_Tabla,
-  Process.Inventario;
+  Report.Saldo_Inventario;
 
 Procedure TFrIWProducto.Resultado_Area(Sender: TObject; EventParams: TStringList);
 Begin
@@ -222,10 +220,10 @@ End;
 
 procedure TFrIWProducto.Buscar_Info(pSD : Integer; pEvent : TIWAsyncEvent);
 Var
-  lBusqueda : TBusqueda_Ercol_WjQDBGrid;
+  lBusqueda : TBusqueda_MQI_WjQDBGrid;
 begin
   Try
-    lBusqueda := TBusqueda_Ercol_WjQDBGrid.Create(Self);
+    lBusqueda := TBusqueda_MQI_WjQDBGrid.Create(Self);
     lBusqueda.Parent := Self;
     lBusqueda.SetComponents(FCNX, pEvent);
     lBusqueda.SetTSD(pSD);
@@ -413,6 +411,8 @@ Begin
 End;
 
 Procedure TFrIWProducto.SetLabel;
+Var
+  lExistencia : Double;
 Begin
   If Not FQRMAESTRO.Active Then
     Exit;
@@ -420,7 +420,8 @@ Begin
     lbNombre_Area.Caption := FCNX.GetValue(gInfo_Tablas[Id_TBL_Area].Name, ['CODIGO_AREA'], [FQRMAESTRO.QR.FieldByName('CODIGO_AREA').AsString], ['NOMBRE']);
     lbNombre_Unidad_Medida.Caption := FCNX.GetValue(gInfo_Tablas[Id_TBL_Unidad_Medida].Name, ['CODIGO_UNIDAD_MEDIDA'], [FQRMAESTRO.QR.FieldByName('CODIGO_UNIDAD_MEDIDA').AsString], ['NOMBRE']);
     lbNombre_Activo.Caption := IfThen(FQRMAESTRO.QR.FieldByName('ID_ACTIVO').AsString = 'S', 'Producto activa', 'Producto inactivo');
-    lbNombre_Unidad_Medida.Caption := lbNombre_Unidad_Medida.Caption +  ', Existencia: ' + FormatFloat('###,###,##0.#0', Process_Inventario_Saldo(FQRMAESTRO.QR.FieldByName('CODIGO_PRODUCTO').AsString, -1, '', 0));
+    lExistencia := Report_Saldo_Inventario_Saldo(FCNX, FQRMAESTRO.QR.FieldByName('CODIGO_PRODUCTO').AsString, FQRMAESTRO.QR.FieldByName('CODIGO_PRODUCTO').AsString);
+    lbNombre_Unidad_Medida.Caption := lbNombre_Unidad_Medida.Caption + ', Existencia: ' + FormatFloat('###,###,##0.#0', lExistencia);
   Except
     On E: Exception Do
     Begin

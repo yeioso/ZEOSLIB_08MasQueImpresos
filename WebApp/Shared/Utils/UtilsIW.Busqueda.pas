@@ -7,7 +7,7 @@ Uses
 
 Type
 
-  TBusqueda_Ercol_WjQDBGrid = Class(TBusqueda_WjQDBGrid)
+  TBusqueda_MQI_WjQDBGrid = Class(TBusqueda_WjQDBGrid)
     Public
       Constructor Create(AOwner : TComponent); Override;
       Procedure SetTSD(Const pId : Integer);
@@ -19,14 +19,14 @@ Uses
   StrUtils,
   TBL000.Info_Tabla;
 
-{ TBusqueda_Ercol_WjQDBGrid }
-constructor TBusqueda_Ercol_WjQDBGrid.Create(AOwner: TComponent);
+{ TBusqueda_MQI_WjQDBGrid }
+constructor TBusqueda_MQI_WjQDBGrid.Create(AOwner: TComponent);
 begin
   inherited;
 
 end;
 
-Procedure TBusqueda_Ercol_WjQDBGrid.SetTSD(Const pId : Integer);
+Procedure TBusqueda_MQI_WjQDBGrid.SetTSD(Const pId : Integer);
 Var
   lS : String;
 begin
@@ -137,7 +137,7 @@ begin
   Self.SetGrid;
 End;
 
-destructor TBusqueda_Ercol_WjQDBGrid.Destroy;
+destructor TBusqueda_MQI_WjQDBGrid.Destroy;
 begin
 
   inherited;

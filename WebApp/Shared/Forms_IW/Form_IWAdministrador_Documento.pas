@@ -119,10 +119,10 @@ End;
 
 procedure TFrIWAdministrador_Documento.Buscar_Info(pSD : Integer; pEvent : TIWAsyncEvent);
 Var
-  lBusqueda : TBusqueda_Ercol_WjQDBGrid;
+  lBusqueda : TBusqueda_MQI_WjQDBGrid;
 begin
   Try
-    lBusqueda := TBusqueda_Ercol_WjQDBGrid.Create(Self);
+    lBusqueda := TBusqueda_MQI_WjQDBGrid.Create(Self);
     lBusqueda.Parent := Self;
     lBusqueda.SetComponents(FCNX, pEvent);
     lBusqueda.SetTSD(pSD);
