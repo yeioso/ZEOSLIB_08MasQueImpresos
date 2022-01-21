@@ -10,8 +10,8 @@ uses
   Generics.Collections;
 
 Const
-  Const_Version = 'Versión 2021.10.21 Rev 1.1 - Delphi Syndey 10.4 (Community) - Intraweb 15.2.40';
-  Const_Max_Record = 100;
+  Const_Version = 'Versión 2022.01.16 Rev 1.0 - Delphi Syndey 10.4 (Community) - Intraweb 15.2.48';
+  Const_Max_Record = 2000;
 
 Type
   TIWServerController = class(TIWServerControllerBase)
@@ -52,7 +52,6 @@ implementation
 {$R *.dfm}
 
 uses
-  UtLog,
   IWInit,
   IWGlobal,
   UtFuncion,
@@ -60,6 +59,7 @@ uses
   Criptografia,
   IW.Common.AppInfo,
   TBL000.Info_Tabla,
+  UtilsIW.ManagerLog,
   TBL001.Create_Tabla;
 
 function IWServerController: TIWServerController;
@@ -68,7 +68,7 @@ begin
     Result := TIWServerController(GServerController);
   Except
     On E: Exception Do
-      UtLog_Execute('IWServerController: TIWServerController, ' + E.Message);
+      Utils_ManagerLog_Add('ServerController', 'IWServerController', 'TIWServerController', E.Message);
   End;
 end;
 
@@ -80,7 +80,7 @@ begin
       Result := TIWUserSession(WebApplication.Data);
   Except
     On E: Exception Do
-      UtLog_Execute('UserSession: TIWUserSession, ' + E.Message);
+      Utils_ManagerLog_Add('ServerController', 'UserSession', 'TIWUserSession', E.Message);
   End;
 end;
 
@@ -96,7 +96,7 @@ begin
   Try
     lPath := IncludeTrailingPathDelimiter(TIWAppInfo.GetAppPath);
 //  lPath := IncludeTrailingBackslash(ExtractFilePath(GetModuleName(HInstance)));
-    UtLog_Execute('TIWServerController.IWServerControllerBaseConfig, Cargando ruta de trabajo: ' + lPath);
+    Utils_ManagerLog_Add('ServerController', 'TIWServerController', 'IWServerControllerBaseConfig', 'Cargando ruta de trabajo: ' + lPath);
 
     Self.FPATH_LOG    := IncludeTrailingPathDelimiter(lPath + 'log');
     ForceDirectories(Self.FPATH_LOG);
@@ -118,10 +118,10 @@ begin
     Self.ExceptionLogger.Enabled := True;
     Self.ExceptionLogger.FilePath := Self.FPATH_LOG;
     Self.ExceptionLogger.FileName := ChangeFileExt(ExtractFileName(TIWAppInfo.GetAppFullFileName), '.log');
-    UtLog_Execute('TIWServerController.IWServerControllerBaseConfig, Cargando ruta de configuraci�n: ' + lPath);
+    Utils_ManagerLog_Add('ServerController', 'TIWServerController', 'IWServerControllerBaseConfig', 'Cargando ruta de configuraci�n: ' + lPath);
   Except
     On E: Exception Do
-      UtLog_Execute('TIWServerController.IWServerControllerBaseConfig, ' + E.Message);
+      Utils_ManagerLog_Add('ServerController', 'TIWServerController', 'IWServerControllerBaseConfig',  E.Message);
   End;
 end;
 
@@ -135,7 +135,7 @@ Begin
   Try
     FCNX.AUX.Active := False;
     FCNX.AUX.SQL.Clear;
-    FCNX.AUX.SQL.Add(' SELECT * FROM ' + gInfo_Tablas[Id_TBL_Usuario].Name + ' ' + FCNX.No_Lock);
+    FCNX.AUX.SQL.Add(' SELECT * FROM ' + Info_TablaGet(Id_TBL_Usuario).Name + ' ' + FCNX.No_Lock);
     FCNX.AUX.SQL.Add(' WHERE ID_ACTIVO = ' + QuotedStr(Trim('S')));
     FCNX.AUX.SQL.Add('  AND ');
     FCNX.AUX.SQL.Add('  ( ');
@@ -172,7 +172,7 @@ Begin
     FCNX.AUX.SQL.Clear;
   Except
     On E : Exception Do
-      UtLog_Execute('TIWServerController.GetPassword_Items, ' + E.Message);
+      Utils_ManagerLog_Add('ServerController', 'TIWServerController', 'GetPassword_Items',  E.Message);
   End;
 End;
 
@@ -195,7 +195,7 @@ Begin
     End;
   Except
     On E: Exception Do
-      UtLog_Execute('TIWServerController.Prepare_Container, ' + E.Message);
+      Utils_ManagerLog_Add('ServerController', 'TIWServerController', 'Prepare_Container', E.Message);
   End;
 End;
 
@@ -209,8 +209,7 @@ begin
   FPATH_LOG := IncludeTrailingPathDelimiter(lPath + 'Log');
   FPATH_FILES := IncludeTrailingPathDelimiter(lPath + 'Files');
   FPATH_CONFIG := IncludeTrailingPathDelimiter(lPath + 'Config');
-  UtLog_Execute('TDM.Establecer_Conexion, cargando el archivo de configuraci�n de ' + FPATH_CONFIG);
-
+  Utils_ManagerLog_Add('ServerController', 'TIWServerController', 'IWServerControllerBaseCreate', 'Cargando el archivo de configuracion de ' + FPATH_CONFIG);
   If Not DirectoryExists(FPATH_LOG) Then
     ForceDirectories(FPATH_LOG);
 
@@ -227,7 +226,7 @@ begin
   End
   Else
   Begin
-    UtLog_Execute('No hay archivo de configuraci�n, ' + FPATH_CONFIG);
+    Utils_ManagerLog_Add('ServerController', 'TIWServerController', 'IWServerControllerBaseCreate', 'No existe el archivo de configuracion de ' + FPATH_CONFIG);
   End;
 end;
 
@@ -244,7 +243,7 @@ end;
 
 procedure TIWServerController.IWServerControllerBaseException(AApplication: TIWApplication; AException: Exception; var Handled: Boolean);
 begin
-  UtLog_Execute('AException ' + AException.Message);
+  Utils_ManagerLog_Add('ServerController', 'TIWServerController', 'IWServerControllerBaseException', AException.Message);
 end;
 
 Procedure TIWServerController.Close_Session(ASession: TIWApplication);
@@ -274,7 +273,7 @@ Begin
     Except
       On E: Exception Do
       Begin
-        UtLog_Execute('TIWServerController.Close_Session, ' + E.Message);
+        Utils_ManagerLog_Add('ServerController', 'TIWServerController', 'TIWServerController.Close_Session', E.Message);
       End;
     End;
   Finally
@@ -289,7 +288,7 @@ End;
 procedure TIWServerController.IWServerControllerBaseNewSession(ASession: TIWApplication);
 Begin
   If Assigned(ASession) Then
-    UtLog_Execute('TIWServerController.IWServerControllerBaseNewSession, Creando sesion: ' + ASession.IP + ', ' + ASession.AppID);
+    Utils_ManagerLog_Add('ServerController', 'TIWServerController', 'IWServerControllerBaseNewSession', 'Creando sesion: ' + ASession.IP + ', ' + ASession.AppID);
   ASession.Data := TIWUserSession.Create(nil, ASession);
   TIWUserSession(ASession.Data).SetPATH_CONFIG(Self.PATH_LOG);
   ForceDirectories(Self.PATH_LOG);
@@ -301,7 +300,7 @@ Begin
   ForceDirectories(Self.PATH_FILES);
   TFrIWLogin.SetAsMainForm;
   If Assigned(ASession) Then
-    UtLog_Execute('TIWServerController.IWServerControllerBaseNewSession, Creando sesion: ' + ASession.IP + ', ' + ASession.AppID);
+    Utils_ManagerLog_Add('ServerController', 'TIWServerController', 'IWServerControllerBaseNewSession', 'Creando sesion: ' + ASession.IP + ', ' + ASession.AppID);
 End;
 
 Function TIWServerController.CountSessions : Integer;

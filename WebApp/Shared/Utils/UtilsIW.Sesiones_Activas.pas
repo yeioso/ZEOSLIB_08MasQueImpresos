@@ -10,12 +10,12 @@ Function UtilsIW_Sesiones_Activas_Execute(pAPP : TIWApplication; pCnx: TConexion
 
 implementation
 Uses
-  UtLog,
   IWTypes,
   Classes,
   SysUtils,
   UtFuncion,
   TBL000.Info_Tabla,
+  UtilsIW.ManagerLog,
   Form_Plantilla_Formato;
 
 Type
@@ -61,7 +61,7 @@ Begin
   Try
     FCNX.TMP.Active := False;
     FCNX.TMP.SQL.Clear;
-    FCNX.TMP.SQL.Add(' INSERT INTO ' + gInfo_Tablas[Id_TBL_Usuario_Reporte].Name );
+    FCNX.TMP.SQL.Add(' INSERT INTO ' + Info_TablaGet(Id_TBL_Usuario_Reporte).Name );
     FCNX.TMP.SQL.Add(' ( ');
     FCNX.TMP.SQL.Add('  CODIGO_USUARIO ');
     FCNX.TMP.SQL.Add(' ,LINEA ');
@@ -77,7 +77,7 @@ Begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TDetalleVsParcial.Save, ' + e.Message);
+      Utils_ManagerLog_Add(FUSER_CODE, 'UtilsIW.Sesiones_Activas', 'TDetalleVsParcial.Save', E.Message);
       FMENSAJE := E.Message;
     End;
   End;
@@ -89,7 +89,7 @@ Begin
   Try
     FSQL.Active := False;
     FSQL.SQL.Clear;
-    FSQL.SQL.Add(' DELETE FROM ' + gInfo_Tablas[Id_TBL_Usuario_Reporte].Name + ' ');
+    FSQL.SQL.Add(' DELETE FROM ' + Info_TablaGet(Id_TBL_Usuario_Reporte).Name + ' ');
     FSQL.SQL.Add(' WHERE ' + FCNX.Trim_Sentence('CODIGO_USUARIO') + ' = ' + QuotedStr(Trim(FUSER_CODE)));
     FSQL.ExecSQL;
     Result := (FSQL.RowsAffected > 0);
@@ -98,7 +98,7 @@ Begin
   Except
     On E : Exception Do
     Begin
-      UtLog_Execute('TDetalleVsParcial.Restart, ' + E.Message);
+      Utils_ManagerLog_Add(FUSER_CODE, 'UtilsIW.Sesiones_Activas', 'TDetalleVsParcial.Restart', E.Message);
       FMENSAJE := E.Message;
     End;
   End;
@@ -124,7 +124,7 @@ Begin
             LSession: TIWApplication absolute aSession;
           begin
             FLISTADO.Add(StringOfChar('=', 50));
-            FLISTADO.Add(Trim(LSession.AuthUser) + ', ' + Trim(FCNX.GetValue(gInfo_Tablas[Id_TBL_Usuario].Name, ['CODIGO_USUARIO'], [Trim(LSession.AuthUser)], ['NOMBRE'])));
+            FLISTADO.Add(Trim(LSession.AuthUser) + ', ' + Trim(FCNX.GetValue(Info_TablaGet(Id_TBL_Usuario).Name, ['CODIGO_USUARIO'], [Trim(LSession.AuthUser)], ['NOMBRE'])));
             FLISTADO.Add(StringOfChar(' ', 03) + Trim(FormatDateTime('YYYY-MM-DD, HH:NN:SS', LSession.SessionTimeStamp)));
             FLISTADO.Add(StringOfChar(' ', 03) + 'Ultimo Acceso=' + DateTimeToStr(LSession.LastAccess));
             FLISTADO.Add(StringOfChar(' ', 03) + 'IP=' + LSession.IP );
@@ -141,7 +141,7 @@ Begin
   Except
     On E : Exception Do
     Begin
-      UtLog_Execute('TDetalleVsParcial.GetData, ' + E.Message);
+      Utils_ManagerLog_Add(FUSER_CODE, 'UtilsIW.Sesiones_Activas', 'TDetalleVsParcial.GetData', E.Message);
       FMENSAJE := E.Message;
     End;
   End;
@@ -171,7 +171,7 @@ Begin
     On E : Exception Do
     Begin
       Result := False;
-      UtLog_Execute('TSessionActiva.Process, ' + E.Message);
+      Utils_ManagerLog_Add(FUSER_CODE, 'UtilsIW.Sesiones_Activas', 'TSessionActiva.Process', E.Message);
       FMENSAJE := E.Message;
     End;
   End;

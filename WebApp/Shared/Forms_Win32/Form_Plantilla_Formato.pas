@@ -80,7 +80,7 @@ implementation
 {$R *.dfm}
 Uses
   Math,
-  UtLog,
+
   UtFecha,
   Data.DB,
   UtBase64,
@@ -91,7 +91,8 @@ Uses
   IW.CacheStream,
   ServerController,
   TBL000.Info_Tabla,
-  DelphiZXIngQRCode;
+  DelphiZXIngQRCode,
+  UtilsIW.ManagerLog;
 
 Function TFrPlantilla_Documento.CUFE_QR_Format_Value(Const pValue : Double) : String;
 Begin
@@ -235,7 +236,7 @@ Begin
 //  Except
 //    On E: Exception Do
 //    Begin
-//      UtLog_Execute('TFrPlantilla_Documento.Set_CUFE_QR, ' + E.Message);
+//      Utils_ManagerLog_Add('TFrPlantilla_Documento.Set_CUFE_QR, ' + E.Message);
 //    End;
 //  End;
 End;
@@ -285,7 +286,7 @@ Begin
 //    Except
 //      On E: Exception Do
 //      Begin
-//        UtLog_Execute('TFrPlantilla_Documento.SetImage 1, ' + E.Message);
+//        Utils_ManagerLog_Add('TFrPlantilla_Documento.SetImage 1, ' + E.Message);
 //      End;
 //    End;
 //  End
@@ -296,7 +297,7 @@ Begin
 //    Except
 //      On E: Exception Do
 //      Begin
-//        UtLog_Execute('TFrPlantilla_Documento.SetImage 2, ' + E.Message);
+//        Utils_ManagerLog_Add('TFrPlantilla_Documento.SetImage 2, ' + E.Message);
 //      End;
 //    End;
 //  End;
@@ -328,7 +329,7 @@ Begin
     On E: Exception Do
     Begin
       pError := E.Message;
-      UtLog_Execute('TFrPlantilla_Documento.SetHead, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_Plantilla_Documento', 'TFrPlantilla_Documento.SetHead', E.Message);
     End;
   End;
 End;
@@ -359,7 +360,7 @@ Begin
     On E: Exception Do
     Begin
       pError := E.Message;
-      UtLog_Execute('TFrPlantilla_Documento.SetHead, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_Plantilla_Formato', 'TFrPlantilla_Documento.SetHead', E.Message);
     End;
   End;
 End;
@@ -398,7 +399,7 @@ Begin
   Try
     lM := TQUERY.Create(Nil);
     lM.Connection := UserSession.CNX;
-    lM.SQL.Add(' SELECT * FROM ' + gInfo_Tablas[Id_TBL_Usuario_Reporte].Name + UserSession.CNX.No_Lock);
+    lM.SQL.Add(' SELECT * FROM ' + Info_TablaGet(Id_TBL_Usuario_Reporte).Name + UserSession.CNX.No_Lock);
     lM.SQL.Add(' WHERE ' + UserSession.CNX.Trim_Sentence('CODIGO_USUARIO') + ' = ' + QuotedStr(Trim(UserSession.USER_CODE)));
     lM.SQL.Add(' ORDER BY LINEA ');
     lM.Active := True;
@@ -493,7 +494,7 @@ Begin
     On E: Exception Do
     Begin
       pError := E.Message;
-      UtLog_Execute('Form_Plantilla_Reporte_Ercol, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_Plantilla_Formato', 'Form_Plantilla_Reporte_Ercol', E.Message);
     End;
   End;
 End;
@@ -506,7 +507,7 @@ begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrPlantilla_Documento.FormCreate, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_Plantilla_Formato', 'TFrPlantilla_Documento.FormCreate', E.Message);
     End;
   End;
 end;

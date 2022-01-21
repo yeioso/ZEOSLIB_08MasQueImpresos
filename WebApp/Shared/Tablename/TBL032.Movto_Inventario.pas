@@ -1,28 +1,28 @@
-unit TBL031.Movto_Inventario;
+unit TBL032.Movto_Inventario;
 
 interface
 Uses
   UtConexion;
 
-Function TBL031_Movto_Inventario_Create(pCnx : TConexion) : Boolean;
+Function TBL032_Movto_Inventario_Create(pCnx : TConexion) : Boolean;
 
 implementation
 
 Uses
-  UtLog,
   UtError,
   SysUtils,
-  TBL000.Info_Tabla;
+  TBL000.Info_Tabla,
+  UtilsIW.ManagerLog;
 
-Function TBL031_Movto_Inventario_Create(pCnx : TConexion) : Boolean;
+Function TBL032_Movto_Inventario_Create(pCnx : TConexion) : Boolean;
 Begin
   Result := True;
-  if Not pCnx.TableExists(gInfo_Tablas[Id_TBL_Movto_Inventario].Name) then
+  if Not pCnx.TableExists(Info_TablaGet(Id_TBL_Movto_Inventario).Name) then
   Begin
     Try
       pCnx.TMP.SQL.Clear;
-      pCnx.TMP.SQL.Add('   CREATE TABLE ' + gInfo_Tablas[Id_TBL_Movto_Inventario].Name + ' '                   );
-      pCnx.TMP.SQL.Add('   (  '                                                                                );
+      pCnx.TMP.SQL.Add('   CREATE TABLE ' + Info_TablaGet(Id_TBL_Movto_Inventario).Name + ' '                   );
+      pCnx.TMP.SQL.Add('   (  '                                                                                 );
       pCnx.TMP.SQL.Add('      CODIGO_DOCUMENTO '    + pCNX.Return_Type(TYPE_VARCHAR) + ' (030) ' + ' NOT NULL, ');
       pCnx.TMP.SQL.Add('      NUMERO  '             + pCNX.Return_Type(TYPE_INT    ) + ' '       + ' NOT NULL, ');
       pCnx.TMP.SQL.Add('      CODIGO_DOCUMENTO_OP ' + pCNX.Return_Type(TYPE_VARCHAR) + ' (030) ' + ' NOT NULL, ');
@@ -41,18 +41,18 @@ Begin
       pCnx.TMP.SQL.Add('      ID_ACTIVO '           + pCNX.Return_Type(TYPE_VARCHAR) + ' (001) ' + ' NULL, '    );
       pCnx.TMP.SQL.Add('      TAG_INFO '            + pCNX.Return_Type(TYPE_INT    ) + ' '       + ' NULL, '    );
       pCnx.TMP.SQL.Add('      PRIMARY KEY (CODIGO_DOCUMENTO, NUMERO), '                                         );
-      pCnx.TMP.SQL.Add(' ' + pCNX.FOREINGKEY(gInfo_Tablas[Id_TBL_Movto_Inventario].Fk[1],'CODIGO_DOCUMENTO'  , gInfo_Tablas[Id_TBL_Administrador_Documento].Name, 'CODIGO_DOCUMENTO') + ', ');
-      pCnx.TMP.SQL.Add(' ' + pCNX.FOREINGKEY(gInfo_Tablas[Id_TBL_Movto_Inventario].Fk[2],'CODIGO_PRODUCTO'   , gInfo_Tablas[Id_TBL_Producto               ].Name, 'CODIGO_PRODUCTO' ) + ', ');
-      pCnx.TMP.SQL.Add(' ' + pCNX.FOREINGKEY(gInfo_Tablas[Id_TBL_Movto_Inventario].Fk[3],'CODIGO_TERCERO'    , gInfo_Tablas[Id_TBL_Tercero                ].Name, 'CODIGO_TERCERO'  ) + ', ');
-      pCnx.TMP.SQL.Add(' ' + pCNX.FOREINGKEY(gInfo_Tablas[Id_TBL_Movto_Inventario].Fk[4],'CODIGO_USUARIO'    , gInfo_Tablas[Id_TBL_Usuario                ].Name, 'CODIGO_USUARIO'  ) + ', ');
-      pCnx.TMP.SQL.Add(' ' + pCNX.FOREINGKEY(gInfo_Tablas[Id_TBL_Movto_Inventario].Fk[5],'CODIGO_DOCUMENTO_OP, NUMERO_OP', gInfo_Tablas[Id_TBL_Orden_Produccion].Name, 'CODIGO_DOCUMENTO, NUMERO') + ' ');
+      pCnx.TMP.SQL.Add(' ' + pCNX.FOREINGKEY(Info_TablaGet(Id_TBL_Movto_Inventario).Fk[1],'CODIGO_DOCUMENTO'  , Info_TablaGet(Id_TBL_Administrador_Documento).Name, 'CODIGO_DOCUMENTO') + ', ');
+      pCnx.TMP.SQL.Add(' ' + pCNX.FOREINGKEY(Info_TablaGet(Id_TBL_Movto_Inventario).Fk[2],'CODIGO_PRODUCTO'   , Info_TablaGet(Id_TBL_Producto               ).Name, 'CODIGO_PRODUCTO' ) + ', ');
+      pCnx.TMP.SQL.Add(' ' + pCNX.FOREINGKEY(Info_TablaGet(Id_TBL_Movto_Inventario).Fk[3],'CODIGO_TERCERO'    , Info_TablaGet(Id_TBL_Tercero                ).Name, 'CODIGO_TERCERO'  ) + ', ');
+      pCnx.TMP.SQL.Add(' ' + pCNX.FOREINGKEY(Info_TablaGet(Id_TBL_Movto_Inventario).Fk[4],'CODIGO_USUARIO'    , Info_TablaGet(Id_TBL_Usuario                ).Name, 'CODIGO_USUARIO'  ) + ', ');
+      pCnx.TMP.SQL.Add(' ' + pCNX.FOREINGKEY(Info_TablaGet(Id_TBL_Movto_Inventario).Fk[5],'CODIGO_DOCUMENTO_OP, NUMERO_OP', Info_TablaGet(Id_TBL_Orden_Produccion).Name, 'CODIGO_DOCUMENTO, NUMERO') + ' ');
       pCnx.TMP.SQL.Add('   ) ');
       pCnx.TMP.ExecSQL;
     Except
       On E : Exception Do
       Begin
         Result := False;
-        UtLog_Execute(MessageError(IE_ERROR_CREATE) + ' Tabla ' + gInfo_Tablas[Id_TBL_Movto_Inventario].Name + ', TBL031_Movto_Inventario_Create, ' + E.Message);
+        Utils_ManagerLog_Add('DATABASE', 'TBL032.Movto_Inventario', 'TBL032_Movto_Inventario_Create', E.Message);
       End;
     End;
   End;

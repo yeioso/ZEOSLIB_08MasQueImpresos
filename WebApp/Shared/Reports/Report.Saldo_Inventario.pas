@@ -11,11 +11,11 @@ Function Report_Saldo_Inventario_Reporte(pCNX: TConexion; Const pCodigo_Producto
 implementation
 
 Uses
-  UtLog,
   UtFuncion,
   System.SysUtils,
   ServerController,
-  TBL000.Info_Tabla;
+  TBL000.Info_Tabla,
+  UtilsIW.ManagerLog;
 
 Type
   TReport_Saldo_Inventario = Class
@@ -52,7 +52,7 @@ Begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TReport_Saldo_Inventario.Create, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Report.Saldo_Inventario', 'TReport_Saldo_Inventario.Create', E.Message);
     End;
   End;
 End;
@@ -62,18 +62,18 @@ Begin
   Result := False;
   Try
     FOUTPUT.SQL.Clear;
-    FOUTPUT.SQL.Add(' DELETE FROM ' + gInfo_Tablas[Id_TBL_Usuario_Reporte].Name + ' ');
+    FOUTPUT.SQL.Add(' DELETE FROM ' + Info_TablaGet(Id_TBL_Usuario_Reporte).Name + ' ');
     FOUTPUT.SQL.Add(' WHERE ' + FCNX.Trim_Sentence('CODIGO_USUARIO')  + ' = ' + QuotedStr(Trim(UserSession.USER_CODE)) + ' ');
     FOUTPUT.ExecSQL;
     FOUTPUT.SQL.Clear;
-    FOUTPUT.SQL.Add(' SELECT * FROM ' + gInfo_Tablas[Id_TBL_Usuario_Reporte].Name + ' ');
+    FOUTPUT.SQL.Add(' SELECT * FROM ' + Info_TablaGet(Id_TBL_Usuario_Reporte).Name + ' ');
     FOUTPUT.SQL.Add(' WHERE ' + FCNX.Trim_Sentence('CODIGO_USUARIO')  + ' = ' + QuotedStr(Trim(UserSession.USER_CODE)) + ' ');
     FOUTPUT.Active := True;
     Result := FOUTPUT.Active;
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TReport_Saldo_Inventario.Create, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Report.Saldo_Inventario', 'TReport_Saldo_Inventario.Inicializar_Reporte', E.Message);
     End;
   End;
 End;
@@ -97,7 +97,7 @@ Begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TReport_Saldo_Inventario.SaveData, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Report.Saldo_Inventario', 'TReport_Saldo_Inventario.SaveData', E.Message);
     End;
   End;
 End;
@@ -118,8 +118,8 @@ Begin
     FINPUT.SQL.Add('        ,  PROD.STOCK_MAXIMO ');
     FINPUT.SQL.Add('        ,  SUM(MOVTO.CANTIDAD) AS ENTRADA ');
     FINPUT.SQL.Add('        , 0 AS SALIDA ');
-    FINPUT.SQL.Add('   FROM ' + gInfo_Tablas[Id_TBL_Movto_Inventario].Name + ' MOVTO ' + FCNX.No_Lock );
-    FINPUT.SQL.Add('   INNER JOIN ' + gInfo_Tablas[Id_TBL_Producto].Name + ' PROD ' + FCNX.No_Lock );
+    FINPUT.SQL.Add('   FROM ' + Info_TablaGet(Id_TBL_Movto_Inventario).Name + ' MOVTO ' + FCNX.No_Lock );
+    FINPUT.SQL.Add('   INNER JOIN ' + Info_TablaGet(Id_TBL_Producto).Name + ' PROD ' + FCNX.No_Lock );
     FINPUT.SQL.Add('   ON PROD.CODIGO_PRODUCTO = MOVTO.CODIGO_PRODUCTO ' );
     FINPUT.SQL.Add('   WHERE ' + FCNX.Trim_Sentence('MOVTO.CODIGO_PRODUCTO') + ' BETWEEN ' + QuotedStr(Trim(FCODIGO_PRODUCTO_INI)) + ' AND ' + QuotedStr(Trim(FCODIGO_PRODUCTO_FIN)));
     FINPUT.SQL.Add('   AND ' );
@@ -137,8 +137,8 @@ Begin
     FINPUT.SQL.Add('        ,  PROD.STOCK_MAXIMO ');
     FINPUT.SQL.Add('        , 0 AS ENTRADA ');
     FINPUT.SQL.Add('        , SUM(MOVTO.CANTIDAD) AS SALIDAD ');
-    FINPUT.SQL.Add('   FROM ' + gInfo_Tablas[Id_TBL_Movto_Inventario].Name + ' MOVTO ' + FCNX.No_Lock );
-    FINPUT.SQL.Add('   INNER JOIN ' + gInfo_Tablas[Id_TBL_Producto].Name + ' PROD ' + FCNX.No_Lock );
+    FINPUT.SQL.Add('   FROM ' + Info_TablaGet(Id_TBL_Movto_Inventario).Name + ' MOVTO ' + FCNX.No_Lock );
+    FINPUT.SQL.Add('   INNER JOIN ' + Info_TablaGet(Id_TBL_Producto).Name + ' PROD ' + FCNX.No_Lock );
     FINPUT.SQL.Add('   ON PROD.CODIGO_PRODUCTO = MOVTO.CODIGO_PRODUCTO ' );
     FINPUT.SQL.Add('   WHERE ' + FCNX.Trim_Sentence('MOVTO.CODIGO_PRODUCTO') + ' BETWEEN ' + QuotedStr(Trim(FCODIGO_PRODUCTO_INI)) + ' AND ' + QuotedStr(Trim(FCODIGO_PRODUCTO_FIN)));
     FINPUT.SQL.Add('   AND ' + FCNX.Trim_Sentence('MOVTO.CODIGO_DOCUMENTO') + ' = ' + QuotedStr(Trim(UserSession.DOCUMENTO_SALIDA_DE_INVENTARIO)));
@@ -151,7 +151,7 @@ Begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TReport_Saldo_Inventario.GetData, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Report.Saldo_Inventario', 'TReport_Saldo_Inventario.GetData', E.Message);
     End;
   End;
 End;
@@ -165,7 +165,7 @@ Begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TReport_Saldo_Inventario.Calcular_Saldo, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Report.Saldo_Inventario', 'TReport_Saldo_Inventario.Calcular_Saldo', E.Message);
     End;
   End;
 End;
@@ -186,7 +186,7 @@ Begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TReport_Saldo_Inventario.SetLinea, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Report.Saldo_Inventario', 'TReport_Saldo_Inventario.SetLinea', E.Message);
     End;
   End;
 End;
@@ -216,7 +216,7 @@ Begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TReport_Saldo_Inventario.PutData, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Report.Saldo_Inventario', 'TReport_Saldo_Inventario.PutData', E.Message);
     End;
   End;
 End;
@@ -238,7 +238,7 @@ Begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TReport_Saldo_Inventario.Destroy, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Report.Saldo_Inventario', 'TReport_Saldo_Inventario.Destroy', E.Message);
     End;
   End;
 End;
@@ -256,7 +256,7 @@ Begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('Report_Saldo_Inventario_Saldo, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Report.Saldo_Inventario', 'Report_Saldo_Inventario_Saldo', E.Message);
     End;
   End;
 End;
@@ -278,7 +278,7 @@ Begin
     On E: Exception Do
     Begin
       Result := False;
-      UtLog_Execute('Report_Saldo_Inventario_Reporte, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Report.Saldo_Inventario', 'Report_Saldo_Inventario_Reporte', E.Message);
     End;
   End;
 End;

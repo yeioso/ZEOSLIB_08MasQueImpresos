@@ -58,12 +58,12 @@ implementation
 Uses
   db,
   Math,
-  UtLog,
   StrUtils,
   Variants,
   UtFuncion,
   ServerController,
   TBL000.Info_Tabla,
+  UtilsIW.ManagerLog,
   UtilsIW.Permisos_App;
 
 { TFrIWPerfil_Permiso }
@@ -84,7 +84,7 @@ begin
       UserSession.SetMessage('Registro almacenado', False);
     Except
       On E: Exception Do
-        UtLog_Execute('TFrIWPerfil_Permiso.Confirmacion_Guardar, ' + E.Message);
+        Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWPerfil_Permiso', 'TFrIWPerfil_Permiso.Confirmacion_Guardar', E.Message);
     End;
   End;
 //  WebApplication.ShowNotification('This is the callback. ' + 'The selected button was: ' + SelectedButton, MsgType);
@@ -106,7 +106,7 @@ begin
       UserSession.SetMessage('Registro eliminado', False);
     Except
       On E: Exception Do
-        UtLog_Execute('TFrIWPerfil_Permiso.Confirmacion_Guardar, ' + E.Message);
+        Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWPerfil_Permiso', 'TFrIWPerfil_Permiso.Confirmacion_Guardar', E.Message);
     End;
   End;
 //  WebApplication.ShowNotification('This is the callback. ' + 'The selected button was: ' + SelectedButton, MsgType);
@@ -133,7 +133,7 @@ Begin
       FQRDETALLE.QR.FieldByName('HABILITA_OPCION').AsString := IfThen(Result_Is_OK(EventParams.Values['RetValue']), 'S', 'N');
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWPerfil_Permiso.Resultado_Activo, ' + e.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWPerfil_Permiso', 'TFrIWPerfil_Permiso.Resultado_Activo', E.Message);
   End;
 End;
 
@@ -146,7 +146,7 @@ begin
   Inherited Create(AOwner);
   Try
     Randomize;
-    Self.Name := 'PERFIL_PERMISO' + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000));
+    Self.Name := 'TFrIWPerfil_Permiso' + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000));
     WebApplication.RegisterCallBack(Self.Name + '.Confirmacion_Guardar'    , Confirmacion_Guardar    );
     WebApplication.RegisterCallBack(Self.Name + '.Confirmacion_Eliminacion', Confirmacion_Eliminacion);
     WebApplication.RegisterCallBack(Self.Name + '.Resultado_Activo'        , Resultado_Activo        );
@@ -169,7 +169,7 @@ begin
     FGRID_MAESTRO.Height := 300;
 
 
-    FQRDETALLE := UserSession.Create_Manager_Data(gInfo_Tablas[Id_TBL_Permiso_App].Name, gInfo_Tablas[Id_TBL_Permiso_App].Caption);
+    FQRDETALLE := UserSession.Create_Manager_Data(Info_TablaGet(Id_TBL_Permiso_App).Name, Info_TablaGet(Id_TBL_Permiso_App).Caption);
     FQRDETALLE.ON_NEW_RECORD   := NewRecordDetalle;
     FQRDETALLE.ON_BEFORE_POST  := Validar_Campos_Detalle;
     FQRDETALLE.ON_DATA_CHANGE  := DsDataChangeDetalle;
@@ -189,7 +189,7 @@ begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrIWPerfil_Permiso.Create, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWPerfil_Permiso', 'TFrIWPerfil_Permiso.Create', E.Message);
     End;
   End;
 end;
@@ -213,7 +213,7 @@ begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrIWPerfil_Permiso.Destroy, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWPerfil_Permiso', 'TFrIWPerfil_Permiso.Destroy', E.Message);
     End;
   End;
   inherited;
@@ -236,7 +236,7 @@ begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrIWPerfil_Permiso.BTNADDAsyncClick, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWPerfil_Permiso', 'TFrIWPerfil_Permiso.BTNADDAsyncClick', E.Message);
     End;
   End;
 end;
@@ -248,7 +248,7 @@ begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrIWPerfil_Permiso.BTNCANCELAsyncClick, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWPerfil_Permiso', 'TFrIWPerfil_Permiso.BTNCANCELAsyncClick', E.Message);
     End;
   End;
 end;
@@ -260,7 +260,7 @@ begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrIWPerfil_Permiso.BTNEDITAsyncClick, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWPerfil_Permiso', 'TFrIWPerfil_Permiso.BTNEDITAsyncClick', E.Message);
     End;
   End;
 end;
@@ -276,7 +276,7 @@ Begin
   Result := False;
   Try
     FQRDETALLE.Active := False;
-    FQRDETALLE.SENTENCE := ' SELECT * FROM ' + gInfo_Tablas[Id_TBL_Permiso_App].Name + FCNX.No_Lock;
+    FQRDETALLE.SENTENCE := ' SELECT * FROM ' + Info_TablaGet(Id_TBL_Permiso_App).Name + FCNX.No_Lock;
     FQRDETALLE.WHERE    := ' WHERE ' + FCNX.Trim_Sentence('CODIGO_PERFIL') + ' = ' + QuotedStr(Trim(FCODIGO_PERFIL));
     If Not Vacio(pDato) Then
     Begin
@@ -293,7 +293,7 @@ Begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrIWPerfil_Permiso.AbrirDetalle, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWPerfil_Permiso', 'TFrIWPerfil_Permiso.AbrirDetalle', E.Message);
     End;
   End;
 End;
@@ -322,7 +322,7 @@ Begin
     End;
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWPerfil_Permiso.Validar_Campos_Detalle, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWPerfil_Permiso', 'TFrIWPerfil_Permiso.Validar_Campos_Detalle', E.Message);
   End;
 End;
 
@@ -331,12 +331,12 @@ begin
   Inherited;
   Try
     FQRDETALLE.QR.FieldByName('CODIGO_PERFIL'  ).AsString := FCODIGO_PERFIL;
-    FQRDETALLE.QR.FieldByName('CONSECUTIVO'    ).AsString := FCNX.Next(gInfo_Tablas[Id_TBL_Permiso_App].Name, '0', ['CONSECUTIVO'], [],[], FQRDETALLE.QR.FieldByName('CODIGO_PERFIL').Size);
+    FQRDETALLE.QR.FieldByName('CONSECUTIVO'    ).AsString := FCNX.Next(Info_TablaGet(Id_TBL_Permiso_App).Name, '0', ['CONSECUTIVO'], [],[], FQRDETALLE.QR.FieldByName('CODIGO_PERFIL').Size);
     FQRDETALLE.QR.FieldByName('HABILITA_OPCION').AsString := 'S';
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrIWPerfil_Permiso.NewRecordDetalle, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWPerfil_Permiso', 'TFrIWPerfil_Permiso.NewRecordDetalle', E.Message);
     End;
   End;
 end;
@@ -348,7 +348,7 @@ Begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrIWPerfil_Permiso.DsDataChangeDetalle, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWPerfil_Permiso', 'TFrIWPerfil_Permiso.DsDataChangeDetalle', E.Message);
     End;
   End;
 End;

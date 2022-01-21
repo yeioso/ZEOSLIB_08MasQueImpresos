@@ -10,7 +10,7 @@ uses
   IWCompTabControl, IWBaseComponent, IWBaseHTMLComponent, IWBaseHTML40Component,
   UtConexion, Data.DB, IWCompGrids, IWDBStdCtrls, IWCompEdit,
   IWCompCheckbox, IWCompMemo, IWDBExtCtrls, IWCompButton, IWCompListbox,
-  UtGrid_JQ, UtNavegador_ASE, UtilsIW.Busqueda;
+  UtGrid_JQ, UtNavegador_ASE, UtilsIW.Busqueda, Form_IWFrame;
 
 type
   TFrIWUsuario_Enc = class(TIWAppForm)
@@ -28,54 +28,42 @@ type
     IWLabel2: TIWLabel;
     IWLabel3: TIWLabel;
     IWLabel4: TIWLabel;
-    IWLabel7: TIWLabel;
-    IWLabel10: TIWLabel;
-    IWRDETALLE: TIWRegion;
-    IWRBOTONDETALLE: TIWRegion;
-    BTNCONTRASENA: TIWImage;
     IWCambiarPassword: TIWRegion;
     IWLabel35: TIWLabel;
     MANAGER_PASSWORD: TIWEdit;
-    BtnGrid: TIWImage;
     IWModalWindow1: TIWModalWindow;
-    BTNCODIGO: TIWImage;
-    CODIGO_USUARIO: TIWDBLabel;
-    BTNNOMBRE: TIWImage;
-    NOMBRE: TIWDBLabel;
-    BTNDIRECCION: TIWImage;
-    DIRECCION: TIWDBLabel;
-    BTNEMAIL: TIWImage;
-    EMAIL: TIWDBLabel;
-    TELEFONO_1: TIWDBLabel;
-    TELEFONO_2: TIWDBLabel;
-    BTNTELEFONO_2: TIWImage;
-    BTNTELEFONO_1: TIWImage;
-    lbNombre_Activo: TIWLabel;
-    BTNACTIVO: TIWImage;
+    IWRegion_Navegador: TIWRegion;
+    CODIGO_USUARIO: TIWDBEdit;
+    NOMBRE: TIWDBEdit;
+    DIRECCION: TIWDBEdit;
+    EMAIL: TIWDBEdit;
+    TELEFONO_1: TIWDBEdit;
+    TELEFONO_2: TIWDBEdit;
+    IWLabel7: TIWLabel;
+    IWLabel10: TIWLabel;
     BTNCODIGO_PERFIL: TIWImage;
     CODIGO_PERFIL: TIWDBLabel;
     lbNombre_Perfil: TIWLabel;
     CONTRASENA: TIWDBEdit;
-    IWRegion_Navegador: TIWRegion;
+    ID_ACTIVO: TIWDBCheckBox;
+    IWRDETALLE: TIWRegion;
     GRID_DETALLE: TIWListbox;
+    IWRBOTONDETALLE: TIWRegion;
+    BtnGrid: TIWImage;
+    BTNCONTRASENA: TIWImage;
     procedure BTNBACKAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure IWAppFormCreate(Sender: TObject);
     procedure IWAppFormDestroy(Sender: TObject);
     procedure BTNBUSCARAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BtnAcarreoAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNCONTRASENAAsyncClick(Sender: TObject; EventParams: TStringList);
-    procedure BTNCODIGOAsyncClick(Sender: TObject; EventParams: TStringList);
-    procedure BTNNOMBREAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNDIRECCIONAsyncClick(Sender: TObject; EventParams: TStringList);
-    procedure BTNEMAILAsyncClick(Sender: TObject; EventParams: TStringList);
-    procedure BTNTELEFONO_1AsyncClick(Sender: TObject; EventParams: TStringList);
-    procedure BTNTELEFONO_2AsyncClick(Sender: TObject; EventParams: TStringList);
-    procedure BTNACTIVOAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNCODIGO_PERFILAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BtnGridAsyncClick(Sender: TObject; EventParams: TStringList);
   private
     FCNX : TConexion;
     FINFO : String;
+    FFRAME : TFrIWFrame;
     FCODIGO_USUARIO : String;
 
     FQRMAESTRO : TMANAGER_DATA;
@@ -89,14 +77,6 @@ type
     Procedure Resultado_Perfil(Sender: TObject; EventParams: TStringList);
     procedure Buscar_Info(pSD : Integer; pEvent : TIWAsyncEvent);
     Procedure Asignar_Password(Sender: TObject;  EventParams: TStringList);
-
-    procedure Resultado_Codigo(EventParams: TStringList);
-    procedure Resultado_Nombre(EventParams: TStringList);
-    procedure Resultado_Direccion(EventParams: TStringList);
-    procedure Resultado_Email(EventParams: TStringList);
-    procedure Resultado_Telefono_1(EventParams: TStringList);
-    procedure Resultado_Telefono_2(EventParams: TStringList);
-    procedure Resultado_Activo(EventParams: TStringList);
 
     Procedure Release_Me;
 
@@ -124,7 +104,6 @@ implementation
 
 Uses
   Math,
-  UtLog,
   UtType,
   UtFecha,
   Variants,
@@ -135,7 +114,8 @@ Uses
   System.UITypes,
   System.StrUtils,
   ServerController,
-  TBL000.Info_Tabla;
+  TBL000.Info_Tabla,
+  UtilsIW.ManagerLog;
 
 Procedure TFrIWUsuario_Enc.Resultado_Perfil(Sender: TObject; EventParams: TStringList);
 Begin
@@ -146,7 +126,7 @@ Begin
     End;
   Except
    On E: Exception Do
-     UtLog_Execute('TFrIWUsuario_Enc.Resultado_Perfil, ' + e.Message);
+     Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWUsuario_Enc', 'TFrIWUsuario_Enc.Resultado_Perfil', E.Message);
   End;
 End;
 
@@ -178,88 +158,7 @@ begin
     End;
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWUsuario_Enc.Buscar_Info, ' + e.Message);
-  End;
-End;
-
-procedure TFrIWUsuario_Enc.Resultado_Codigo(EventParams: TStringList);
-Begin
-  Try
-    If FQRMAESTRO.Mode_Edition And (Result_Is_OK(EventParams.Values['RetValue'])) Then
-    Begin
-      FQRMAESTRO.QR.FieldByName('CODIGO_USUARIO').AsString := Justificar(EventParams.Values['InputStr'], ' ', FQRMAESTRO.QR.FieldByName('CODIGO_USUARIO').Size);
-    End;
-  Except
-    On E: Exception Do
-      UtLog_Execute('TFrIWUsuario_Enc.Resultado_Codigo, ' + e.Message);
-  End;
-End;
-
-procedure TFrIWUsuario_Enc.Resultado_Nombre(EventParams: TStringList);
-Begin
-  Try
-    If FQRMAESTRO.Mode_Edition And (Result_Is_OK(EventParams.Values['RetValue'])) Then
-    Begin
-      FQRMAESTRO.QR.FieldByName('NOMBRE').AsString := AnsiUpperCase(Trim(EventParams.Values['InputStr']));
-    End;
-  Except
-    On E: Exception Do
-      UtLog_Execute('TFrIWUsuario_Enc.Resultado_Nombre, ' + e.Message);
-  End;
-End;
-
-procedure TFrIWUsuario_Enc.Resultado_Direccion(EventParams: TStringList);
-Begin
-  Try
-    If FQRMAESTRO.Mode_Edition And (Result_Is_OK(EventParams.Values['RetValue'])) Then
-      FQRMAESTRO.QR.FieldByName('DIRECCION').AsString := AnsiUpperCase(Trim(EventParams.Values['InputStr']));
-  Except
-    On E: Exception Do
-      UtLog_Execute('TFrIWUsuario_Enc.Resultado_Direccion, ' + e.Message);
-  End;
-End;
-
-procedure TFrIWUsuario_Enc.Resultado_Email(EventParams: TStringList);
-Begin
-  Try
-    If FQRMAESTRO.Mode_Edition And (Result_Is_OK(EventParams.Values['RetValue'])) Then
-      FQRMAESTRO.QR.FieldByName('EMAIL').AsString := LowerCase(Trim(EventParams.Values['InputStr']));
-  Except
-    On E: Exception Do
-      UtLog_Execute('TFrIWUsuario_Enc.Resultado_Email, ' + e.Message);
-  End;
-End;
-
-procedure TFrIWUsuario_Enc.Resultado_Telefono_1(EventParams: TStringList);
-Begin
-  Try
-    If FQRMAESTRO.Mode_Edition And (Result_Is_OK(EventParams.Values['RetValue'])) Then
-      FQRMAESTRO.QR.FieldByName('TELEFONO_1').AsString := AnsiUpperCase(Trim(EventParams.Values['InputStr']));
-  Except
-    On E: Exception Do
-      UtLog_Execute('TFrIWUsuario_Enc.Resultado_Telefono_1, ' + e.Message);
-  End;
-End;
-
-procedure TFrIWUsuario_Enc.Resultado_Telefono_2(EventParams: TStringList);
-Begin
-  Try
-    If FQRMAESTRO.Mode_Edition And (Result_Is_OK(EventParams.Values['RetValue'])) Then
-      FQRMAESTRO.QR.FieldByName('TELEFONO_2').AsString := AnsiUpperCase(Trim(EventParams.Values['InputStr']));
-  Except
-    On E: Exception Do
-      UtLog_Execute('TFrIWUsuario_Enc.Resultado_Telefono_2, ' + e.Message);
-  End;
-End;
-
-procedure TFrIWUsuario_Enc.Resultado_Activo(EventParams: TStringList);
-Begin
-  Try
-    If FQRMAESTRO.Mode_Edition Then
-      FQRMAESTRO.QR.FieldByName('ID_ACTIVO').AsString := IfThen(Result_Is_OK(EventParams.Values['RetValue']), 'S', 'N');
-  Except
-    On E: Exception Do
-      UtLog_Execute('TFrIWUsuario_Enc.Resultado_Activo, ' + e.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWUsuario_Enc', 'TFrIWUsuario_Enc.Buscar_Info', E.Message);
   End;
 End;
 
@@ -305,7 +204,7 @@ End;
 
 Function TFrIWUsuario_Enc.Existe_Usuario(Const pCODIGO_USUARIO : String) : Boolean;
 Begin
-  Result := FCNX.Record_Exist(gInfo_Tablas[Id_TBL_Usuario].Name, ['CODIGO_USUARIO'], [pCODIGO_USUARIO]);
+  Result := FCNX.Record_Exist(Info_TablaGet(Id_TBL_Usuario).Name, ['CODIGO_USUARIO'], [pCODIGO_USUARIO]);
 End;
 
 Procedure TFrIWUsuario_Enc.Validar_Campos_Master(pSender: TObject);
@@ -321,7 +220,7 @@ Begin
     CODIGO_PERFIL.BGColor := UserSession.COLOR_OK;
     CONTRASENA.BGColor := UserSession.COLOR_OK;
 
-    If BTNCODIGO.Visible Then
+    If FQRMAESTRO.Mode_Insert Then
     Begin
       If Vacio(FQRMAESTRO.QR.FieldByName('CODIGO_USUARIO').AsString) Then
       Begin
@@ -329,20 +228,24 @@ Begin
         CODIGO_USUARIO.BGColor := UserSession.COLOR_ERROR;
       End
       Else
-        If FCNX.Record_Exist(gInfo_Tablas[Id_TBL_Usuario].Name, ['CODIGO_USUARIO'], [FQRMAESTRO.QR.FieldByName('CODIGO_USUARIO').AsString]) Then
+      Begin
+        FQRMAESTRO.QR.FieldByName('CODIGO_USUARIO').AsString := Justificar(FQRMAESTRO.QR.FieldByName('CODIGO_USUARIO').AsString, ' ', FQRMAESTRO.QR.FieldByName('CODIGO_USUARIO').Size);
+        FQRMAESTRO.QR.FieldByName('CODIGO_USUARIO').AsString := Copy(FQRMAESTRO.QR.FieldByName('CODIGO_USUARIO').AsString, 1, FQRMAESTRO.QR.FieldByName('CODIGO_USUARIO').Size);
+        If FCNX.Record_Exist(Info_TablaGet(Id_TBL_Usuario).Name, ['CODIGO_USUARIO'], [FQRMAESTRO.QR.FieldByName('CODIGO_USUARIO').AsString]) Then
         Begin
           lMensaje := lMensaje + IfThen(Not Vacio(lMensaje), ', ') + 'Usuario ya existente';
           CODIGO_USUARIO.BGColor := UserSession.COLOR_ERROR;
         End;
+      End;
     End;
 
-    If BTNNOMBRE.Visible And Vacio(FQRMAESTRO.QR.FieldByName('NOMBRE').AsString) Then
+    If FQRMAESTRO.Mode_Edition And Vacio(FQRMAESTRO.QR.FieldByName('NOMBRE').AsString) Then
     Begin
       lMensaje := lMensaje + IfThen(Not Vacio(lMensaje), ', ') + 'Nombre invalido';
       NOMBRE.BGColor := UserSession.COLOR_ERROR;
     End;
 
-    If BTNCONTRASENA.Visible And  Vacio(FQRMAESTRO.QR.FieldByName('CONTRASENA').AsString) Then
+    If FQRMAESTRO.Mode_Edition And  Vacio(FQRMAESTRO.QR.FieldByName('CONTRASENA').AsString) Then
     Begin
       lMensaje := lMensaje + IfThen(Not Vacio(lMensaje), ', ') +  'Contraseña invalido';
       CONTRASENA.BGColor := UserSession.COLOR_ERROR;
@@ -362,26 +265,26 @@ Begin
     End;
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWUsuario_Enc.Validar_Campos_Master, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWUsuario_Enc', 'TFrIWUsuario_Enc.Validar_Campos_Master', E.Message);
   End;
 End;
 
 Procedure TFrIWUsuario_Enc.Estado_Controles;
 Begin
-  CONTRASENA.Enabled        := False;
-  BTNCODIGO.Visible         :=  (FQRMAESTRO.DS.State In [dsInsert]) And Documento_Activo;
-  BTNNOMBRE.Visible         := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  BTNDIRECCION.Visible      := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  BTNEMAIL.Visible          := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  BTNTELEFONO_1.Visible     := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  BTNTELEFONO_2.Visible     := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  BTNCONTRASENA.Visible     := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  BTNCODIGO_PERFIL.Visible  := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  BTNACTIVO.Visible         := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  IWRBOTONDETALLE.Visible   := FQRMAESTRO.ACTIVE And (Not FQRMAESTRO.Mode_Edition) And (FQRMAESTRO.QR.RecordCount > 0);
-  DATO.Visible              := (Not FQRMAESTRO.Mode_Edition);
-  PAG_00.Visible            := (Not FQRMAESTRO.Mode_Edition);
-  PAG_01.Visible            := True;
+  CONTRASENA.Enabled       := False;
+  CODIGO_USUARIO.Enabled   := FQRMAESTRO.Mode_Insert  And Documento_Activo;
+  NOMBRE.Enabled           := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  DIRECCION.Enabled        := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  EMAIL.Enabled            := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  TELEFONO_1.Enabled       := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  TELEFONO_2.Enabled       := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  BTNCONTRASENA.Visible    := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  BTNCODIGO_PERFIL.Visible := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  ID_ACTIVO.Enabled        := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  IWRBOTONDETALLE.Visible  := FQRMAESTRO.ACTIVE And (Not FQRMAESTRO.Mode_Edition) And (FQRMAESTRO.QR.RecordCount > 0);
+  DATO.Visible             := (Not FQRMAESTRO.Mode_Edition);
+  PAG_00.Visible           := (Not FQRMAESTRO.Mode_Edition);
+  PAG_01.Visible           := True;
 End;
 
 Procedure TFrIWUsuario_Enc.SetLabel;
@@ -389,12 +292,11 @@ Begin
   If Not FQRMAESTRO.Active Then
     Exit;
   Try
-    lbNombre_Activo.Caption := IfThen(FQRMAESTRO.QR.FieldByName('ID_ACTIVO').AsString = 'S', 'Esta activo', 'No esta activo');
-    lbNombre_Perfil.Caption := FCNX.GetValue(gInfo_Tablas[Id_TBL_Perfil].Name, ['CODIGO_PERFIL'], [FQRMAESTRO.QR.FieldByName('CODIGO_PERFIL').AsString], ['NOMBRE']);
+    lbNombre_Perfil.Caption := FCNX.GetValue(Info_TablaGet(Id_TBL_Perfil).Name, ['CODIGO_PERFIL'], [FQRMAESTRO.QR.FieldByName('CODIGO_PERFIL').AsString], ['NOMBRE']);
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrIWUsuario_Enc.SetLabel, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWUsuario_Enc', 'TFrIWUsuario_Enc.SetLabel', E.Message);
     End;
   End;
 End;
@@ -407,7 +309,7 @@ Begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrIWUsuario_Enc.Documento_Activo, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWUsuario_Enc', 'TFrIWUsuario_Enc.Documento_Activo', E.Message);
     End;
   End;
 End;
@@ -433,7 +335,7 @@ begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrIWUsuario_Enc.DsDataChangeMaster, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWUsuario_Enc', 'TFrIWUsuario_Enc.DsDataChangeMaster', E.Message);
     End;
   End;
 end;
@@ -448,24 +350,20 @@ Begin
     PAGINAS.ActivePage := 1;
   Case FQRMAESTRO.QR.State Of
     dsInsert : Begin
-//                 If CODIGO_USUARIO.Enabled Then
-//                   CODIGO_USUARIO.SetFocus;
                End;
     dsEdit   : Begin
-//                 If NOMBRE.Enabled Then
-//                   NOMBRE.SetFocus;
                End;
   End;
 End;
 
 Function TFrIWUsuario_Enc.AbrirMaestro(Const pDato: String = ''): Boolean;
 Begin
-  FGRID_MAESTRO.Caption := gInfo_Tablas[Id_TBL_Usuario].Caption;
+  FGRID_MAESTRO.Caption := Info_TablaGet(Id_TBL_Usuario).Caption;
   Result := False;
   Try
     FQRMAESTRO.Active := False;
     FQRMAESTRO.WHERE    := '';
-    FQRMAESTRO.SENTENCE := ' SELECT * FROM ' + gInfo_Tablas[Id_TBL_Usuario].Name + FCNX.No_Lock;
+    FQRMAESTRO.SENTENCE := ' SELECT * FROM ' + Info_TablaGet(Id_TBL_Usuario).Name + FCNX.No_Lock;
     If Trim(pDato) <> '' Then
     Begin
       FQRMAESTRO.WHERE := ' WHERE CODIGO_USUARIO LIKE ' + QuotedStr('%' + Trim(pDato) + '%');
@@ -480,7 +378,7 @@ Begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrIWUsuario_Enc.AbrirMaestro, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWUsuario_Enc', 'TFrIWUsuario_Enc.AbrirMaestro', E.Message);
     End;
   End;
   FGRID_MAESTRO.RefreshData;
@@ -492,7 +390,7 @@ Begin
   Try
     FCNX.TMP.Active := False;
     FCNX.TMP.SQL.Clear;
-    FCNX.TMP.SQL.Add(' SELECT * FROM ' + gInfo_Tablas[Id_TBL_Permiso_App].Name + FCNX.No_Lock);
+    FCNX.TMP.SQL.Add(' SELECT * FROM ' + Info_TablaGet(Id_TBL_Permiso_App).Name + FCNX.No_Lock);
     FCNX.TMP.SQL.Add(' WHERE CODIGO_PERFIL = ' + QuotedStr(FQRMAESTRO.QR.FieldByName('CODIGO_PERFIL').AsString));
     FCNX.TMP.SQL.Add(' ORDER BY NOMBRE ');
     FCNX.TMP.Active := True;
@@ -508,7 +406,7 @@ Begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrIWUsuario_Enc.AbrirDetalle, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWUsuario_Enc', 'TFrIWUsuario_Enc.AbrirDetalle', E.Message);
     End;
   End;
 End;
@@ -527,7 +425,7 @@ begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrIWUsuario_Enc.IWAppFormCreate, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWUsuario_Enc', 'TFrIWUsuario_Enc.IWAppFormCreate', E.Message);
     End;
   End;
 end;
@@ -535,17 +433,12 @@ end;
 procedure TFrIWUsuario_Enc.IWAppFormCreate(Sender: TObject);
 begin
   Randomize;
-  Self.Name := 'USUARIO' + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000));
+  Self.Name := 'TFrIWUsuario_Enc' + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000));
   FCNX := UserSession.CNX;
-  WebApplication.RegisterCallBack(Self.Name + '.Resultado_Codigo'    , Resultado_Codigo    );
-  WebApplication.RegisterCallBack(Self.Name + '.Resultado_Nombre'    , Resultado_Nombre    );
-  WebApplication.RegisterCallBack(Self.Name + '.Resultado_Direccion' , Resultado_Direccion );
-  WebApplication.RegisterCallBack(Self.Name + '.Resultado_Email'     , Resultado_Email     );
-  WebApplication.RegisterCallBack(Self.Name + '.Resultado_Telefono_1', Resultado_Telefono_1);
-  WebApplication.RegisterCallBack(Self.Name + '.Resultado_Telefono_2', Resultado_Telefono_2);
-  WebApplication.RegisterCallBack(Self.Name + '.Resultado_Activo'    , Resultado_Activo    );
+  FFRAME := TFrIWFrame.Create(Self);
+  FFRAME.Parent := Self;
   FCODIGO_ACTUAL := '';
-  FINFO := UserSession.FULL_INFO + gInfo_Tablas[Id_TBL_Usuario].Caption;
+  FINFO := UserSession.FULL_INFO + Info_TablaGet(Id_TBL_Usuario).Caption;
   Try
     FGRID_MAESTRO        := TGRID_JQ.Create(PAG_00);
     FGRID_MAESTRO.Parent := PAG_00;
@@ -554,7 +447,7 @@ begin
     FGRID_MAESTRO.Width  := 700;
     FGRID_MAESTRO.Height := 500;
 
-    FQRMAESTRO := UserSession.Create_Manager_Data(gInfo_Tablas[Id_TBL_Usuario].Name, gInfo_Tablas[Id_TBL_Usuario].Caption);
+    FQRMAESTRO := UserSession.Create_Manager_Data(Info_TablaGet(Id_TBL_Usuario).Name, Info_TablaGet(Id_TBL_Usuario).Caption);
 
     FQRMAESTRO.ON_NEW_RECORD   := NewRecordMaster;
     FQRMAESTRO.ON_DATA_CHANGE  := DsDataChangeMaster;
@@ -570,6 +463,7 @@ begin
     CONTRASENA.DataSource     := FQRMAESTRO.DS;
     CODIGO_PERFIL.DataSource  := FQRMAESTRO.DS;
     CODIGO_PERFIL.DataSource  := FQRMAESTRO.DS;
+    ID_ACTIVO.DataSource      := FQRMAESTRO.DS;
 
     FGRID_MAESTRO.SetGrid(FQRMAESTRO.DS, ['CODIGO_USUARIO', 'NOMBRE'     ],
                                          ['Usuario'       , 'Nombre'     ],
@@ -592,7 +486,7 @@ begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrIWUsuario_Enc.IWAppFormCreate, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWUsuario_Enc', 'TFrIWUsuario_Enc.IWAppFormCreate', E.Message);
     End;
   End;
 end;
@@ -612,9 +506,12 @@ begin
     If Assigned(FNAVEGADOR) Then
       FreeAndNil(FNAVEGADOR);
 
+    If Assigned(FFRAME) Then
+      FreeAndNil(FFRAME);
+
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWUsuario_Enc.IWAppFormDestroy, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWUsuario_Enc', 'TFrIWUsuario_Enc.IWAppFormDestroy', E.Message);
   End;
 end;
 
@@ -626,7 +523,7 @@ begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrIWUsuario_Enc.NewRecordMaster, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWUsuario_Enc', 'TFrIWUsuario_Enc.NewRecordMaster', E.Message);
     End;
   End;
 end;
@@ -634,12 +531,6 @@ end;
 procedure TFrIWUsuario_Enc.BtnAcarreoAsyncClick(Sender: TObject;  EventParams: TStringList);
 begin
   FQRMAESTRO.SetAcarreo(Not FQRMAESTRO.ACARREO, ['CODIGO_USUARIO'], [FQRMAESTRO.QR.FieldByName('CODIGO_USUARIO').AsString]);
-end;
-
-
-procedure TFrIWUsuario_Enc.BTNACTIVOAsyncClick(Sender: TObject; EventParams: TStringList);
-begin
-  WebApplication.ShowConfirm('Esta activo?', Self.Name + '.Resultado_Activo', 'Activo', 'Sí', 'No')
 end;
 
 procedure TFrIWUsuario_Enc.BTNBACKAsyncClick(Sender: TObject;  EventParams: TStringList);
@@ -655,7 +546,7 @@ Begin
     AbrirMaestro(EventParams.Values['CODIGO_USUARIO']);
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWUsuario_Enc.Localizar_Registro, ' + e.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWUsuario_Enc', 'TFrIWUsuario_Enc.Localizar_Registro', E.Message);
   End;
 End;
 
@@ -672,59 +563,7 @@ begin
     End;
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWAdm_Documento.BTNBUSCARAsyncClick, ' + e.Message);
-  End;
-end;
-
-procedure TFrIWUsuario_Enc.BTNNOMBREAsyncClick(Sender: TObject; EventParams: TStringList);
-begin
-  Try
-    If FQRMAESTRO.Mode_Edition Then
-    Begin
-      WebApplication.ShowPrompt('Ingrese el nombre del usuario', Self.Name + '.Resultado_Nombre', 'Nombre', FQRMAESTRO.QR.FieldByName('NOMBRE').AsString);
-    End;
-  Except
-    On E: Exception Do
-      UtLog_Execute('TFrIWUsuario_Enc.BTNNOMBREAsyncClick, ' + e.Message);
-  End;
-end;
-
-procedure TFrIWUsuario_Enc.BTNTELEFONO_1AsyncClick(Sender: TObject; EventParams: TStringList);
-begin
-  Try
-    If FQRMAESTRO.Mode_Edition Then
-    Begin
-      WebApplication.ShowPrompt('Ingrese el telefono 1 ', Self.Name + '.Resultado_Telefono_1', 'Telefono', FQRMAESTRO.QR.FieldByName('TELEFONO_1').AsString);
-    End;
-  Except
-    On E: Exception Do
-      UtLog_Execute('TFrIWUsuario_Enc.BTNTELEFONO_1AsyncClick, ' + e.Message);
-  End;
-end;
-
-procedure TFrIWUsuario_Enc.BTNTELEFONO_2AsyncClick(Sender: TObject; EventParams: TStringList);
-begin
-  Try
-    If FQRMAESTRO.Mode_Edition Then
-    Begin
-      WebApplication.ShowPrompt('Ingrese el telefono 2', Self.Name + '.Resultado_Telefono_2', 'Telefono', FQRMAESTRO.QR.FieldByName('TELEFONO_2').AsString);
-    End;
-  Except
-    On E: Exception Do
-      UtLog_Execute('TFrIWUsuario_Enc.BTNTELEFONO_2AsyncClick, ' + e.Message);
-  End;
-end;
-
-Procedure TFrIWUsuario_Enc.BTNCODIGOAsyncClick(Sender: TObject; EventParams: TStringList);
-begin
-  Try
-    If FQRMAESTRO.Mode_Edition Then
-    Begin
-      WebApplication.ShowPrompt('Ingrese la cédula del usuario', Self.Name + '.Resultado_Codigo', 'Cédula', FQRMAESTRO.QR.FieldByName('CODIGO_USUARIO').AsString);
-    End;
-  Except
-    On E: Exception Do
-      UtLog_Execute('TFrIWUsuario_Enc.BTNCODIGOAsyncClick, ' + e.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWUsuario_Enc', 'TFrIWAdm_Documento.BTNBUSCARAsyncClick', E.Message);
   End;
 end;
 
@@ -742,31 +581,8 @@ procedure TFrIWUsuario_Enc.BTNDIRECCIONAsyncClick(Sender: TObject; EventParams: 
 Var
   ltmp : String;
 begin
-  Try
-    If FQRMAESTRO.Mode_Edition Then
-    Begin
-      ltmp := FQRMAESTRO.QR.FieldByName('DIRECCION').AsString;
-      WebApplication.ShowPrompt('Ingrese la dirección', Self.Name + '.Resultado_Direccion', 'Dirección', ltmp);
-    End;
-  Except
-    On E: Exception Do
-      UtLog_Execute('TFrIWUsuario_Enc.BTNDIRECCIONAsyncClick, ' + e.Message);
-  End;
-end;
 
-procedure TFrIWUsuario_Enc.BTNEMAILAsyncClick(Sender: TObject; EventParams: TStringList);
-begin
-  Try
-    If FQRMAESTRO.Mode_Edition Then
-    Begin
-      WebApplication.ShowPrompt('Ingrese el correo electronico', Self.Name + '.Resultado_Email', 'Correo electronico', FQRMAESTRO.QR.FieldByName('EMAIL').AsString);
-    End;
-  Except
-    On E: Exception Do
-      UtLog_Execute('TFrIWUsuario_Enc.BTNEMAILAsyncClick, ' + e.Message);
-  End;
 end;
-
 
 procedure TFrIWUsuario_Enc.BtnGridAsyncClick(Sender: TObject; EventParams: TStringList);
 begin

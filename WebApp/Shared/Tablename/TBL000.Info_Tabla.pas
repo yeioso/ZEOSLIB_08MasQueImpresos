@@ -16,8 +16,10 @@ Const
   Id_TBL_Tercero                 = 007;
   Id_TBL_Proyecto                = 008;
   Id_TBL_Orden_Produccion        = 009;
-  Id_TBL_Movto_Inventario        = 010;
-  Id_TBL_Usuario_Reporte         = 011;
+  Id_TBL_Explosion_Material      = 010;
+  Id_TBL_Movto_Inventario        = 011;
+  Id_TBL_Notificacion_Producto   = 012;
+  Id_TBL_Usuario_Reporte         = 013;
 
 Type
  TA_PK = Array Of String;
@@ -30,14 +32,22 @@ Type
  End;
  TInfo_Tablas = TList<TInfo_Tabla>;
 
-Var
-  gInfo_Tablas : TInfo_Tablas;
+Function Info_TablaGet(Const pId : Integer) : TInfo_Tabla;
 
 implementation
-
 Uses
   SysUtils,
   UtFuncion;
+
+Var
+  gInfo_Tablas : TInfo_Tablas;
+
+Function Info_TablaGet(Const pId : Integer) : TInfo_Tabla;
+Begin
+  Result := Nil;
+  If (pId >= 0) And (pId < gInfo_Tablas.Count) Then
+    Result := gInfo_Tablas[pId];
+End;
 
 Procedure Cargar_Tablas(Const pId : Integer; Const pIdTable, pName, pCaption : String; Const pPK : TA_PK);
 Var
@@ -66,7 +76,9 @@ Begin
   Cargar_Tablas(Id_TBL_Tercero                , '008', 'TERCERO'      , 'Tercero'                   , ['CODIGO_TERCERO']);
   Cargar_Tablas(Id_TBL_Proyecto               , '009', 'PROYECTO'     , 'Proyecto'                  , ['CODIGO_PROYECTO']);
   Cargar_Tablas(Id_TBL_Orden_Produccion       , '030', 'ORDEN_PROD'   , 'Orden de Produccion'       , ['PREFIJO', 'NUMERO']);
-  Cargar_Tablas(Id_TBL_Movto_Inventario       , '031', 'MOVTO_INV'    , 'Movimiento de Inventario'  , ['PREFIJO', 'NUMERO']);
+  Cargar_Tablas(Id_TBL_Explosion_Material     , '031', 'EXPLOSION_MAT', 'Explosión de Materieles'   , ['PREFIJO', 'NUMERO', 'CODIGO_PRODUCTO']);
+  Cargar_Tablas(Id_TBL_Movto_Inventario       , '032', 'MOVTO_INV'    , 'Movimiento de Inventario'  , ['PREFIJO', 'NUMERO']);
+  Cargar_Tablas(Id_TBL_Notificacion_Producto  , '033', 'NOTIFICA_PROD', 'Notificación de producto'  , ['CODIGO_USUARIO', 'CODIGO_PRODUCTO', 'FECHA_REGISTRO']);
   Cargar_Tablas(Id_TBL_Usuario_Reporte        , '999', 'USUARIO_REP'  , 'Reporte de Usuarios'       , ['CODIGO_USUARIO', 'LINEA']);
 End;
 

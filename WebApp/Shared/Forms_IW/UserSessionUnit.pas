@@ -44,9 +44,11 @@ Uses
   Form_IWProducto,
   Form_IWProyecto,
   Form_IWOrden_Produccion,
+  Form_IWExplosion_Material,
   Form_IWMovto_Inventario,
-
   Form_IWReporte,
+
+  Form_IWNotificacion_Producto,
 
   IWBaseComponent,
   IWBaseHTMLComponent,
@@ -75,7 +77,9 @@ Type
     FProyecto                   : TFrIWProyecto;
     FOrden_Produccion           : TFrIWOrden_Produccion;
     FMovto_Inventario           : TFrIWMovto_Inventario;
+    FExplosion_Material         : TFrIWExplosion_Material;
     FReporte                    : TFrIWReporte;
+    FNotificacion_Producto     : TFrIWNotificacion_Producto;
 
     FCNX                        : TConexion    ;
     FDB                         : TDB          ;
@@ -148,12 +152,14 @@ Type
     Procedure ShowForm_Producto;
     Procedure ShowForm_Proyecto;
     Procedure ShowForm_Orden_Produccion(Const pCodigo_Documento : String);
+    Procedure ShowForm_Explosion_Material(Const pCodigo_Documento : String; pNumero : Integer);
     Procedure ShowForm_Movto_Inventario(Const pCodigo_Documento : String);
     Procedure ShowForm_Reporte;
+    Procedure ShowForm_Notificacion_Producto;
 
     Procedure Update_Menu;
 
-    Procedure Generar_Log_Bloque(pAction: String; pQR: TQUERY);
+    //Procedure Generar_Log_Bloque(pAction: String; pQR: TQUERY);
     Function Usuario_Valido(Const pUsername, pPassword : String) : Boolean;
     Procedure SetTAG_INFO       (Const pValue : Integer  );
     Procedure SetFULL_INFO      (Const pValue : String   );
@@ -179,7 +185,6 @@ Type
 implementation
 {$R *.dfm}
 Uses
-  UtLog,
   IWTypes,
   IWCompEdit,
   IWCompGrids,
@@ -189,7 +194,13 @@ Uses
   UtManagerImages,
   ServerController,
   TBL000.Info_Tabla,
+  UtilsIW.ManagerLog,
   UtilsIW.Usuario_Inicial;
+
+Procedure Bridge_Add_Log(Const pUser, pDocumento, pOperacion, pDetalle : String);
+Begin
+  Utils_ManagerLog_Add(pUser, pDocumento, pOperacion, pDetalle);
+End;
 
 Function TIWUserSession.Create_Manager_Data(Const pName, pCaption : String) : TMANAGER_DATA;
 Begin
@@ -198,9 +209,10 @@ Begin
     Result.QR.Connection := Self.FCNX;
     Result.USER_NAME := FUSER_CODE;
     Result.ESTACION := FESTACION;
+    Result.Procedure_Log := Bridge_Add_Log;
   Except
     On E: Exception Do
-      UtLog_Execute('TIWUserSession.Create_Manager_Data, ' + E.Message);
+      Utils_ManagerLog_Add('UserSessionUnit', 'TIWUserSession', 'Create_Manager_Data', E.Message);
   End;
 End;
 
@@ -339,6 +351,12 @@ Begin
   FOrden_Produccion.Show;
 End;
 
+Procedure TIWUserSession.ShowForm_Explosion_Material(Const pCodigo_Documento : String; pNumero : Integer);
+Begin
+  FExplosion_Material := TFrIWExplosion_Material.Create(WebApplication, pCodigo_Documento, pNumero);
+  FExplosion_Material.Show;
+End;
+
 Procedure TIWUserSession.ShowForm_Movto_Inventario(Const pCodigo_Documento : String);
 Begin
   FMovto_Inventario := TFrIWMovto_Inventario.Create(WebApplication, pCodigo_Documento);
@@ -351,56 +369,62 @@ Begin
   FReporte.Show;
 End;
 
+Procedure TIWUserSession.ShowForm_Notificacion_Producto;
+Begin
+  FNotificacion_Producto := TFrIWNotificacion_Producto.Create(WebApplication);
+  FNotificacion_Producto.Show;
+End;
+
 Procedure TIWUserSession.Update_Menu;
 Begin
   If Assigned(FMenu) Then
     FMenu.Actualizar_Info;
 End;
 
-Procedure TIWUserSession.Generar_Log_Bloque(pAction: String; pQR: TQUERY);
-Const
-  LINE_START = '<-----!';
-  LINE_FINISH = '!----->';
-Var
-  lI: Integer;
-  lLog : String;
-  lTexto : String;
-Begin
-  lTexto := '';
-  For lI := 0 To pQR.Fields.Count - 1 Do
-    If pQR.Fields[lI].DataType In  [ftSmallint, ftString, ftWideString, ftMemo, ftWideMemo, ftFloat, ftInteger, ftCurrency] Then
-      If Not Vacio(pQR.Fields[lI].AsString) Then
-        lTexto := lTexto + IfThen(Not Vacio(lTexto), #13 + StringOfChar(' ', 22)) + Trim(pQR.Fields[lI].FullName) + ' = ' + Trim(pQR.Fields[lI].AsString) ;
-  lLog := LINE_START + #13 +
-          StringOfChar(' ', 20) + pAction                  + #13 +
-          StringOfChar(' ', 20) + 'USUARIO: ' + FUSER_NAME + #13 +
-          StringOfChar(' ', 20) + 'ESTACION: ' + FESTACION + #13 +
-          StringOfChar(' ', 22) + lTexto                   + #13 +
-          StringOfChar(' ', 20) + LINE_FINISH;
-  UtLog_Execute(lLog);
-End;
+//Procedure TIWUserSession.Generar_Log_Bloque(pAction: String; pQR: TQUERY);
+//Const
+//  LINE_START = '<-----!';
+//  LINE_FINISH = '!----->';
+//Var
+//  lI: Integer;
+//  lLog : String;
+//  lTexto : String;
+//Begin
+//  lTexto := '';
+//  For lI := 0 To pQR.Fields.Count - 1 Do
+//    If pQR.Fields[lI].DataType In  [ftSmallint, ftString, ftWideString, ftMemo, ftWideMemo, ftFloat, ftInteger, ftCurrency] Then
+//      If Not Vacio(pQR.Fields[lI].AsString) Then
+//        lTexto := lTexto + IfThen(Not Vacio(lTexto), #13 + StringOfChar(' ', 22)) + Trim(pQR.Fields[lI].FullName) + ' = ' + Trim(pQR.Fields[lI].AsString) ;
+//  lLog := LINE_START + #13 +
+//          StringOfChar(' ', 20) + pAction                  + #13 +
+//          StringOfChar(' ', 20) + 'USUARIO: ' + FUSER_NAME + #13 +
+//          StringOfChar(' ', 20) + 'ESTACION: ' + FESTACION + #13 +
+//          StringOfChar(' ', 22) + lTexto                   + #13 +
+//          StringOfChar(' ', 20) + LINE_FINISH;
+//  Utils_ManagerLog_Add(lLog);
+//End;
 
 Procedure TIWUserSession.Establecer_Conexion;
 Begin
   Try
     Self.FDB := IWServerController.DB;
-    UtLog_Execute('TDM.Establecer_Conexion, Iniciando la conexion a la base de datos... ');
+    Utils_ManagerLog_Add('UserSessionUnit', 'TIWUserSession', 'Establecer_Conexion', 'Iniciando la conexion a la base de datos... ');
     FCNX.Connect(False);
     FCNX.SetConnection  (Conn_SQLSERVER);
-    UtLog_Execute('IWServerController.DB.ServerName, ' + IWServerController.DB.ServerName);
+    Utils_ManagerLog_Add('UserSessionUnit', 'TIWUserSession', 'Establecer_Conexion', 'IWServerController.DB.ServerName, ' + IWServerController.DB.ServerName);
     FCNX.SetServer      (IWServerController.DB.ServerName  );
-    UtLog_Execute('IWServerController.DB.DatabaseName, ' + IWServerController.DB.DatabaseName);
+    Utils_ManagerLog_Add('UserSessionUnit', 'TIWUserSession', 'Establecer_Conexion', 'IWServerController.DB.DatabaseName, ' + IWServerController.DB.DatabaseName);
     FCNX.SetDatabase    (IWServerController.DB.DatabaseName);
-    UtLog_Execute('IWServerController.DB.UserName, ' + IWServerController.DB.UserName);
+    Utils_ManagerLog_Add('UserSessionUnit', 'TIWUserSession', 'Establecer_Conexion', 'IWServerController.DB.UserName, ' + IWServerController.DB.UserName);
     FCNX.SetUser        (IWServerController.DB.UserName    );
     FCNX.SetPassword    (IWServerController.DB.Password    );
-    UtLog_Execute('IWServerController.DB.DLL_DATABASE, ' + IWServerController.DB.DLL_DATABASE);
+    Utils_ManagerLog_Add('UserSessionUnit', 'TIWUserSession', 'Establecer_Conexion', 'IWServerController.DB.DLL_DATABASE, ' + IWServerController.DB.DLL_DATABASE);
     FCNX.SetDLL_DATABASE(IWServerController.DB.DLL_DATABASE);
-    UtLog_Execute('IWServerController.DB.Port, ' + IntToStr(IWServerController.DB.Port));
+    Utils_ManagerLog_Add('UserSessionUnit', 'TIWUserSession', 'Establecer_Conexion', 'IWServerController.DB.Port, ' + IntToStr(IWServerController.DB.Port));
     FCNX.SetPort        (IWServerController.DB.Port        );
     If Not FCNX.Connect(True) Then
     Begin
-      UtLog_Execute('No es posible conectarse a la base de datos');
+      Utils_ManagerLog_Add('UserSessionUnit', 'TIWUserSession', 'Establecer_Conexion', 'No es posible conectarse a la base de datos');
       FRESUMEN.Add('No es posible conectarse a la base de datos');
     End
     Else
@@ -409,11 +433,11 @@ Begin
         Self.ShowForm_Login
       Else
         Self.Show_Form_IWUsuario_Inicial;
-      UtLog_Execute('TDM.Establecer_Conexion, conexion exitosa... ');
+      Utils_ManagerLog_Add('UserSessionUnit', 'TIWUserSession', 'Establecer_Conexion', 'TDM.Establecer_Conexion, conexion exitosa... ');
     End;
   Except
     On E: Exception Do
-      UtLog_Execute('TDM.Establecer_Conexion, ' + E.Message);
+      Utils_ManagerLog_Add('UserSessionUnit', 'TIWUserSession', 'Establecer_Conexion', E.Message);
   End;
 End;
 
@@ -422,10 +446,10 @@ Var
   lI : Integer;
   lResult : String;
 Begin
-  UtLog_Execute('TDM.Validar_Perfil, Cargando permisos... ');
+  Utils_ManagerLog_Add('UserSessionUnit', 'TIWUserSession', 'TDM.Validar_Perfil', 'Cargando permisos... ');
   For lI := 0 To PERMISOS_APP.Items_App.Count - 1 Do
   Begin
-    lResult := CNX.GetValue(gInfo_Tablas[Id_TBL_Permiso_App].Name, ['CODIGO_PERFIL', 'NOMBRE'], [pCodigo_Perfil, PERMISOS_APP.Items_App[lI].Id_Str], ['HABILITA_OPCION']);
+    lResult := CNX.GetValue(Info_TablaGet(Id_TBL_Permiso_App).Name, ['CODIGO_PERFIL', 'NOMBRE'], [pCodigo_Perfil, PERMISOS_APP.Items_App[lI].Id_Str], ['HABILITA_OPCION']);
     PERMISOS_APP.SetEnabled(PERMISOS_APP.Items_App[lI].Id_Int, lResult = 'S');
   End;
 End;
@@ -439,7 +463,7 @@ Begin
   Try
     CNX.SQL.Active := False;
     CNX.SQL.SQL.Clear;
-    CNX.SQL.SQL.Add(' SELECT * FROM ' + gInfo_Tablas[Id_TBL_Usuario].Name + ' ' + CNX.No_Lock);
+    CNX.SQL.SQL.Add(' SELECT * FROM ' + Info_TablaGet(Id_TBL_Usuario).Name + ' ' + CNX.No_Lock);
     CNX.SQL.SQL.Add(' WHERE ' );
     CNX.SQL.SQL.Add(' ( ' );
     CNX.SQL.SQL.Add(' '   + FCNX.Trim_Sentence('CODIGO_USUARIO') + ' = ' + QuotedStr(Trim(pUsername)));
@@ -451,7 +475,7 @@ Begin
     Begin
       Result := Trim(AnsiUpperCase(CNX.SQL.FieldByName('CONTRASENA').AsString)) = Trim(AnsiUpperCase(pPassword));
       If Not Result Then
-        UtLog_Execute('Autenticación no valida')
+        Utils_ManagerLog_Add('UserSessionUnit', 'TIWUserSession', 'Usuario_Valido', 'Autenticación no valida de ' + pUsername)
       Else
       Begin
         SetUSER_CODE(CNX.SQL.FieldByName('CODIGO_USUARIO').AsString);
@@ -460,11 +484,13 @@ Begin
       End;
     End
     Else
-      UtLog_Execute('Usuario no existe');
+    Begin
+      Utils_ManagerLog_Add('UserSessionUnit', 'TIWUserSession', 'Usuario_Valido', 'Usuario no existe ' + pUsername);
+    End;
     CNX.SQL.Active := False;
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWLogin.Usuario_Valido, ' + E.Message);
+      Utils_ManagerLog_Add('UserSessionUnit', 'TIWUserSession', 'Usuario_Valido', E.Message);
   End;
 End;
 
@@ -585,7 +611,7 @@ begin
           Inc(lI);
       Except
         On E: Exception Do
-          UtLog_Execute('TIWUserSession.TerminateSession, ' +E.Message);
+          Utils_ManagerLog_Add('UserSessionUnit', 'TIWUserSession', 'TerminateSession', E.Message);
       End;
     End;
   Finally
@@ -607,7 +633,7 @@ Begin
       WebApplication.ShowNotification(pValue, ntSuccess);
   Except
     On E: Exception Do
-      UtLog_Execute('TIWUserSession.SetMessage, ' +E.Message);
+       Utils_ManagerLog_Add('UserSessionUnit', 'TIWUserSession', 'SetMessage', E.Message);
   End;
 End;
 

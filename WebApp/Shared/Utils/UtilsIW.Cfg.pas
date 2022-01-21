@@ -19,10 +19,10 @@ Function UtilsIW_Cfg_Save(Const pDB : TDB; Const pPath : String) : Boolean;
 implementation
 
 Uses
-  UtLog,
   UtFuncion,
   System.Classes,
-  System.SysUtils;
+  System.SysUtils,
+  UtilsIW.ManagerLog;
 
 Const
   Const_Config = 'MQIERPCFG.dll';
@@ -66,7 +66,7 @@ Begin
     End;
   Except
     On E: Exception Do
-      UtLog_Execute('UtilsIW_Cfg_Load, ' + E.Message);
+      Utils_ManagerLog_Add('CONFIGURACION', 'UtilsIW.Cfg', 'UtilsIW_Cfg_Load', E.Message);
   End;
 End;
 
@@ -87,7 +87,7 @@ Begin
     FreeAndNil(lF);
   Except
     On E: Exception Do
-      UtLog_Execute('UtilsIW_Cfg_Save, ' + E.Message);
+      Utils_ManagerLog_Add('CONFIGURACION', 'UtilsIW.Cfg', 'UtilsIW_Cfg_Save', E.Message);
   End;
 End;
 

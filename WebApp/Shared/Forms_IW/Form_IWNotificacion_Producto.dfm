@@ -1,0 +1,87 @@
+object FrIWNotificacion_Producto: TFrIWNotificacion_Producto
+  Left = 0
+  Top = 0
+  Width = 643
+  Height = 551
+  RenderInvisibleControls = True
+  AllowPageAccess = True
+  ConnectionMode = cmAny
+  OnCreate = IWAppFormCreate
+  OnDestroy = IWAppFormDestroy
+  Background.Fixed = False
+  HandleTabs = False
+  LeftToRight = True
+  LockUntilLoaded = True
+  LockOnSubmit = True
+  ShowHint = True
+  DesignLeft = 2
+  DesignTop = 2
+  object IWRegion_Head: TIWRegion
+    Left = 0
+    Top = 0
+    Width = 643
+    Height = 60
+    HorzScrollBar.Visible = False
+    VertScrollBar.Visible = False
+    RenderInvisibleControls = True
+    Align = alTop
+    ExplicitLeft = 200
+    ExplicitTop = 72
+    ExplicitWidth = 60
+    object BTNCERRAR: TIWButton
+      Left = 24
+      Top = 16
+      Width = 120
+      Height = 30
+      Cursor = crHandPoint
+      Caption = 'CERRAR'
+      Color = clBtnFace
+      Font.Color = clNone
+      Font.Size = 10
+      Font.Style = []
+      FriendlyName = 'BTNCERRAR'
+      OnAsyncClick = BTNCERRARAsyncClick
+    end
+    object BTNGUARDAR: TIWButton
+      Left = 160
+      Top = 16
+      Width = 120
+      Height = 30
+      Cursor = crHandPoint
+      Caption = 'GUARDAR'
+      Color = clBtnFace
+      Font.Color = clNone
+      Font.Size = 10
+      Font.Style = []
+      FriendlyName = 'BTNGUARDAR'
+    end
+  end
+  object IWRegion_Detalle: TIWRegion
+    Left = 0
+    Top = 60
+    Width = 643
+    Height = 491
+    HorzScrollBar.Visible = False
+    VertScrollBar.Visible = False
+    RenderInvisibleControls = True
+    Align = alClient
+    BorderOptions.NumericWidth = 0
+    ExplicitLeft = 3
+    ExplicitTop = 63
+    ExplicitWidth = 549
+    ExplicitHeight = 439
+    object IWjQGrid1: TIWjQGrid
+      Left = 0
+      Top = 0
+      Width = 643
+      Height = 473
+      Align = alTop
+      Caption = ''
+      VisibleRowCount = 15
+      Options = [goViewRecords, goCellEdit, goGridView, goHoverRows, goIgnoreCase, goSortable, goShowHideBtn, goShowPager, goMultiBoxOnly]
+      DateFormat = 'd-m-Y'
+      Columns = <>
+      RowCount = 15
+    end
+  end
+end

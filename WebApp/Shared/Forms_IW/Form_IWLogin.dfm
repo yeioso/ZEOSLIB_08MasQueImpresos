@@ -1456,6 +1456,8 @@ object FrIWLogin: TFrIWLogin
       Top = 237
       Width = 68
       Height = 56
+      HorzScrollBar.Visible = False
+      VertScrollBar.Visible = False
       RenderInvisibleControls = True
       BorderOptions.NumericWidth = 0
       BorderOptions.Style = cbsNone

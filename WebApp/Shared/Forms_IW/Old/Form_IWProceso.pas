@@ -83,7 +83,7 @@ implementation
 {$R *.dfm}
 Uses
   Math,
-  UtLog,
+  
   UtFecha,
   Variants,
   UtFuncion,
@@ -100,7 +100,7 @@ Begin
     AbrirMaestro(EventParams.Values['CODIGO_PROCESO']);
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWProceso.Localizar_Registro, ' + e.Message);
+      Utils_ManagerLog_Add('TFrIWProceso.Localizar_Registro, ' + e.Message);
   End;
 End;
 
@@ -132,7 +132,7 @@ begin
     End;
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWProceso.Buscar_Info, ' + e.Message);
+      Utils_ManagerLog_Add('TFrIWProceso.Buscar_Info, ' + e.Message);
   End;
 End;
 
@@ -156,7 +156,7 @@ Begin
     End;
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWProceso.Resultado_Codigo, ' + e.Message);
+      Utils_ManagerLog_Add('TFrIWProceso.Resultado_Codigo, ' + e.Message);
   End;
 End;
 
@@ -169,7 +169,7 @@ Begin
     End;
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWProceso.Resultado_Nombre, ' + e.Message);
+      Utils_ManagerLog_Add('TFrIWProceso.Resultado_Nombre, ' + e.Message);
   End;
 End;
 
@@ -182,7 +182,7 @@ Begin
     End;
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWProceso.Resultado_Descripcion, ' + e.Message);
+      Utils_ManagerLog_Add('TFrIWProceso.Resultado_Descripcion, ' + e.Message);
   End;
 End;
 
@@ -193,7 +193,7 @@ Begin
       FQRMAESTRO.QR.FieldByName('ID_ACTIVO').AsString := IfThen(Result_Is_OK(EventParams.Values['RetValue']), 'S', 'N');
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWProceso.Resultado_Activo, ' + E.Message);
+      Utils_ManagerLog_Add('TFrIWProceso.Resultado_Activo, ' + E.Message);
   End;
 End;
 
@@ -229,7 +229,7 @@ Begin
     End;
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWProceso_Enc.Validar_Campos_Master, ' + E.Message);
+      Utils_ManagerLog_Add('TFrIWProceso_Enc.Validar_Campos_Master, ' + E.Message);
   End;
 End;
 
@@ -261,7 +261,7 @@ Begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrIWProceso.SetLabel, ' + E.Message);
+      Utils_ManagerLog_Add('TFrIWProceso.SetLabel, ' + E.Message);
     End;
   End;
 End;
@@ -274,7 +274,7 @@ Begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrIWProceso.Documento_Activo, ' + E.Message);
+      Utils_ManagerLog_Add('TFrIWProceso.Documento_Activo, ' + E.Message);
     End;
   End;
 End;
@@ -297,7 +297,7 @@ begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrIWProceso.DsDataChangeMaster, ' + E.Message);
+      Utils_ManagerLog_Add('TFrIWProceso.DsDataChangeMaster, ' + E.Message);
     End;
   End;
 end;
@@ -344,7 +344,7 @@ Begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrIWProceso.AbrirMaestro, ' + E.Message);
+      Utils_ManagerLog_Add('TFrIWProceso.AbrirMaestro, ' + E.Message);
     End;
   End;
   FGRID_MAESTRO.RefreshData;
@@ -407,7 +407,7 @@ begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrIWProceso_Enc.IWAppFormCreate, ' + E.Message);
+      Utils_ManagerLog_Add('TFrIWProceso_Enc.IWAppFormCreate, ' + E.Message);
     End;
   End;
 end;
@@ -429,7 +429,7 @@ begin
 
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWProceso_Enc.IWAppFormDestroy, ' + e.Message);
+      Utils_ManagerLog_Add('TFrIWProceso_Enc.IWAppFormDestroy, ' + e.Message);
   End;
 end;
 
@@ -442,7 +442,7 @@ begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrIWProceso.NewRecordMaster, ' + E.Message);
+      Utils_ManagerLog_Add('TFrIWProceso.NewRecordMaster, ' + E.Message);
     End;
   End;
 End;
@@ -481,7 +481,7 @@ begin
     End;
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWTercero_Enc.BTNBUSCARAsyncClick, ' + e.Message);
+      Utils_ManagerLog_Add('TFrIWTercero_Enc.BTNBUSCARAsyncClick, ' + e.Message);
   End;
 //AbrirMaestro(DATO.Text);
 end;
@@ -495,7 +495,7 @@ begin
     End;
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWProceso.BTNCODIGOAsyncClick, ' + e.Message);
+      Utils_ManagerLog_Add('TFrIWProceso.BTNCODIGOAsyncClick, ' + e.Message);
   End;
 end;
 
@@ -511,7 +511,7 @@ begin
     End;
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWProceso.BTNDESCRIPCIONAsyncClick, ' + e.Message);
+      Utils_ManagerLog_Add('TFrIWProceso.BTNDESCRIPCIONAsyncClick, ' + e.Message);
   End;
 end;
 
@@ -524,7 +524,7 @@ begin
     End;
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWProceso.BTNNOMBREAsyncClick, ' + e.Message);
+      Utils_ManagerLog_Add('TFrIWProceso.BTNNOMBREAsyncClick, ' + e.Message);
   End;
 end;
 

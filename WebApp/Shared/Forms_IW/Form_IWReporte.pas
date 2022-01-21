@@ -26,6 +26,7 @@ type
     procedure BTNCODIGO_PRODUCTO_INIAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNCODIGO_PRODUCTO_FINAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNPRODUCTOAsyncClick(Sender: TObject; EventParams: TStringList);
+    procedure IWAppFormCreate(Sender: TObject);
   private
     Procedure Resultado_Codigo_Producto_Ini(Sender: TObject; EventParams: TStringList);
     Procedure Resultado_Codigo_Producto_Fin(Sender: TObject; EventParams: TStringList);
@@ -36,11 +37,11 @@ type
 implementation
 {$R *.dfm}
 Uses
-  UtLog,
   UtFuncion,
   UtilsIW.Busqueda,
   ServerController,
   TBL000.Info_Tabla,
+  UtilsIW.ManagerLog,
   Report.Saldo_Inventario,
   Form_Plantilla_Documento;
 
@@ -72,9 +73,15 @@ begin
     End;
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWReporte.Buscar_Info, ' + e.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWReporte', 'TFrIWReporte.Buscar_Info', E.Message);
   End;
 End;
+
+procedure TFrIWReporte.IWAppFormCreate(Sender: TObject);
+begin
+  Randomize;
+  Self.Name := 'TFrIWReporte' + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000) );
+end;
 
 procedure TFrIWReporte.BTNCODIGO_PRODUCTO_INIAsyncClick(Sender: TObject; EventParams: TStringList);
 begin
@@ -104,7 +111,7 @@ Begin
     CODIGO_PRODUCTO_INI.Text := EventParams.Values ['CODIGO_PRODUCTO'];
   Except
    On E: Exception Do
-     UtLog_Execute('TFrIWReporte.Resultado_Codigo_Producto_Ini, ' + e.Message);
+     Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWReporte', 'TFrIWReporte.Resultado_Codigo_Producto_Ini', E.Message);
   End;
 End;
 
@@ -114,7 +121,7 @@ Begin
     CODIGO_PRODUCTO_FIN.Text := EventParams.Values ['CODIGO_PRODUCTO'];
   Except
    On E: Exception Do
-     UtLog_Execute('TFrIWReporte.Resultado_Codigo_Producto_Fin, ' + e.Message);
+     Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWReporte', 'TFrIWReporte.Resultado_Codigo_Producto_Fin', E.Message);
   End;
 End;
 

@@ -34,9 +34,9 @@ implementation
 {$R *.dfm}
 
 Uses
-  UtLog,
   UtFuncion,
   ServerController,
+  UtilsIW.ManagerLog,
   UtilsIW.Usuario_Inicial;
 
 procedure TFrIWUsuario_Inicial.btnAceptarAsyncClick(Sender: TObject; EventParams: TStringList);
@@ -79,7 +79,7 @@ Begin
     On E: Exception Do
     Begin
       Result := False;
-      UtLog_Execute('TFrIWUsuario_Inicial.Validar, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWUsuario_Inicial', 'TFrIWUsuario_Inicial.Validar', E.Message);
     End;
   End;
 End;

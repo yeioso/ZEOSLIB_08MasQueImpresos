@@ -10,11 +10,11 @@ Function UtilsIW_Usuario_Existe(pCnx : TConexion) : Boolean;
 implementation
 
 Uses
-  UtLog,
   UtFuncion,
   Criptografia,
   System.SysUtils,
   TBL000.Info_Tabla,
+  UtilsIW.ManagerLog,
   UtilsIW.Permisos_App;
 
 Type
@@ -49,14 +49,14 @@ Begin
   Try
     FCNX.AUX.Active := False;
     FCNX.AUX.SQL.Clear;
-    FCNX.AUX.SQL.Add(' SELECT * FROM ' + gInfo_Tablas[Id_TBL_Permiso_App].Name + FCNX.No_Lock);
+    FCNX.AUX.SQL.Add(' SELECT * FROM ' + Info_TablaGet(Id_TBL_Permiso_App).Name + FCNX.No_Lock);
     FCNX.AUX.SQL.Add(' WHERE ' + FCNX.Trim_Sentence('NOMBRE') + ' = ' + QuotedStr(Trim(FPERMISO.GetItem(CONST_ACCION_ERP_ADMINISTRADOR).Id_Str)));
     FCNX.AUX.Active := True;
     If FCNX.AUX.Active And (FCNX.AUX.RecordCount <= 0) Then
     Begin
       FCNX.TMP.Active := False;
       FCNX.TMP.SQL.Clear;
-      FCNX.TMP.SQL.Add(' SELECT * FROM ' + gInfo_Tablas[Id_TBL_Perfil].Name + FCNX.No_Lock);
+      FCNX.TMP.SQL.Add(' SELECT * FROM ' + Info_TablaGet(Id_TBL_Perfil).Name + FCNX.No_Lock);
       FCNX.TMP.Active := True;
       FCNX.TMP.Append;
       FCNX.TMP.FieldByName('CODIGO_PERFIL').AsString := Justificar('0', '0', FCNX.TMP.FieldByName('CODIGO_PERFIL').Size);
@@ -74,7 +74,7 @@ Begin
 
     FCNX.SQL.Active := False;
     FCNX.SQL.SQL.Clear;
-    FCNX.SQL.SQL.Add(' SELECT * FROM ' + gInfo_Tablas[Id_TBL_Usuario].Name + FCNX.No_Lock);
+    FCNX.SQL.SQL.Add(' SELECT * FROM ' + Info_TablaGet(Id_TBL_Usuario).Name + FCNX.No_Lock);
     FCNX.SQL.SQL.Add(' WHERE ' + FCNX.Trim_Sentence('CODIGO_USUARIO') + ' = ' + QuotedStr(Trim(pCodigo_Usuario)));
     FCNX.SQL.Active := True;
     If FCNX.SQL.Active Then
@@ -106,7 +106,7 @@ Begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TUsuario_Inicial.Execute, ' + E.Message);
+      Utils_ManagerLog_Add('WIZARD', 'UtilsIW.Usuario_Inicial', 'TUsuario_Inicial.Execute', E.Message);
     End;
   End;
   If Result Then
@@ -125,8 +125,8 @@ Begin
     FCNX.AUX.SQL.Clear;
     FCNX.AUX.SQL.Add(' SELECT ');
     FCNX.AUX.SQL.Add('     USUARIO.CODIGO_USUARIO ');
-    FCNX.AUX.SQL.Add(' FROM ' + gInfo_Tablas[Id_TBL_Permiso_App].Name + ' PERMISOS ' + FCNX.No_Lock);
-    FCNX.AUX.SQL.Add(' INNER JOIN ' + gInfo_Tablas[Id_TBL_Usuario].Name + ' USUARIO ' + FCNX.No_Lock);
+    FCNX.AUX.SQL.Add(' FROM ' + Info_TablaGet(Id_TBL_Permiso_App).Name + ' PERMISOS ' + FCNX.No_Lock);
+    FCNX.AUX.SQL.Add(' INNER JOIN ' + Info_TablaGet(Id_TBL_Usuario).Name + ' USUARIO ' + FCNX.No_Lock);
     FCNX.AUX.SQL.Add(' ON USUARIO.CODIGO_PERFIL = PERMISOS.CODIGO_PERFIL ');
     FCNX.AUX.SQL.Add(' WHERE ' + FCNX.Trim_Sentence('PERMISOS.NOMBRE') + ' = ' + QuotedStr(Trim(FPERMISO.GetItem(CONST_ACCION_ERP_ADMINISTRADOR).Id_Str)));
     FCNX.AUX.Active := True;
@@ -136,7 +136,7 @@ Begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TUsuario_Inicial.Exists, ' + E.Message);
+      Utils_ManagerLog_Add('WIZARD', 'UtilsIW.Usuario_Inicial', 'TUsuario_Inicial.Exists', E.Message);
     End;
   End;
 End;

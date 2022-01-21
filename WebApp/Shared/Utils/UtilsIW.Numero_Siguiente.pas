@@ -11,9 +11,10 @@ Function UtilsIW_Numero_Siguiente_Put(pCNX : TConexion; Const pCodigo_Documento 
 
 implementation
 Uses
-  UtLog,
   System.SysUtils,
-  TBL000.Info_Tabla;
+  ServerController,
+  TBL000.Info_Tabla,
+  UtilsIW.ManagerLog;
 
 Type
   TNumero_Siguiente = Class
@@ -30,7 +31,7 @@ Begin
   Try
     FCNX.TMP.Active := False;
     FCNX.TMP.SQL.Clear;
-    FCNX.TMP.SQL.Add(' SELECT * FROM ' + gInfo_Tablas[Id_TBL_Administrador_Documento].Name + FCNX.No_Lock);
+    FCNX.TMP.SQL.Add(' SELECT * FROM ' + Info_TablaGet(Id_TBL_Administrador_Documento).Name + FCNX.No_Lock);
     FCNX.TMP.SQL.Add(' WHERE ' + FCNX.Trim_Sentence('CODIGO_DOCUMENTO') + ' = ' + QuotedStr(Trim(pCodigo_Documento)));
     FCNX.TMP.Active := True;
     If FCNX.TMP.Active And (FCNX.TMP.RecordCount > 0) Then
@@ -40,7 +41,7 @@ Begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TNumero_Siguiente.Siguiente_Get, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'UtilsIW.Numero_Siguiente', 'TNumero_Siguiente.Siguiente_Get', E.Message);
     End;
   End;
 End;
@@ -51,7 +52,7 @@ Begin
   Try
     FCNX.TMP.Active := False;
     FCNX.TMP.SQL.Clear;
-    FCNX.TMP.SQL.Add(' SELECT * FROM ' + gInfo_Tablas[Id_TBL_Administrador_Documento].Name + FCNX.No_Lock);
+    FCNX.TMP.SQL.Add(' SELECT * FROM ' + Info_TablaGet(Id_TBL_Administrador_Documento).Name + FCNX.No_Lock);
     FCNX.TMP.SQL.Add(' WHERE ' + FCNX.Trim_Sentence('CODIGO_DOCUMENTO') + ' = ' + QuotedStr(Trim(pCodigo_Documento)));
     FCNX.TMP.Active := True;
     If FCNX.TMP.Active And (FCNX.TMP.RecordCount > 0) Then
@@ -66,7 +67,7 @@ Begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TNumero_Siguiente.Siguiente_Put, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'UtilsIW.Numero_Siguiente', 'TNumero_Siguiente.Siguiente_Put', E.Message);
     End;
   End;
 End;

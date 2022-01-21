@@ -10,7 +10,7 @@ uses
   IWCompTabControl, IWCompJQueryWidget, IWBaseComponent, IWBaseHTMLComponent,
   IWBaseHTML40Component, UtConexion, Data.DB, IWCompGrids, IWDBStdCtrls,
   IWCompEdit, IWCompCheckbox, IWCompMemo, IWDBExtCtrls, IWCompButton,
-  IWCompListbox, IWCompGradButton, UtGrid_JQ, UtNavegador_ASE;
+  IWCompListbox, IWCompGradButton, UtGrid_JQ, UtNavegador_ASE, Form_IWFrame;
 
 type
   TFrIWPerfil_Enc = class(TIWAppForm)
@@ -22,29 +22,26 @@ type
     PAG_01: TIWTabPage;
     RNAVEGADOR: TIWRegion;
     DATO: TIWEdit;
-    IWRDETALLE: TIWRegion;
-    IWRBOTONDETALLE: TIWRegion;
-    BtnGrid: TIWImage;
     IWLabel1: TIWLabel;
     IWLabel8: TIWLabel;
-    BTNCODIGO: TIWImage;
-    CODIGO_PERFIL: TIWDBLabel;
-    BTNNOMBRE: TIWImage;
-    NOMBRE: TIWDBLabel;
-    DETALLE_PERFIL: TIWListbox;
     IWRegion_Navegador: TIWRegion;
     IWModalWindow1: TIWModalWindow;
+    CODIGO_PERFIL: TIWDBEdit;
+    NOMBRE: TIWDBEdit;
+    IWRDETALLE: TIWRegion;
+    DETALLE_PERFIL: TIWListbox;
+    IWRBOTONDETALLE: TIWRegion;
+    BtnGrid: TIWImage;
     procedure BTNBACKAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure IWAppFormCreate(Sender: TObject);
     procedure IWAppFormDestroy(Sender: TObject);
     procedure BTNBUSCARAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BtnAcarreoAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BtnGridAsyncClick(Sender: TObject; EventParams: TStringList);
-    procedure BTNCODIGOAsyncClick(Sender: TObject; EventParams: TStringList);
-    procedure BTNNOMBREAsyncClick(Sender: TObject; EventParams: TStringList);
   private
     FCNX : TConexion;
     FINFO : String;
+    FFRAME : TFrIWFrame;
     FQRMAESTRO : TMANAGER_DATA;
 
     FNAVEGADOR : TNavegador_ASE;
@@ -64,9 +61,6 @@ type
     Procedure Validar_Campos_Master (pSender: TObject);
     Function Documento_Activo : Boolean;
 
-    procedure Resultado_Codigo(EventParams: TStringList);
-    procedure Resultado_Nombre(EventParams: TStringList);
-
     Procedure NewRecordMaster(pSender: TObject);
     Procedure DsDataChangeMaster(pSender: TObject);
     Procedure DsStateMaster(pSender: TObject);
@@ -84,7 +78,6 @@ implementation
 {$R *.dfm}
 Uses
   Math,
-  UtLog,
   UtFecha,
   Variants,
   UtFuncion,
@@ -94,7 +87,8 @@ Uses
   System.StrUtils,
   ServerController,
   UtilsIW.Busqueda,
-  TBL000.Info_Tabla;
+  TBL000.Info_Tabla,
+  UtilsIW.ManagerLog;
 
 Procedure TFrIWPerfil_Enc.Release_Me;
 Begin
@@ -103,33 +97,7 @@ End;
 
 Function TFrIWPerfil_Enc.Existe_Perfil(Const pCodigo_Perfil : String) : Boolean;
 Begin
-  Result := FCNX.Record_Exist(gInfo_Tablas[Id_TBL_Perfil].Name, ['CODIGO_PERFIL'], [pCodigo_Perfil]);
-End;
-
-procedure TFrIWPerfil_Enc.Resultado_Codigo(EventParams: TStringList);
-Begin
-  Try
-    If FQRMAESTRO.Mode_Edition And (Result_Is_OK(EventParams.Values['RetValue'])) Then
-    Begin
-      FQRMAESTRO.QR.FieldByName('CODIGO_PERFIL').AsString := Justificar(EventParams.Values['InputStr'], '0', FQRMAESTRO.QR.FieldByName('CODIGO_PERFIL').Size);
-    End;
-  Except
-    On E: Exception Do
-      UtLog_Execute('TFrIWPerfil_Enc.Resultado_Codigo, ' + e.Message);
-  End;
-End;
-
-procedure TFrIWPerfil_Enc.Resultado_Nombre(EventParams: TStringList);
-Begin
-  Try
-    If FQRMAESTRO.Mode_Edition And (Result_Is_OK(EventParams.Values['RetValue'])) Then
-    Begin
-      FQRMAESTRO.QR.FieldByName('NOMBRE').AsString := AnsiUpperCase(Trim(EventParams.Values['InputStr']));
-    End;
-  Except
-    On E: Exception Do
-      UtLog_Execute('TFrIWPerfil_Enc.Resultado_Nombre, ' + e.Message);
-  End;
+  Result := FCNX.Record_Exist(Info_TablaGet(Id_TBL_Perfil).Name, ['CODIGO_PERFIL'], [pCodigo_Perfil]);
 End;
 
 Procedure  TFrIWPerfil_Enc.Validar_Campos_Master(pSender: TObject);
@@ -141,14 +109,19 @@ Begin
     lMensaje := '';
     NOMBRE.BGColor := UserSession.COLOR_OK;
     CODIGO_PERFIL.BGColor := UserSession.COLOR_OK;
+    If FQRMAESTRO.Mode_Insert And (Not Vacio(FQRMAESTRO.QR.FieldByName('CODIGO_PERFIL').AsString))  Then
+    Begin
+      FQRMAESTRO.QR.FieldByName('CODIGO_PERFIL').AsString := Justificar(FQRMAESTRO.QR.FieldByName('CODIGO_PERFIL').AsString, '0', FQRMAESTRO.QR.FieldByName('CODIGO_PERFIL').Size);
+      FQRMAESTRO.QR.FieldByName('CODIGO_PERFIL').AsString := Copy(FQRMAESTRO.QR.FieldByName('CODIGO_PERFIL').AsString, 01, FQRMAESTRO.QR.FieldByName('CODIGO_PERFIL').Size);
+    End;
 
-    If BTNCODIGO.Visible And (Vacio(FQRMAESTRO.QR.FieldByName('CODIGO_PERFIL').AsString) Or Existe_Perfil(FQRMAESTRO.QR.FieldByName('CODIGO_PERFIL').AsString)) Then
+    If FQRMAESTRO.Mode_Insert And (Vacio(FQRMAESTRO.QR.FieldByName('CODIGO_PERFIL').AsString) Or Existe_Perfil(FQRMAESTRO.QR.FieldByName('CODIGO_PERFIL').AsString)) Then
     Begin
       lMensaje := lMensaje + IfThen(Not Vacio(lMensaje), ', ') + 'Perfil invalido';
       CODIGO_PERFIL.BGColor := UserSession.COLOR_ERROR;
     End;
 
-    If BTNNOMBRE.Visible And Vacio(FQRMAESTRO.QR.FieldByName('NOMBRE').AsString) Then
+    If FQRMAESTRO.Mode_Edition And Vacio(FQRMAESTRO.QR.FieldByName('NOMBRE').AsString) Then
     Begin
       lMensaje := lMensaje + IfThen(Not Vacio(lMensaje), ', ') + 'Nombre invalido';
       NOMBRE.BGColor := UserSession.COLOR_ERROR;
@@ -162,21 +135,18 @@ Begin
     End;
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWPerfil_Enc.Validar_Campos_Master, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWPerfil_Enc', 'TFrIWPerfil_Enc.Validar_Campos_Master', E.Message);
   End;
 End;
 
 Procedure TFrIWPerfil_Enc.Estado_Controles;
 Begin
-  BTNCODIGO.Visible := (FQRMAESTRO.DS.State In [dsInsert]) And Documento_Activo;
-  BTNNOMBRE.Visible :=  FQRMAESTRO.Mode_Edition And Documento_Activo;
+  CODIGO_PERFIL.Enabled := FQRMAESTRO.Mode_Insert  And Documento_Activo;
+  NOMBRE.Enabled        := FQRMAESTRO.Mode_Edition And Documento_Activo;
 
   IWRBOTONDETALLE.Visible := FQRMAESTRO.Active And (Not FQRMAESTRO.Mode_Edition) And (FQRMAESTRO.QR.RecordCount >= 1);
-//  BtnBuscar.Enabled       := FQRMAESTRO.Active And (Not FQRMAESTRO.Mode_Edition) And (FQRMAESTRO.QR.RecordCount >= 1);
-//  BtnAcarreo.Visible      := FQRMAESTRO.Active And (Not FQRMAESTRO.Mode_Edition) And (FQRMAESTRO.QR.RecordCount > 0);
 
   DATO.Visible            := (Not FQRMAESTRO.Mode_Edition);
-//  BTNBUSCAR.Visible       := (Not FQRMAESTRO.Mode_Edition);
   PAG_00.Visible          := (Not FQRMAESTRO.Mode_Edition);
   PAG_01.Visible          := True;
 
@@ -191,7 +161,7 @@ Begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrIWPerfil_Enc.SetLabel, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWPerfil_Enc', 'TFrIWPerfil_Enc.SetLabel', E.Message);
     End;
   End;
 End;
@@ -200,11 +170,10 @@ Function TFrIWPerfil_Enc.Documento_Activo : Boolean;
 Begin
   Try
     Result := True;
-    //Result := (FQRMAESTRO.RecordCount >= 1) {And (Trim(FQRMAESTRO.FieldByName('ID_ANULADO').AsString) <> 'S')};
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrIWPerfil_Enc.Documento_Activo, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWPerfil_Enc', 'TFrIWPerfil_Enc.Documento_Activo', E.Message);
     End;
   End;
 End;
@@ -231,7 +200,7 @@ begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrIWPerfil_Enc.DsDataChangeMaster, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWPerfil_Enc', 'TFrIWPerfil_Enc.DsDataChangeMaster', E.Message);
     End;
   End;
 end;
@@ -256,12 +225,12 @@ End;
 
 Function TFrIWPerfil_Enc.AbrirMaestro(Const pDato : String = '') : Boolean;
 Begin
-  FGRID_MAESTRO.Caption := gInfo_Tablas[Id_TBL_Perfil].Caption;
+  FGRID_MAESTRO.Caption := Info_TablaGet(Id_TBL_Perfil).Caption;
   Result := False;
 //  GRID_MAESTRO.Visible := False;
   Try
     FQRMAESTRO.Active := False;
-    FQRMAESTRO.SENTENCE := ' SELECT * FROM ' + gInfo_Tablas[Id_TBL_Perfil].Name + ' '+ FCNX.No_Lock;
+    FQRMAESTRO.SENTENCE := ' SELECT * FROM ' + Info_TablaGet(Id_TBL_Perfil).Name + ' '+ FCNX.No_Lock;
     If Trim(pDato) <> '' Then
     Begin
       FQRMAESTRO.WHERE := '  WHERE CODIGO_PERFIL LIKE ' + QuotedStr('%' + Trim(pDato) + '%') ;
@@ -277,7 +246,7 @@ Begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrIWPerfil_Enc.AbrirMaestro, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWPerfil_Enc', 'TFrIWPerfil_Enc.AbrirMaestro', E.Message);
     End;
   End;
   FGRID_MAESTRO.RefreshData;
@@ -291,7 +260,7 @@ Begin
   DETALLE_PERFIL.Items.Clear;
   Try
     FQRDETALLE.Active := False;
-    FQRDETALLE.SENTENCE := ' SELECT * FROM ' + gInfo_Tablas[Id_TBL_Perfil].Name + ' ' + FCNX.No_Lock;
+    FQRDETALLE.SENTENCE := ' SELECT * FROM ' + Info_TablaGet(Id_TBL_Perfil).Name + ' ' + FCNX.No_Lock;
     FQRDETALLE.WHERE    := ' WHERE ' + FCNX.Trim_Sentence('CODIGO_PERFIL') +' = ' + QuotedStr(Trim(pCodigo_Perfil));
     FQRDETALLE.Active := True;
     Result := FQRDETALLE.Active;
@@ -307,7 +276,7 @@ Begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrIWPerfil_Enc.AbrirDetalle, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWPerfil_Enc', 'TFrIWPerfil_Enc.AbrirDetalle', E.Message);
     End;
   End;
 End;
@@ -325,7 +294,7 @@ begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrIWUsuario_Enc.IWAppFormCreate, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWPerfil_Enc', 'TFrIWUsuario_Enc.IWAppFormCreate', E.Message);
     End;
   End;
 end;
@@ -335,14 +304,14 @@ Var
   lI : Integer;
 begin
   Randomize;
-  Self.Name := 'PERFIL' + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000));
+  Self.Name := 'TFrIWPerfil_Enc' + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000));
   FCNX := UserSession.CNX;
-  WebApplication.RegisterCallBack(Self.Name + '.Resultado_Codigo'    , Resultado_Codigo    );
-  WebApplication.RegisterCallBack(Self.Name + '.Resultado_Nombre'    , Resultado_Nombre    );
+  FFRAME := TFrIWFrame.Create(Self);
+  FFRAME.Parent := Self;
   FCODIGO_ACTUAL := '';
   FCODIGO_PERFIL := '';
 
-  FINFO := UserSession.FULL_INFO + gInfo_Tablas[Id_TBL_Perfil].Caption;
+  FINFO := UserSession.FULL_INFO + Info_TablaGet(Id_TBL_Perfil).Caption;
   Try
 
     FGRID_MAESTRO        := TGRID_JQ.Create(PAG_00);
@@ -352,14 +321,14 @@ begin
     FGRID_MAESTRO.Width  := 700;
     FGRID_MAESTRO.Height := 500;
 
-    FQRMAESTRO := UserSession.Create_Manager_Data(gInfo_Tablas[Id_TBL_Perfil].Name, gInfo_Tablas[Id_TBL_Perfil].Caption);
+    FQRMAESTRO := UserSession.Create_Manager_Data(Info_TablaGet(Id_TBL_Perfil).Name, Info_TablaGet(Id_TBL_Perfil).Caption);
 
     FQRMAESTRO.ON_NEW_RECORD   := NewRecordMaster;
     FQRMAESTRO.ON_BEFORE_POST  := Validar_Campos_Master;
     FQRMAESTRO.ON_DATA_CHANGE  := DsDataChangeMaster;
     FQRMAESTRO.ON_STATE_CHANGE := DsStateMaster;
 
-    FQRDETALLE := UserSession.Create_Manager_Data(gInfo_Tablas[Id_TBL_Permiso_App].Name, gInfo_Tablas[Id_TBL_Permiso_App].Caption);
+    FQRDETALLE := UserSession.Create_Manager_Data(Info_TablaGet(Id_TBL_Permiso_App).Name, Info_TablaGet(Id_TBL_Permiso_App).Caption);
 
     CODIGO_PERFIL.DataSource := FQRMAESTRO.DS;
     NOMBRE.DataSource        := FQRMAESTRO.DS;
@@ -384,7 +353,7 @@ begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrIWPerfil_Enc.IWAppFormCreate, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWPerfil_Enc', 'TFrIWPerfil_Enc.IWAppFormCreate', E.Message);
     End;
   End;
 end;
@@ -411,20 +380,23 @@ begin
       If Assigned(FGRID_MAESTRO) Then
         FreeAndNil(FGRID_MAESTRO);
 
+    If Assigned(FFRAME) Then
+      FreeAndNil(FFRAME);
+
     Except
       On E: Exception Do
-        UtLog_Execute('TFrIWPerfil_Enc.IWAppFormDestroy, ' + e.Message);
+        Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWPerfil_Enc', 'TFrIWPerfil_Enc.IWAppFormDestroy', E.Message);
     End;
 end;
 
 procedure TFrIWPerfil_Enc.NewRecordMaster(pSender: TObject);
 begin
   Try
-    FQRMAESTRO.QR.FieldByName('CODIGO_PERFIL' ).AsString := FCNX.Next(gInfo_Tablas[Id_TBL_Perfil].Name, '0', ['CODIGO_PERFIL'], [],[], FQRMAESTRO.QR.FieldByName('CODIGO_PERFIL').Size);
+    FQRMAESTRO.QR.FieldByName('CODIGO_PERFIL' ).AsString := FCNX.Next(Info_TablaGet(Id_TBL_Perfil).Name, '0', ['CODIGO_PERFIL'], [],[], FQRMAESTRO.QR.FieldByName('CODIGO_PERFIL').Size);
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrIWPerfil_Enc.NewRecordMaster, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWPerfil_Enc', 'TFrIWPerfil_Enc.NewRecordMaster', E.Message);
     End;
   End;
 end;
@@ -432,10 +404,6 @@ end;
 procedure TFrIWPerfil_Enc.BtnAcarreoAsyncClick(Sender: TObject; EventParams: TStringList);
 begin
   FQRMAESTRO.SetAcarreo(Not FQRMAESTRO.ACARREO, ['CODIGO_PERFIL'], [FQRMAESTRO.QR.FieldByName('CODIGO_PERFIL').AsString]);
-//  If Not FQRMAESTRO.ACARREO Then
-//    BtnAcarreo.Hint := 'Acarreo Inactivo'
-//  Else
-//    BtnAcarreo.Hint := 'Acarreo Activo';
 end;
 
 
@@ -452,7 +420,7 @@ Begin
     AbrirMaestro(EventParams.Values['CODIGO_PERFIL']);
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWPerfil_Enc.Localizar_Registro, ' + e.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWPerfil_Enc', 'TFrIWPerfil_Enc.Localizar_Registro', E.Message);
   End;
 End;
 
@@ -491,21 +459,7 @@ begin
     End;
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWPerfil_Enc.BTNBUSCARAsyncClick, ' + e.Message);
-  End;
-//  AbrirMaestro(DATO.Text);
-end;
-
-procedure TFrIWPerfil_Enc.BTNCODIGOAsyncClick(Sender: TObject; EventParams: TStringList);
-begin
-  Try
-    If FQRMAESTRO.Mode_Edition Then
-    Begin
-      WebApplication.ShowPrompt('Ingrese el código del perfil', Self.Name + '.Resultado_Codigo', 'Perfíl', FQRMAESTRO.QR.FieldByName('CODIGO_PERFIL').AsString);
-    End;
-  Except
-    On E: Exception Do
-      UtLog_Execute('TFrIWPerfil_Enc.BTNCODIGOAsyncClick, ' + e.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWPerfil_Enc', 'TFrIWPerfil_Enc.BTNBUSCARAsyncClick', E.Message);
   End;
 end;
 
@@ -513,19 +467,6 @@ procedure TFrIWPerfil_Enc.BtnGridAsyncClick(Sender: TObject; EventParams: TStrin
 begin
   UserSession.ShowForm_Perfil_Permiso(CODIGO_PERFIL.Text);
   Release_Me;
-end;
-
-procedure TFrIWPerfil_Enc.BTNNOMBREAsyncClick(Sender: TObject; EventParams: TStringList);
-begin
-  Try
-    If FQRMAESTRO.Mode_Edition Then
-    Begin
-      WebApplication.ShowPrompt('Ingrese el nombre del usuario', Self.Name + '.Resultado_Nombre', 'Nombre', FQRMAESTRO.QR.FieldByName('NOMBRE').AsString);
-    End;
-  Except
-    On E: Exception Do
-      UtLog_Execute('TFrIWPerfil_Enc.BTNNOMBREAsyncClick, ' + e.Message);
-  End;
 end;
 
 end.

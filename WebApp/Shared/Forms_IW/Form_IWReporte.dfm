@@ -6,6 +6,7 @@ object FrIWReporte: TFrIWReporte
   RenderInvisibleControls = True
   AllowPageAccess = True
   ConnectionMode = cmAny
+  OnCreate = IWAppFormCreate
   Background.Fixed = False
   HandleTabs = False
   LeftToRight = True
@@ -24,9 +25,6 @@ object FrIWReporte: TFrIWReporte
     VertScrollBar.Visible = False
     RenderInvisibleControls = True
     Align = alTop
-    ExplicitLeft = 296
-    ExplicitTop = 48
-    ExplicitWidth = 60
     object BTNBACK: TIWButton
       Left = 13
       Top = 12

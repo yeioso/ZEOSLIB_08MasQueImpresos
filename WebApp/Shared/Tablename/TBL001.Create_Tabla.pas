@@ -8,7 +8,7 @@ Function TBL001_Create_Tabla_CheckTables(pCnx : TConexion) : Boolean;
 
 implementation
 Uses
-  UtLog,
+  UtilsIW.ManagerLog,
   SysUtils,
   TBL002.Update_Field,
   TBL003.Perfil,
@@ -21,7 +21,9 @@ Uses
   TBL010.Tercero,
   TBL011.Proyecto,
   TBL030.Orden_Produccion,
-  TBL031.Movto_Inventario,
+  TBL031.Explosion_Material,
+  TBL032.Movto_Inventario,
+  TBL033.Notificacion_Producto,
   TBL999.Usuario_Reporte;
 
 Function TBL001_Create_Tabla_Execute(pCnx : TConexion) : Boolean;
@@ -47,13 +49,17 @@ Begin
     If Result Then
       Result := TBL030_Orden_Produccion_Create(pCnx);
     If Result Then
-      Result := TBL031_Movto_Inventario_Create(pCnx);
+      Result := TBL031_Explosion_Material_Create(pCnx);
+    If Result Then
+      Result := TBL032_Movto_Inventario_Create(pCnx);
+    If Result Then
+      Result := TBL033_Notificacion_Producto_Create(pCnx);
     If Result Then
       Result := TBL999_Usuario_Reporte_Create(pCnx);
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TBL001_Create_Tabla_Execute, ' + E.Message);
+      Utils_ManagerLog_Add('DATABASE', 'TBL001.Create_Tabla', 'TBL001_Create_Tabla_Execute', E.Message);
     End;
   End;
 End;

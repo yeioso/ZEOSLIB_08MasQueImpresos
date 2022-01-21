@@ -84,7 +84,6 @@ Type
 implementation
 {$R *.dfm}
 Uses
-  UtLog,
   UtFuncion,
   IWAppCache,
   UtConexion,
@@ -94,6 +93,7 @@ Uses
   IW.CacheStream,
   ServerController,
   TBL000.Info_Tabla,
+  UtilsIW.ManagerLog,
   UtilsIW.Permisos_App,
   UtilsIW.Sesiones_Activas;
 
@@ -131,7 +131,7 @@ Begin
     End;
   Except
     On E : Exception Do
-      UtLog_Execute('TFrIWMenu.Launch_Option, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWMenu', 'TFrIWMenu.Launch_Option', E.Message);
   End;
 End;
 
@@ -150,7 +150,7 @@ Begin
        Launch_Option(lItem_App);
   Except
     On E : Exception Do
-      UtLog_Execute('TFrIWMenu.Ejecutar_Item, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWMenu', 'TFrIWMenu.Ejecutar_Item', E.Message);
   End;
 End;
 
@@ -181,7 +181,7 @@ begin
     Ejecutar_Item(RG_FACTURACION);
   Except
     On E : Exception Do
-      UtLog_Execute('TFrIWMenu.BTNEJECUTAR_FACTURACIONAsyncClick, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWMenu', 'TFrIWMenu.BTNEJECUTAR_FACTURACIONAsyncClick', E.Message);
   End;
 end;
 
@@ -191,7 +191,7 @@ begin
     Ejecutar_Item(RG_INFORMES);
   Except
     On E : Exception Do
-      UtLog_Execute('TFrIWMenu.BTNEJECUTAR_INFORMESAsyncClick, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWMenu', 'TFrIWMenu.BTNEJECUTAR_INFORMESAsyncClick', E.Message);
   End;
 end;
 
@@ -201,7 +201,7 @@ begin
     Ejecutar_Item(RG_INVENTARIOS);
   Except
     On E : Exception Do
-      UtLog_Execute('TFrIWMenu.BTNEJECUTAR_INVENTARIOSAsyncClick, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWMenu', 'TFrIWMenu.BTNEJECUTAR_INVENTARIOSAsyncClick', E.Message);
   End;
 end;
 
@@ -211,7 +211,7 @@ begin
     Ejecutar_Item(RG_MAESTROS);
   Except
     On E : Exception Do
-      UtLog_Execute('TFrIWMenu.BTNEJECUTAR_MAESTROAsyncClick, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWMenu', 'TFrIWMenu.BTNEJECUTAR_MAESTROAsyncClick', E.Message);
   End;
 End;
 
@@ -221,7 +221,7 @@ begin
     Ejecutar_Item(RG_MOVIMIENTOS);
   Except
     On E : Exception Do
-      UtLog_Execute('TFrIWMenu.BTNEJECUTAR_MOVIMIENTOSAsyncClick, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWMenu', 'TFrIWMenu.BTNEJECUTAR_MOVIMIENTOSAsyncClick', E.Message);
   End;
 end;
 
@@ -231,7 +231,7 @@ begin
     Ejecutar_Item(RG_PROCESOS);
   Except
     On E : Exception Do
-      UtLog_Execute('TFrIWMenu.BTNEJECUTAR_PROCESOSAsyncClick, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWMenu', 'TFrIWMenu.BTNEJECUTAR_PROCESOSAsyncClick', E.Message);
   End;
 end;
 
@@ -241,7 +241,7 @@ begin
     Ejecutar_Item(RG_SALIR);
   Except
     On E : Exception Do
-      UtLog_Execute('TFrIWMenu.BTNEJECUTAR_SALIRAsyncClick, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWMenu', 'TFrIWMenu.BTNEJECUTAR_SALIRAsyncClick', E.Message);
   End;
 end;
 
@@ -251,7 +251,7 @@ begin
     Ejecutar_Item(RG_TRANSFERENCIAS);
   Except
     On E : Exception Do
-      UtLog_Execute('TFrIWMenu.BTNEJECUTAR_TRANSFERENCIASAsyncClick, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWMenu', 'TFrIWMenu.BTNEJECUTAR_TRANSFERENCIASAsyncClick', E.Message);
   End;
 end;
 
@@ -261,7 +261,7 @@ begin
     Ejecutar_Item(RG_UTILIDADES);
   Except
     On E : Exception Do
-      UtLog_Execute('TFrIWMenu.BTNEJECUTAR_UTILIDADESAsyncClick, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWMenu', 'TFrIWMenu.BTNEJECUTAR_UTILIDADESAsyncClick', E.Message);
   End;
 end;
 
@@ -340,7 +340,7 @@ Begin
 
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWMenu.Cargar_Opciones, ' + e.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWMenu', 'TFrIWMenu.Cargar_Opciones', E.Message);
   End;
 End;
 
@@ -352,7 +352,7 @@ begin
       WebApplication.Terminate('Gracias por utilizar la plataforma');
   Except
     On E : Exception Do
-      UtLog_Execute('TFrIWMenu.Ejecutar_Salida, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWMenu', 'TFrIWMenu.Ejecutar_Salida', E.Message);
   End;
 end;
 
@@ -379,7 +379,7 @@ End;
 procedure TFrIWMenu.IWAppFormCreate(Sender: TObject);
 begin
   Randomize;
-  Self.Name := 'MENU' + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000));
+  Self.Name := 'TFrIWMenu' + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000));
   WebApplication.RegisterCallBack(Self.Name + '.Ejecutar_Salida', Ejecutar_Salida);
   Actualizar_Info;
   Cargar_Opciones(RG_MAESTROS      );

@@ -44,21 +44,21 @@ type
 implementation
 {$R *.dfm}
 Uses
-  UtLog,
   UtFuncion,
   Criptografia,
   ServerController,
-  TBL000.Info_Tabla;
+  TBL000.Info_Tabla,
+  UtilsIW.ManagerLog;
 
 Procedure TFrIWCambio_Password.Cargar_informacion;
 Begin
   Try
     NOMBRE_USUARIO.Text := AnsiUpperCase(Trim(UserSession.USER_NAME));
-    EMAIL.Text          := FCNX.GetValue(gInfo_Tablas[Id_TBL_Usuario].Name, ['CODIGO_USUARIO'], [UserSession.USER_CODE], ['EMAIL']);
+    EMAIL.Text          := FCNX.GetValue(Info_TablaGet(Id_TBL_Usuario).Name, ['CODIGO_USUARIO'], [UserSession.USER_CODE], ['EMAIL']);
     EMAIL.Text          := Trim(LowerCase(EMAIL.Text));
   Except
     On E : Exception Do
-      UtLog_Execute('TFrIWCambio_Password.Cargar_informacion, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWCambio_Password', 'TFrIWCambio_Password.Cargar_informacion', E.Message);
   End;
 End;
 
@@ -84,7 +84,7 @@ Begin
     Try
       FCNX.AUX.Active := False;
       FCNX.AUX.SQL.Clear;
-      FCNX.AUX.SQL.Add(' SELECT * FROM ' + gInfo_Tablas[Id_TBL_Usuario].Name + ' ' + FCNX.No_Lock);
+      FCNX.AUX.SQL.Add(' SELECT * FROM ' + Info_TablaGet(Id_TBL_Usuario).Name + ' ' + FCNX.No_Lock);
       FCNX.AUX.SQL.Add(' WHERE ID_SISTEMA = ' + QuotedStr('S'));
       FCNX.AUX.SQL.Add(' AND ' + FCNX.Trim_Sentence('CODIGO_USUARIO') + ' = ' + QuotedStr(Trim(UserSession.USER_CODE)));
       FCNX.AUX.Active := True;
@@ -100,11 +100,11 @@ Begin
       FCNX.AUX.Active := False;
     Except
       On E: Exception Do
-        UtLog_Execute('TFrIWCambio_Password.Password_Valido, A: ' + E.Message);
+        Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWCambio_Password', 'TFrIWCambio_Password.Password_Valido, A: ', E.Message);
     End;
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWCambio_Password.Password_Valido, B: ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWCambio_Password', 'TFrIWCambio_Password.Password_Valido, B: ', E.Message);
   End;
 End;
 
@@ -117,7 +117,7 @@ Begin
     Try
       FCNX.AUX.Active := False;
       FCNX.AUX.SQL.Clear;
-      FCNX.AUX.SQL.Add(' SELECT * FROM ' + gInfo_Tablas[Id_TBL_Usuario].Name + FCNX.No_Lock);
+      FCNX.AUX.SQL.Add(' SELECT * FROM ' + Info_TablaGet(Id_TBL_Usuario).Name + FCNX.No_Lock);
       FCNX.AUX.SQL.Add(' WHERE ID_SISTEMA = ' + QuotedStr('S'));
       FCNX.AUX.SQL.Add(' AND ' + FCNX.Trim_Sentence('CODIGO_USUARIO') + ' = ' + QuotedStr(Trim(UserSession.USER_CODE)));
       FCNX.AUX.Active := True;
@@ -142,11 +142,11 @@ Begin
       FCNX.AUX.Active := False;
     Except
       On E: Exception Do
-        UtLog_Execute('TFrIWCambio_Password.Actualizar_Password, A: ' + E.Message);
+        Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWCambio_Password', 'TFrIWCambio_Password.Actualizar_Password, A: ', E.Message);
     End;
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWCambio_Password.Actualizar_Password, B: ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWCambio_Password', 'TFrIWCambio_Password.Actualizar_Password, B: ', E.Message);
   End;
 End;
 
@@ -171,7 +171,7 @@ end;
 procedure TFrIWCambio_Password.IWAppFormCreate(Sender: TObject);
 begin
   Randomize;
-  Self.Name := 'CAMBIO_PASSWORD' + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000));
+  Self.Name := 'TFrIWCambio_Password' + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000));
   FCNX := UserSession.CNX;
   Cargar_informacion;
   WebApplication.RegisterCallBack(Self.Name + '.Ejecutar_Cambiar_Password', Ejecutar_Cambiar_Password);

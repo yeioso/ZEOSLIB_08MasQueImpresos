@@ -8,10 +8,10 @@ Procedure TBL002_Update_Field_Execute(pCnx : TConexion);
 
 implementation
 Uses
-  UtLog,
   Classes,
   SysUtils,
-  TBL000.Info_Tabla;
+  TBL000.Info_Tabla,
+  UtilsIW.ManagerLog;
 
 Function Tabla_Existe(pCnx : TConexion; pId : String) : Boolean;
 Begin
@@ -58,7 +58,7 @@ Begin
       lSQL.Free;
     Except
       On E : Exception Do
-        UtLog_Execute(lTexto + ', Actualizar_Estructura, ' + E.Message);
+        Utils_ManagerLog_Add('UPDATEFIELD', 'TBL002.Update_Field', 'Actualizar_Estructura', 'Actualizar_Estructura, ' + E.Message + ', ' + lTexto);
     End;
   End;
 End;

@@ -9,7 +9,7 @@ Function TBL008_Proceso_Create(pCnx : TConexion) : Boolean;
 implementation
 
 Uses
-  UtLog,
+  
   UtError,
   SysUtils,
   TBL000.Info_Tabla;
@@ -35,7 +35,7 @@ Begin
       On E : Exception Do
       Begin
         Result := False;
-        UtLog_Execute(MessageError(IE_ERROR_CREATE) + ' Tabla ' + gInfo_Tablas[Id_TBL_Proceso].Name + ', TBL008_Proceso_Create, ' + E.Message);
+        Utils_ManagerLog_Add(MessageError(IE_ERROR_CREATE) + ' Tabla ' + gInfo_Tablas[Id_TBL_Proceso].Name + ', TBL008_Proceso_Create, ' + E.Message);
       End;
     End;
   End;

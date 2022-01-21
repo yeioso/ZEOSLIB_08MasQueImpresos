@@ -19,23 +19,23 @@ implementation
 Uses
   DB,
   Math,
-  UtLog,
   UtError,
   Classes,
   SysUtils,
   StrUtils,
   Variants,
   UtFuncion,
-  TBL000.Info_Tabla;
+  TBL000.Info_Tabla,
+  UtilsIW.ManagerLog;
 
 Function TBL006_Administrador_Documento_Execute(pCnx : TConexion) : Boolean;
 Begin
   Result := True;
-  if Not pCnx.TableExists(gInfo_Tablas[Id_TBL_Administrador_Documento].Name) then
+  if Not pCnx.TableExists(Info_TablaGet(Id_TBL_Administrador_Documento).Name) then
   Begin
     Try
       pCnx.TMP.SQL.Clear;
-      pCnx.TMP.SQL.Add('   CREATE TABLE ' + gInfo_Tablas[Id_TBL_Administrador_Documento].Name + ' '            );
+      pCnx.TMP.SQL.Add('   CREATE TABLE ' + Info_TablaGet(Id_TBL_Administrador_Documento).Name + ' '           );
       pCnx.TMP.SQL.Add('   (  '                                                                                );
       pCnx.TMP.SQL.Add('      CODIGO_DOCUMENTO '  + pCNX.Return_Type(TYPE_VARCHAR) + ' (030)  ' + ' NOT NULL, ');
       pCnx.TMP.SQL.Add('      NOMBRE '            + pCNX.Return_Type(TYPE_VARCHAR) + ' (255)  ' + ' NULL, '    );
@@ -52,7 +52,7 @@ Begin
       On E : Exception Do
       Begin
         Result := False;
-        UtLog_Execute(MessageError(IE_ERROR_CREATE) + ' Tabla ' + gInfo_Tablas[Id_TBL_Administrador_Documento].Name + ', TBL006_Administrador_Documento_Execute, ' + E.Message);
+        Utils_ManagerLog_Add('DATABASE', 'TBL006.Administrador_Documento', 'TBL006_Administrador_Documento_Execute', E.Message);
       End;
     End;
   End;
@@ -80,7 +80,7 @@ End;
 //    lSQL.Free;
 //  Except
 //    On E : Exception Do
-//      UtLog_Execute('Tablename_Adm_Documento, Retornar_Numero_Adm_Documento, ' + E.Message);
+//      Utils_ManagerLog_Add('Tablename_Adm_Documento, Retornar_Numero_Adm_Documento, ' + E.Message);
 //  End;
 //End;
 //
@@ -107,7 +107,7 @@ End;
 //    lSQL.Free;
 //  Except
 //    On E : Exception Do
-//      UtLog_Execute('Tablename_Adm_Documento, Retornar_Numero_Adm_Documento, ' + E.Message);
+//      Utils_ManagerLog_Add('Tablename_Adm_Documento, Retornar_Numero_Adm_Documento, ' + E.Message);
 //  End;
 //End;
 //
@@ -124,12 +124,12 @@ End;
 //    lSL[lI] := Trim(lSL[lI]);
 //    If FileExists(lSL[lI]) Then
 //    Begin
-//      UtLog_Execute('Tablename_Adm_Documento, Tablename_Adm_Documento_Validate_Path, existe ' + lSL[lI]);
+//      Utils_ManagerLog_Add('Tablename_Adm_Documento, Tablename_Adm_Documento_Validate_Path, existe ' + lSL[lI]);
 //      pOut := lSL[lI];
 //    End
 //    Else
 //    Begin
-//      UtLog_Execute('Tablename_Adm_Documento, Tablename_Adm_Documento_Validate_Path, no existe ' + lSL[lI]);
+//      Utils_ManagerLog_Add('Tablename_Adm_Documento, Tablename_Adm_Documento_Validate_Path, no existe ' + lSL[lI]);
 //    End;
 //  End;
 //  lSL.Clear;
@@ -165,7 +165,7 @@ End;
 //    lSQL.Free;
 //  Except
 //    On E : Exception Do
-//      UtLog_Execute('Tablename_Adm_Documento, Retornar_Formato_Adm_Documento, ' + E.Message);
+//      Utils_ManagerLog_Add('Tablename_Adm_Documento, Retornar_Formato_Adm_Documento, ' + E.Message);
 //  End;
 //End;
 //
@@ -194,7 +194,7 @@ End;
 //    lSQL.Free;
 //  Except
 //    On E : Exception Do
-//      UtLog_Execute('Tablename_Adm_Documento, Retornar_Formato_Adm_Documento, ' + E.Message);
+//      Utils_ManagerLog_Add('Tablename_Adm_Documento, Retornar_Formato_Adm_Documento, ' + E.Message);
 //  End;
 //End;
 //
@@ -223,7 +223,7 @@ End;
 //    lSQL.Free;
 //  Except
 //    On E : Exception Do
-//      UtLog_Execute('Tablename_Adm_Documento, Retornar_Formato_Adm_Documento, ' + E.Message);
+//      Utils_ManagerLog_Add('Tablename_Adm_Documento, Retornar_Formato_Adm_Documento, ' + E.Message);
 //  End;
 //End;
 //
@@ -281,7 +281,7 @@ End;
 //    lDoc.DisposeOf;
 //  Except
 //    On E : Exception Do
-//      UtLog_Execute('Tablename_Adm_Documento, Retornar_Disponible_Adm_Documento, ' + E.Message);
+//      Utils_ManagerLog_Add('Tablename_Adm_Documento, Retornar_Disponible_Adm_Documento, ' + E.Message);
 //  End;
 //End;
 //
@@ -311,7 +311,7 @@ End;
 //    lSQL.Free;
 //  Except
 //    On E : Exception Do
-//      UtLog_Execute('Tablename_Adm_Documento_Get_Prefix_Number_Fenalco, ' + E.Message);
+//      Utils_ManagerLog_Add('Tablename_Adm_Documento_Get_Prefix_Number_Fenalco, ' + E.Message);
 //  End;
 //End;
 //
@@ -338,7 +338,7 @@ End;
 //    lSQL.Free;
 //  Except
 //    On E : Exception Do
-//      UtLog_Execute('Tablename_Adm_Documento_Update_Prefix_Number_Fenalco, ' + E.Message);
+//      Utils_ManagerLog_Add('Tablename_Adm_Documento_Update_Prefix_Number_Fenalco, ' + E.Message);
 //  End;
 //End;
 

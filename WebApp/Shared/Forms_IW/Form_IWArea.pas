@@ -11,7 +11,7 @@ uses
   IWBaseHTML40Component, UtConexion, Data.DB, IWCompGrids, IWDBStdCtrls,
   IWCompEdit, IWCompCheckbox, IWCompMemo, IWDBExtCtrls, IWCompButton,
   IWCompListbox, IWCompGradButton, UtGrid_JQ, UtNavegador_ASE,
-  UtilsIW.Busqueda;
+  UtilsIW.Busqueda, Form_IWFrame;
 
 type
   TFrIWArea = class(TIWAppForm)
@@ -26,29 +26,21 @@ type
     IWLabel8: TIWLabel;
     DATO: TIWEdit;
     IWLabel2: TIWLabel;
-    DESCRIPCION: TIWDBMemo;
-    BTNNOMBRE: TIWImage;
-    NOMBRE: TIWDBLabel;
-    CODIGO_AREA: TIWDBLabel;
-    BTNCODIGO: TIWImage;
-    BTNDESCRIPCION: TIWImage;
-    BTNACTIVO: TIWImage;
-    lbNombre_Activo: TIWLabel;
     IWRegion_Navegador: TIWRegion;
     IWModalWindow1: TIWModalWindow;
+    CODIGO_AREA: TIWDBEdit;
+    NOMBRE: TIWDBEdit;
+    DESCRIPCION: TIWDBMemo;
+    ID_ACTIVO: TIWDBCheckBox;
     procedure BTNBACKAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure IWAppFormCreate(Sender: TObject);
     procedure IWAppFormDestroy(Sender: TObject);
     procedure BTNBUSCARAsyncClick(Sender: TObject; EventParams: TStringList);
-    procedure CODIGO_AREAAsyncExit(Sender: TObject;  EventParams: TStringList);
     procedure BtnAcarreoAsyncClick(Sender: TObject; EventParams: TStringList);
-    procedure BTNCODIGOAsyncClick(Sender: TObject; EventParams: TStringList);
-    procedure BTNNOMBREAsyncClick(Sender: TObject; EventParams: TStringList);
-    procedure BTNDESCRIPCIONAsyncClick(Sender: TObject; EventParams: TStringList);
-    procedure BTNACTIVOAsyncClick(Sender: TObject; EventParams: TStringList);
   private
     FCNX : TConexion;
     FINFO : String;
+    FFRAME : TFrIWFrame;
     FQRMAESTRO : TMANAGER_DATA;
     FNAVEGADOR : TNavegador_ASE;
     FGRID_MAESTRO : TGRID_JQ;
@@ -61,11 +53,6 @@ type
 
     Procedure Validar_Campos_Master(pSender: TObject);
     procedure NewRecordMaster(pSender: TObject);
-
-    procedure Resultado_Codigo(EventParams: TStringList);
-    procedure Resultado_Nombre(EventParams: TStringList);
-    procedure Resultado_Descripcion(EventParams: TStringList);
-    procedure Resultado_Activo(EventParams: TStringList);
 
     Function Documento_Activo : Boolean;
 
@@ -83,7 +70,7 @@ implementation
 {$R *.dfm}
 Uses
   Math,
-  UtLog,
+  
   UtFecha,
   Variants,
   UtFuncion,
@@ -92,7 +79,8 @@ Uses
   System.UITypes,
   System.StrUtils,
   ServerController,
-  TBL000.Info_Tabla;
+  TBL000.Info_Tabla,
+  UtilsIW.ManagerLog;
 
 Procedure TFrIWArea.Localizar_Registro(Sender: TObject; EventParams: TStringList);
 Begin
@@ -100,7 +88,7 @@ Begin
     AbrirMaestro(EventParams.Values['CODIGO_AREAD']);
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWArea.Localizar_Registro, ' + e.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWArea', 'TFrIWArea.Localizar_Registro', E.Message);
   End;
 End;
 
@@ -132,7 +120,7 @@ begin
     End;
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWArea.Buscar_Info, ' + e.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWArea', 'TFrIWArea.Buscar_Info', E.Message);
   End;
 End;
 
@@ -143,60 +131,8 @@ End;
 
 Function TFrIWArea.Existe_Area(Const pCODIGO_AREA : String) : Boolean;
 Begin
-  Result := FCNX.Record_Exist(gInfo_Tablas[Id_TBL_Area].Name, ['CODIGO_AREA'], [pCODIGO_AREA]);
+  Result := FCNX.Record_Exist(Info_TablaGet(Id_TBL_Area).Name, ['CODIGO_AREA'], [pCODIGO_AREA]);
 End;
-
-procedure TFrIWArea.Resultado_Codigo(EventParams: TStringList);
-Begin
-  Try
-    If FQRMAESTRO.Mode_Edition And (Result_Is_OK(EventParams.Values['RetValue'])) Then
-    Begin
-      FQRMAESTRO.QR.FieldByName('CODIGO_AREA').AsString := Justificar(EventParams.Values['InputStr'], '0', FQRMAESTRO.QR.FieldByName('CODIGO_AREA').Size);
-      FQRMAESTRO.QR.FieldByName('CODIGO_AREA').AsString := AnsiUpperCase(FQRMAESTRO.QR.FieldByName('CODIGO_AREA').AsString);
-    End;
-  Except
-    On E: Exception Do
-      UtLog_Execute('TFrIWArea.Resultado_Codigo, ' + e.Message);
-  End;
-End;
-
-procedure TFrIWArea.Resultado_Nombre(EventParams: TStringList);
-Begin
-  Try
-    If FQRMAESTRO.Mode_Edition And (Result_Is_OK(EventParams.Values['RetValue'])) Then
-    Begin
-      FQRMAESTRO.QR.FieldByName('NOMBRE').AsString := AnsiUpperCase(Trim(EventParams.Values['InputStr']));
-    End;
-  Except
-    On E: Exception Do
-      UtLog_Execute('TFrIWArea.Resultado_Nombre, ' + e.Message);
-  End;
-End;
-
-procedure TFrIWArea.Resultado_Descripcion(EventParams: TStringList);
-Begin
-  Try
-    If FQRMAESTRO.Mode_Edition And (Result_Is_OK(EventParams.Values['RetValue'])) Then
-    Begin
-      FQRMAESTRO.QR.FieldByName('DESCRIPCION').AsString := AnsiUpperCase(Trim(EventParams.Values['InputStr']));
-    End;
-  Except
-    On E: Exception Do
-      UtLog_Execute('TFrIWArea.Resultado_Descripcion, ' + e.Message);
-  End;
-End;
-
-procedure TFrIWArea.Resultado_Activo(EventParams: TStringList);
-Begin
-  Try
-    If FQRMAESTRO.Mode_Edition Then
-      FQRMAESTRO.QR.FieldByName('ID_ACTIVO').AsString := IfThen(Result_Is_OK(EventParams.Values['RetValue']), 'S', 'N');
-  Except
-    On E: Exception Do
-      UtLog_Execute('TFrIWArea.Resultado_Activo, ' + E.Message);
-  End;
-End;
-
 
 Procedure TFrIWArea.Validar_Campos_Master(pSender: TObject);
 Var
@@ -209,13 +145,19 @@ Begin
     NOMBRE.BGColor := UserSession.COLOR_OK;
     CODIGO_AREA.BGColor := UserSession.COLOR_OK;
 
-    If BTNCODIGO.Visible And (Vacio(FQRMAESTRO.QR.FieldByName('CODIGO_AREA').AsString) Or Existe_Area(FQRMAESTRO.QR.FieldByName('CODIGO_AREA').AsString)) Then
+    If FQRMAESTRO.Mode_Insert And (Not Vacio(FQRMAESTRO.QR.FieldByName('CODIGO_AREA').AsString)) Then
+    Begin
+      FQRMAESTRO.QR.FieldByName('CODIGO_AREA').AsString := Justificar(FQRMAESTRO.QR.FieldByName('CODIGO_AREA').AsString, '0', FQRMAESTRO.QR.FieldByName('CODIGO_AREA').Size);
+      FQRMAESTRO.QR.FieldByName('CODIGO_AREA').AsString := Copy(FQRMAESTRO.QR.FieldByName('CODIGO_AREA').AsString, 1, FQRMAESTRO.QR.FieldByName('CODIGO_AREA').Size);
+    End;
+
+    If FQRMAESTRO.Mode_Insert And (Vacio(FQRMAESTRO.QR.FieldByName('CODIGO_AREA').AsString) Or Existe_Area(FQRMAESTRO.QR.FieldByName('CODIGO_AREA').AsString)) Then
     Begin
       lMensaje := lMensaje + IfThen(Not Vacio(lMensaje), ', ') + 'Codigo del area no valido o ya existe';
       CODIGO_AREA.BGColor := UserSession.COLOR_ERROR;
     End;
 
-    If BTNNOMBRE.Visible And Vacio(FQRMAESTRO.QR.FieldByName('NOMBRE').AsString) Then
+    If FQRMAESTRO.Mode_Edition And Vacio(FQRMAESTRO.QR.FieldByName('NOMBRE').AsString) Then
     Begin
       lMensaje := lMensaje + IfThen(Not Vacio(lMensaje), ', ') + 'Nombre invalido';
       NOMBRE.BGColor := UserSession.COLOR_ERROR;
@@ -229,25 +171,19 @@ Begin
     End;
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWArea_Enc.Validar_Campos_Master, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWArea', 'TFrIWArea_Enc.Validar_Campos_Master', E.Message);
   End;
 End;
 
-procedure TFrIWArea.CODIGO_AREAAsyncExit(Sender: TObject;  EventParams: TStringList);
-begin
-  If FQRMAESTRO.Mode_Edition And (Not Vacio(FQRMAESTRO.QR.FieldByName('CODIGO_AREA').AsString)) Then
-    FQRMAESTRO.QR.FieldByName('CODIGO_AREA').AsString := Justificar(FQRMAESTRO.QR.FieldByName('CODIGO_AREA').AsString, '0', FQRMAESTRO.QR.FieldByName('CODIGO_AREA').Size);
-end;
-
 Procedure TFrIWArea.Estado_Controles;
 Begin
-  BTNCODIGO.Visible      := (FQRMAESTRO.DS.State In [dsInsert]) And Documento_Activo;
-  BTNNOMBRE.Visible      := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  BTNDESCRIPCION.Visible := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  BTNACTIVO.Visible      := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  DATO.Visible           := (Not FQRMAESTRO.Mode_Edition);
-  PAG_00.Visible         := (Not FQRMAESTRO.Mode_Edition);
-  PAG_01.Visible         := True;
+  CODIGO_AREA.Enabled  := FQRMAESTRO.Mode_Insert  And Documento_Activo;
+  NOMBRE.Enabled       := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  DESCRIPCION.Editable := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  ID_ACTIVO.Enabled    := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  DATO.Visible        := (Not FQRMAESTRO.Mode_Edition);
+  PAG_00.Visible      := (Not FQRMAESTRO.Mode_Edition);
+  PAG_01.Visible      := True;
 End;
 
 Procedure TFrIWArea.SetLabel;
@@ -255,11 +191,10 @@ Begin
   If Not FQRMAESTRO.Active Then
     Exit;
   Try
-    lbNombre_Activo.Caption := IfThen(FQRMAESTRO.QR.FieldByName('ID_ACTIVO').AsString = 'S', 'Area activa', 'Area inactivo');
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrIWArea.SetLabel, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWArea', 'TFrIWArea.SetLabel', E.Message);
     End;
   End;
 End;
@@ -271,7 +206,7 @@ Begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrIWArea.Documento_Activo, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWArea', 'TFrIWArea.Documento_Activo', E.Message);
     End;
   End;
 End;
@@ -290,7 +225,7 @@ begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrIWArea.DsDataChangeMaster, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWArea', 'TFrIWArea.DsDataChangeMaster', E.Message);
     End;
   End;
 end;
@@ -312,11 +247,11 @@ End;
 
 Function TFrIWArea.AbrirMaestro(Const pDato : String = '') : Boolean;
 Begin
-  FGRID_MAESTRO.Caption := gInfo_Tablas[Id_TBL_Area].Caption;
+  FGRID_MAESTRO.Caption := Info_TablaGet(Id_TBL_Area).Caption;
   Result := False;
   Try
     FQRMAESTRO.Active := False;
-    FQRMAESTRO.SENTENCE := ' SELECT ' + FCNX.Top_Sentence(Const_Max_Record) + ' * FROM ' + gInfo_Tablas[Id_TBL_Area].Name + ' ';
+    FQRMAESTRO.SENTENCE := ' SELECT ' + FCNX.Top_Sentence(Const_Max_Record) + ' * FROM ' + Info_TablaGet(Id_TBL_Area).Name + ' ';
     FQRMAESTRO.WHERE := '';
     If Trim(pDato) <> '' Then
     Begin
@@ -333,7 +268,7 @@ Begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrIWArea.AbrirMaestro, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWArea', 'TFrIWArea.AbrirMaestro', E.Message);
     End;
   End;
   FGRID_MAESTRO.RefreshData;
@@ -343,14 +278,13 @@ procedure TFrIWArea.IWAppFormCreate(Sender: TObject);
 Var
   lI : Integer;
 begin
-  FINFO := UserSession.FULL_INFO + gInfo_Tablas[Id_TBL_Area].Caption;
+  FINFO := UserSession.FULL_INFO + Info_TablaGet(Id_TBL_Area).Caption;
   Randomize;
-  Self.Name := gInfo_Tablas[Id_TBL_Area].Name + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000) );
+  Self.Name := 'TFrIWArea' + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000) );
   FCNX := UserSession.CNX;
-  WebApplication.RegisterCallBack(Self.Name + '.Resultado_Codigo'     , Resultado_Codigo     );
-  WebApplication.RegisterCallBack(Self.Name + '.Resultado_Nombre'     , Resultado_Nombre     );
-  WebApplication.RegisterCallBack(Self.Name + '.Resultado_Descripcion', Resultado_Descripcion);
-  WebApplication.RegisterCallBack(Self.Name + '.Resultado_Activo'     , Resultado_Activo     );
+  FFRAME := TFrIWFrame.Create(Self);
+  FFRAME.Parent := Self;
+
   Try
     FGRID_MAESTRO        := TGRID_JQ.Create(PAG_00);
     FGRID_MAESTRO.Parent := PAG_00;
@@ -359,8 +293,7 @@ begin
     FGRID_MAESTRO.Width  := 700;
     FGRID_MAESTRO.Height := 500;
 
-
-    FQRMAESTRO := UserSession.Create_Manager_Data(gInfo_Tablas[Id_TBL_Area].Name, gInfo_Tablas[Id_TBL_Area].Caption);
+    FQRMAESTRO := UserSession.Create_Manager_Data(Info_TablaGet(Id_TBL_Area).Name, Info_TablaGet(Id_TBL_Area).Caption);
 
     FQRMAESTRO.ON_NEW_RECORD   := NewRecordMaster;
     FQRMAESTRO.ON_DATA_CHANGE  := DsDataChangeMaster;
@@ -396,7 +329,7 @@ begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrIWArea_Enc.IWAppFormCreate, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWArea', 'TFrIWArea_Enc.IWAppFormCreate', E.Message);
     End;
   End;
 end;
@@ -416,9 +349,12 @@ begin
     If Assigned(FGRID_MAESTRO) Then
       FreeAndNil(FGRID_MAESTRO);
 
+    If Assigned(FFRAME) Then
+      FreeAndNil(FFRAME);
+
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWArea_Enc.IWAppFormDestroy, ' + e.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWArea', 'TFrIWArea_Enc.IWAppFormDestroy', E.Message);
   End;
 end;
 
@@ -426,12 +362,12 @@ procedure TFrIWArea.NewRecordMaster(pSender: TObject);
 begin
   Inherited;
   Try
-    FQRMAESTRO.QR.FieldByName('CODIGO_AREA').AsString := FCNX.Next(gInfo_Tablas[Id_TBL_Area].Name, '0', ['CODIGO_AREA'], [],[], FQRMAESTRO.QR.FieldByName('CODIGO_AREA').Size);
+    FQRMAESTRO.QR.FieldByName('CODIGO_AREA').AsString := FCNX.Next(Info_TablaGet(Id_TBL_Area).Name, '0', ['CODIGO_AREA'], [],[], FQRMAESTRO.QR.FieldByName('CODIGO_AREA').Size);
     FQRMAESTRO.QR.FieldByName('ID_ACTIVO'  ).AsString := 'S';
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrIWArea.NewRecordMaster, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWArea', 'TFrIWArea.NewRecordMaster', E.Message);
     End;
   End;
 End;
@@ -439,15 +375,6 @@ End;
 procedure TFrIWArea.BtnAcarreoAsyncClick(Sender: TObject; EventParams: TStringList);
 begin
   FQRMAESTRO.SetAcarreo(Not FQRMAESTRO.ACARREO, ['CODIGO_AREA'], [FQRMAESTRO.QR.FieldByName('CODIGO_AREA').AsString]);
-//  If Not FQRMAESTRO.ACARREO Then
-//    BtnAcarreo.Caption := 'Acarreo Inactivo'
-//  Else
-//    BtnAcarreo.Caption := 'Acarreo Activo';
-end;
-
-procedure TFrIWArea.BTNACTIVOAsyncClick(Sender: TObject; EventParams: TStringList);
-begin
-  WebApplication.ShowConfirm('Está seguro(a) de activar el registro?', Self.Name + '.Resultado_Activo', 'Activar', 'Sí', 'No')
 end;
 
 Procedure TFrIWArea.BTNBACKAsyncClick(Sender: TObject; EventParams: TStringList);
@@ -470,50 +397,7 @@ begin
     End;
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWTercero_Enc.BTNBUSCARAsyncClick, ' + e.Message);
-  End;
-//AbrirMaestro(DATO.Text);
-end;
-
-procedure TFrIWArea.BTNCODIGOAsyncClick(Sender: TObject; EventParams: TStringList);
-begin
-  Try
-    If FQRMAESTRO.Mode_Edition Then
-    Begin
-      WebApplication.ShowPrompt('Ingrese el codigo del area', Self.Name + '.Resultado_Codigo', 'Area', FQRMAESTRO.QR.FieldByName('CODIGO_AREA').AsString);
-    End;
-  Except
-    On E: Exception Do
-      UtLog_Execute('TFrIWArea.BTNCODIGOAsyncClick, ' + e.Message);
-  End;
-end;
-
-procedure TFrIWArea.BTNDESCRIPCIONAsyncClick(Sender: TObject; EventParams: TStringList);
-Var
-  ltmp : String;
-begin
-  Try
-    If FQRMAESTRO.Mode_Edition Then
-    Begin
-      ltmp := FQRMAESTRO.QR.FieldByName('DESCRIPCION').AsString;
-      WebApplication.ShowPrompt('Ingrese la descripción', Self.Name + '.Resultado_Descripcion', 'Descripción', ltmp);
-    End;
-  Except
-    On E: Exception Do
-      UtLog_Execute('TFrIWArea.BTNDESCRIPCIONAsyncClick, ' + e.Message);
-  End;
-end;
-
-procedure TFrIWArea.BTNNOMBREAsyncClick(Sender: TObject; EventParams: TStringList);
-begin
-  Try
-    If FQRMAESTRO.Mode_Edition Then
-    Begin
-      WebApplication.ShowPrompt('Ingrese el nombre del area', Self.Name + '.Resultado_Nombre', 'Nombre', FQRMAESTRO.QR.FieldByName('NOMBRE').AsString);
-    End;
-  Except
-    On E: Exception Do
-      UtLog_Execute('TFrIWArea.BTNNOMBREAsyncClick, ' + e.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWArea', 'TFrIWArea.BTNBUSCARAsyncClick', E.Message);
   End;
 end;
 

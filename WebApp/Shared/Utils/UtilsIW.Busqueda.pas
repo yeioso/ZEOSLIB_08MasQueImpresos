@@ -43,7 +43,7 @@ begin
   Self.CAMPOS_DESTINO   := [];
   Case pId Of
       Id_TBL_Administrador_Documento  : Begin
-                                          Self.TABLA            := gInfo_Tablas[pId].Name;
+                                          Self.TABLA            := Info_TablaGet(pId).Name;
                                           Self.TITULO_ORIGEN    := ['Código'                 , 'Nombre'                ];
                                           Self.CAMPOS_ORIGEN    := ['CODIGO_DOCUMENTO'       , 'NOMBRE'                ];
                                           Self.CAMPOS_LIKE      := ['CODIGO_DOCUMENTO'       , 'NOMBRE'                ];
@@ -53,7 +53,7 @@ begin
                                           Self.CAMPOS_DESTINO   := ['CODIGO_DOCUMENTO'];
                                         End;
       Id_TBL_Perfil                   : Begin
-                                          Self.TABLA            := gInfo_Tablas[pId].Name;
+                                          Self.TABLA            := Info_TablaGet(pId).Name;
                                           Self.TITULO_ORIGEN    := ['Código'                 , 'Nombre'                ];
                                           Self.CAMPOS_ORIGEN    := ['CODIGO_PERFIL'          , 'NOMBRE'                ];
                                           Self.CAMPOS_LIKE      := ['CODIGO_PERFIL'          , 'NOMBRE'                ];
@@ -63,7 +63,7 @@ begin
                                           Self.CAMPOS_DESTINO   := ['CODIGO_PERFIL'];
                                         End;
       Id_TBL_Usuario                  : Begin
-                                          Self.TABLA            := gInfo_Tablas[pId].Name;
+                                          Self.TABLA            := Info_TablaGet(pId).Name;
                                           Self.TITULO_ORIGEN    := ['Código'                 , 'Nombre'                ];
                                           Self.CAMPOS_ORIGEN    := ['CODIGO_USUARIO'         , 'NOMBRE'                ];
                                           Self.CAMPOS_LIKE      := ['CODIGO_USUARIO'         , 'NOMBRE'                ];
@@ -73,7 +73,7 @@ begin
                                           Self.CAMPOS_DESTINO   := ['CODIGO_USUARIO'];
                                         End;
       Id_TBL_Area                     : Begin
-                                          Self.TABLA            := gInfo_Tablas[pId].Name;
+                                          Self.TABLA            := Info_TablaGet(pId).Name;
                                           Self.TITULO_ORIGEN    := ['Código'                 , 'Nombre'                ];
                                           Self.CAMPOS_ORIGEN    := ['CODIGO_AREA'            , 'NOMBRE'                ];
                                           Self.CAMPOS_LIKE      := ['CODIGO_AREA'            , 'NOMBRE'                ];
@@ -83,7 +83,7 @@ begin
                                           Self.CAMPOS_DESTINO   := ['CODIGO_AREA'];
                                         End;
       Id_TBL_Unidad_Medida            : Begin
-                                          Self.TABLA            := gInfo_Tablas[pId].Name;
+                                          Self.TABLA            := Info_TablaGet(pId).Name;
                                           Self.TITULO_ORIGEN    := ['Código'                 , 'Nombre'                ];
                                           Self.CAMPOS_ORIGEN    := ['CODIGO_UNIDAD_MEDIDA'   , 'NOMBRE'                ];
                                           Self.CAMPOS_LIKE      := ['CODIGO_UNIDAD_MEDIDA'   , 'NOMBRE'                ];
@@ -93,7 +93,7 @@ begin
                                           Self.CAMPOS_DESTINO   := ['CODIGO_UNIDAD_MEDIDA'];
                                         End;
       Id_TBL_Producto                 : Begin
-                                          Self.TABLA            := gInfo_Tablas[pId].Name;
+                                          Self.TABLA            := Info_TablaGet(pId).Name;
                                           Self.TITULO_ORIGEN    := ['Código'                 , 'Nombre'                ];
                                           Self.CAMPOS_ORIGEN    := ['CODIGO_PRODUCTO'        , 'NOMBRE'                ];
                                           Self.CAMPOS_LIKE      := ['CODIGO_PRODUCTO'        , 'NOMBRE'                ];
@@ -103,7 +103,7 @@ begin
                                           Self.CAMPOS_DESTINO   := ['CODIGO_PRODUCTO'];
                                         End;
       Id_TBL_Tercero                  : Begin
-                                          Self.TABLA            := gInfo_Tablas[pId].Name;
+                                          Self.TABLA            := Info_TablaGet(pId).Name;
                                           Self.TITULO_ORIGEN    := ['Código'                 , 'Nombre'                ];
                                           Self.CAMPOS_ORIGEN    := ['CODIGO_TERCERO'         , 'NOMBRE'                ];
                                           Self.CAMPOS_LIKE      := ['CODIGO_TERCERO'         , 'NOMBRE'                ];
@@ -113,7 +113,7 @@ begin
                                           Self.CAMPOS_DESTINO   := ['CODIGO_TERCERO'];
                                         End;
       Id_TBL_Proyecto                 : Begin
-                                          Self.TABLA            := gInfo_Tablas[pId].Name;
+                                          Self.TABLA            := Info_TablaGet(pId).Name;
                                           Self.TITULO_ORIGEN    := ['Código'                 , 'Nombre'                ];
                                           Self.CAMPOS_ORIGEN    := ['CODIGO_PROYECTO'        , 'NOMBRE'                ];
                                           Self.CAMPOS_LIKE      := ['CODIGO_PROYECTO'        , 'NOMBRE'                ];
@@ -124,7 +124,7 @@ begin
                                         End;
       Id_TBL_Orden_Produccion          ,
       Id_TBL_Movto_Inventario          : Begin
-                                          Self.TABLA            := gInfo_Tablas[pId].Name;
+                                          Self.TABLA            := Info_TablaGet(pId).Name;
                                           Self.TITULO_ORIGEN    := ['Numero'                 , 'Nombre'                ];
                                           Self.CAMPOS_ORIGEN    := ['NUMERO'                 , 'NOMBRE'                ];
                                           Self.CAMPOS_LIKE      := ['NUMERO'                 , 'NOMBRE'                ];

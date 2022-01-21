@@ -9,19 +9,19 @@ Function TBL007_Area_Create(pCnx : TConexion) : Boolean;
 implementation
 
 Uses
-  UtLog,
   UtError,
   SysUtils,
-  TBL000.Info_Tabla;
+  TBL000.Info_Tabla,
+  UtilsIW.ManagerLog;
 
 Function TBL007_Area_Create(pCnx : TConexion) : Boolean;
 Begin
   Result := True;
-  if Not pCnx.TableExists(gInfo_Tablas[Id_TBL_Area].Name) then
+  if Not pCnx.TableExists(Info_TablaGet(Id_TBL_Area).Name) then
   Begin
     Try
       pCnx.TMP.SQL.Clear;
-      pCnx.TMP.SQL.Add('   CREATE TABLE ' + gInfo_Tablas[Id_TBL_Area].Name + ' '                        );
+      pCnx.TMP.SQL.Add('   CREATE TABLE ' + Info_TablaGet(Id_TBL_Area).Name + ' '                       );
       pCnx.TMP.SQL.Add('   (  '                                                                         );
       pCnx.TMP.SQL.Add('      CODIGO_AREA ' + pCNX.Return_Type(TYPE_VARCHAR) + ' (010) ' + ' NOT NULL, ');
       pCnx.TMP.SQL.Add('      NOMBRE '      + pCNX.Return_Type(TYPE_VARCHAR) + ' (255) ' + ' NULL, '    );
@@ -35,7 +35,7 @@ Begin
       On E : Exception Do
       Begin
         Result := False;
-        UtLog_Execute(MessageError(IE_ERROR_CREATE) + ' Tabla ' + gInfo_Tablas[Id_TBL_Area].Name + ', TBL007_Area_Create, ' + E.Message);
+        Utils_ManagerLog_Add('DATABASE', 'TBL007.Area', 'TBL007_Area_Create', E.Message);
       End;
     End;
   End;

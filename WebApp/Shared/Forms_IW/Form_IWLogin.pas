@@ -49,7 +49,7 @@ type
 implementation
 {$R *.dfm}
 Uses
-  UtLog,
+
   UtCaptcha,
   UtFuncion,
   UtilsIW.Cfg,
@@ -59,6 +59,7 @@ Uses
   IW.Common.AppInfo,
   TBL000.Info_Tabla,
   IW.Browser.Browser,
+  UtilsIW.ManagerLog,
   UtilsIW.Permisos_App;
 
 
@@ -104,7 +105,7 @@ Begin
   Try
     FCNX.AUX.Active := False;
     FCNX.AUX.SQL.Clear;
-    FCNX.AUX.SQL.Add(' SELECT * FROM ' + gInfo_Tablas[Id_TBL_Usuario].Name + FCNX.No_Lock);
+    FCNX.AUX.SQL.Add(' SELECT * FROM ' + Info_TablaGet(Id_TBL_Usuario).Name + FCNX.No_Lock);
     FCNX.AUX.SQL.Add(' WHERE ID_ACTIVO = ' + QuotedStr('S'));
     FCNX.AUX.SQL.Add(' AND ' );
     FCNX.AUX.SQL.Add(' ( ' );
@@ -134,8 +135,8 @@ Begin
           UserSession.SetEstacion(UserSession.WebApplication.IP + ' - ' + UserSession.USER_NAME);
           FCNX.SetAppUser(UserSession.USER_CODE + ' - ' + UserSession.USER_NAME);
           FCNX.SetAppWorkStations(UserSession.WebApplication.IP + ' - ' + UserSession.USER_NAME);
-          UtLog_Execute('TFrIWLogin.Usuario_Valido, Autenticado: ' + UserSession.USER_CODE + ', ' + UserSession.USER_NAME);
-          UtLog_Execute('TFrIWLogin.Usuario_Valido,IP: ' + UserSession.WebApplication.IP);
+          Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWLogin', 'TFrIWLogin.Usuario_Valido', 'Autenticado: ' + UserSession.USER_CODE + ', ' + UserSession.USER_NAME);
+          Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWLogin', 'TFrIWLogin.Usuario_Valido' ,'IP: ' + UserSession.WebApplication.IP);
         End
         Else
         Begin
@@ -150,7 +151,7 @@ Begin
     FCNX.AUX.Active := False;
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWLogin.Usuario_Valido, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE,  'Form_IWLogin', 'TFrIWLogin.Usuario_Valido', E.Message);
   End;
 End;
 
@@ -197,7 +198,7 @@ end;
 procedure TFrIWLogin.IWAppFormCreate(Sender: TObject);
 begin
   Randomize;
-  Self.Name := 'LOGIN' + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000));
+  Self.Name := 'TFrIWLogin' + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000));
   LBVERION.Caption := Const_Version;
   WebApplication.RegisterCallBack(Self.Name + '.Recuperar_Password', Recuperar_Password);
   UtCaptcha_Generate(FCaptcha, IWImageCaptcha);
@@ -219,9 +220,5 @@ procedure TFrIWLogin.IWImage3AsyncClick(Sender: TObject; EventParams: TStringLis
 begin
   UtCaptcha_Generate(FCaptcha, IWImageCaptcha);
 end;
-
-initialization
-  UtLog_Execute('Form_IWLogin, Preparando sesion...');
-  TFrIWLogin.SetAsMainForm;
 
 end.

@@ -11,7 +11,7 @@ uses
   IWBaseHTML40Component, UtConexion, Data.DB, IWCompGrids, IWDBStdCtrls,
   IWCompEdit, IWCompCheckbox, IWCompMemo, IWDBExtCtrls, IWCompButton,
   IWCompListbox, IWCompGradButton, UtGrid_JQ, UtNavegador_ASE,
-  UtilsIW.Busqueda;
+  UtilsIW.Busqueda, Form_IWFrame;
 
 type
   TFrIWProyecto = class(TIWAppForm)
@@ -26,39 +26,25 @@ type
     IWLabel8: TIWLabel;
     DATO: TIWEdit;
     IWLabel2: TIWLabel;
-    DESCRIPCION: TIWDBMemo;
-    BTNNOMBRE: TIWImage;
-    NOMBRE: TIWDBLabel;
-    CODIGO_PROYECTO: TIWDBLabel;
-    BTNCODIGO: TIWImage;
-    BTNDESCRIPCION: TIWImage;
-    BTNACTIVO: TIWImage;
-    lbNombre_Activo: TIWLabel;
     IWRegion_Navegador: TIWRegion;
     IWModalWindow1: TIWModalWindow;
     IWLabel3: TIWLabel;
-    BTNFECHA_INICIAL: TIWImage;
-    FECHA_INICIAL: TIWDBLabel;
-    FECHA_FINAL: TIWDBLabel;
-    BTNFECHA_FINAL: TIWImage;
     IWLabel4: TIWLabel;
+    CODIGO_PROYECTO: TIWDBEdit;
+    NOMBRE: TIWDBEdit;
+    DESCRIPCION: TIWDBMemo;
+    FECHA_INICIAL: TIWDBEdit;
+    FECHA_FINAL: TIWDBEdit;
+    ID_ACTIVO: TIWDBCheckBox;
     procedure BTNBACKAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure IWAppFormCreate(Sender: TObject);
     procedure IWAppFormDestroy(Sender: TObject);
     procedure BTNBUSCARAsyncClick(Sender: TObject; EventParams: TStringList);
-    procedure CODIGO_PROYECTOAsyncExit(Sender: TObject;  EventParams: TStringList);
     procedure BtnAcarreoAsyncClick(Sender: TObject; EventParams: TStringList);
-    procedure BTNCODIGOAsyncClick(Sender: TObject; EventParams: TStringList);
-    procedure BTNNOMBREAsyncClick(Sender: TObject; EventParams: TStringList);
-    procedure BTNDESCRIPCIONAsyncClick(Sender: TObject; EventParams: TStringList);
-    procedure BTNACTIVOAsyncClick(Sender: TObject; EventParams: TStringList);
-    procedure BTNFECHA_INICIALAsyncClick(Sender: TObject;
-      EventParams: TStringList);
-    procedure BTNFECHA_FINALAsyncClick(Sender: TObject;
-      EventParams: TStringList);
   private
     FCNX : TConexion;
     FINFO : String;
+    FFRAME : TFrIWFrame;
     FQRMAESTRO : TMANAGER_DATA;
     FNAVEGADOR : TNavegador_ASE;
     FGRID_MAESTRO : TGRID_JQ;
@@ -71,13 +57,6 @@ type
 
     Procedure Validar_Campos_Master(pSender: TObject);
     procedure NewRecordMaster(pSender: TObject);
-
-    procedure Resultado_Codigo(EventParams: TStringList);
-    procedure Resultado_Nombre(EventParams: TStringList);
-    procedure Resultado_Descripcion(EventParams: TStringList);
-    procedure Resultado_Fecha_Inicial(EventParams: TStringList);
-    procedure Resultado_Fecha_Final(EventParams: TStringList);
-    procedure Resultado_Activo(EventParams: TStringList);
 
     Function Documento_Activo : Boolean;
 
@@ -95,7 +74,6 @@ implementation
 {$R *.dfm}
 Uses
   Math,
-  UtLog,
   UtFecha,
   Variants,
   UtFuncion,
@@ -104,7 +82,8 @@ Uses
   System.UITypes,
   System.StrUtils,
   ServerController,
-  TBL000.Info_Tabla;
+  TBL000.Info_Tabla,
+  UtilsIW.ManagerLog;
 
 Procedure TFrIWProyecto.Localizar_Registro(Sender: TObject; EventParams: TStringList);
 Begin
@@ -112,7 +91,7 @@ Begin
     AbrirMaestro(EventParams.Values['CODIGO_PROYECTOD']);
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWProyecto.Localizar_Registro, ' + e.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWProyecto', 'TFrIWProyecto.Localizar_Registro', E.Message);
   End;
 End;
 
@@ -144,7 +123,7 @@ begin
     End;
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWProyecto.Buscar_Info, ' + e.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWProyecto', 'TFrIWProyecto.Buscar_Info', E.Message);
   End;
 End;
 
@@ -155,86 +134,8 @@ End;
 
 Function TFrIWProyecto.Existe_Proyecto(Const pCODIGO_PROYECTO : String) : Boolean;
 Begin
-  Result := FCNX.Record_Exist(gInfo_Tablas[Id_TBL_Proyecto].Name, ['CODIGO_PROYECTO'], [pCODIGO_PROYECTO]);
+  Result := FCNX.Record_Exist(Info_TablaGet(Id_TBL_Proyecto).Name, ['CODIGO_PROYECTO'], [pCODIGO_PROYECTO]);
 End;
-
-procedure TFrIWProyecto.Resultado_Codigo(EventParams: TStringList);
-Begin
-  Try
-    If FQRMAESTRO.Mode_Edition And (Result_Is_OK(EventParams.Values['RetValue'])) Then
-    Begin
-      FQRMAESTRO.QR.FieldByName('CODIGO_PROYECTO').AsString := Justificar(EventParams.Values['InputStr'], '0', FQRMAESTRO.QR.FieldByName('CODIGO_PROYECTO').Size);
-      FQRMAESTRO.QR.FieldByName('CODIGO_PROYECTO').AsString := AnsiUpperCase(FQRMAESTRO.QR.FieldByName('CODIGO_PROYECTO').AsString);
-    End;
-  Except
-    On E: Exception Do
-      UtLog_Execute('TFrIWProyecto.Resultado_Codigo, ' + e.Message);
-  End;
-End;
-
-procedure TFrIWProyecto.Resultado_Nombre(EventParams: TStringList);
-Begin
-  Try
-    If FQRMAESTRO.Mode_Edition And (Result_Is_OK(EventParams.Values['RetValue'])) Then
-    Begin
-      FQRMAESTRO.QR.FieldByName('NOMBRE').AsString := AnsiUpperCase(Trim(EventParams.Values['InputStr']));
-    End;
-  Except
-    On E: Exception Do
-      UtLog_Execute('TFrIWProyecto.Resultado_Nombre, ' + e.Message);
-  End;
-End;
-
-procedure TFrIWProyecto.Resultado_Descripcion(EventParams: TStringList);
-Begin
-  Try
-    If FQRMAESTRO.Mode_Edition And (Result_Is_OK(EventParams.Values['RetValue'])) Then
-    Begin
-      FQRMAESTRO.QR.FieldByName('DESCRIPCION').AsString := AnsiUpperCase(Trim(EventParams.Values['InputStr']));
-    End;
-  Except
-    On E: Exception Do
-      UtLog_Execute('TFrIWProyecto.Resultado_Descripcion, ' + e.Message);
-  End;
-End;
-
-procedure TFrIWProyecto.Resultado_Fecha_Inicial(EventParams: TStringList);
-Begin
-  Try
-    If FQRMAESTRO.Mode_Edition And (Result_Is_OK(EventParams.Values['RetValue'])) Then
-    Begin
-      FQRMAESTRO.QR.FieldByName('FECHA_INICIAL').AsString := AnsiUpperCase(Trim(EventParams.Values['InputStr']));
-    End;
-  Except
-    On E: Exception Do
-      UtLog_Execute('TFrIWProyecto.Resultado_Fecha_Inicial, ' + e.Message);
-  End;
-End;
-
-procedure TFrIWProyecto.Resultado_Fecha_Final(EventParams: TStringList);
-Begin
-  Try
-    If FQRMAESTRO.Mode_Edition And (Result_Is_OK(EventParams.Values['RetValue'])) Then
-    Begin
-      FQRMAESTRO.QR.FieldByName('FECHA_FINAL').AsString := AnsiUpperCase(Trim(EventParams.Values['InputStr']));
-    End;
-  Except
-    On E: Exception Do
-      UtLog_Execute('TFrIWProyecto.Resultado_Fecha_Final, ' + e.Message);
-  End;
-End;
-
-procedure TFrIWProyecto.Resultado_Activo(EventParams: TStringList);
-Begin
-  Try
-    If FQRMAESTRO.Mode_Edition Then
-      FQRMAESTRO.QR.FieldByName('ID_ACTIVO').AsString := IfThen(Result_Is_OK(EventParams.Values['RetValue']), 'S', 'N');
-  Except
-    On E: Exception Do
-      UtLog_Execute('TFrIWProyecto.Resultado_Activo, ' + E.Message);
-  End;
-End;
-
 
 Procedure TFrIWProyecto.Validar_Campos_Master(pSender: TObject);
 Var
@@ -247,13 +148,19 @@ Begin
     NOMBRE.BGColor := UserSession.COLOR_OK;
     CODIGO_PROYECTO.BGColor := UserSession.COLOR_OK;
 
-    If BTNCODIGO.Visible And (Vacio(FQRMAESTRO.QR.FieldByName('CODIGO_PROYECTO').AsString) Or Existe_Proyecto(FQRMAESTRO.QR.FieldByName('CODIGO_PROYECTO').AsString)) Then
+    If FQRMAESTRO.Mode_Insert And (Not Vacio(FQRMAESTRO.QR.FieldByName('CODIGO_PROYECTO').AsString)) Then
+    Begin
+      FQRMAESTRO.QR.FieldByName('CODIGO_PROYECTO').AsString := Justificar(FQRMAESTRO.QR.FieldByName('CODIGO_PROYECTO').AsString, '0', FQRMAESTRO.QR.FieldByName('CODIGO_PROYECTO').Size);
+      FQRMAESTRO.QR.FieldByName('CODIGO_PROYECTO').AsString := Copy(FQRMAESTRO.QR.FieldByName('CODIGO_PROYECTO').AsString, 1, FQRMAESTRO.QR.FieldByName('CODIGO_PROYECTO').Size);
+    End;
+
+    If FQRMAESTRO.Mode_Insert And (Vacio(FQRMAESTRO.QR.FieldByName('CODIGO_PROYECTO').AsString) Or Existe_Proyecto(FQRMAESTRO.QR.FieldByName('CODIGO_PROYECTO').AsString)) Then
     Begin
       lMensaje := lMensaje + IfThen(Not Vacio(lMensaje), ', ') + 'Codigo del Proyecto no valido o ya existe';
       CODIGO_PROYECTO.BGColor := UserSession.COLOR_ERROR;
     End;
 
-    If BTNNOMBRE.Visible And Vacio(FQRMAESTRO.QR.FieldByName('NOMBRE').AsString) Then
+    If FQRMAESTRO.Mode_Edition And Vacio(FQRMAESTRO.QR.FieldByName('NOMBRE').AsString) Then
     Begin
       lMensaje := lMensaje + IfThen(Not Vacio(lMensaje), ', ') + 'Nombre invalido';
       NOMBRE.BGColor := UserSession.COLOR_ERROR;
@@ -267,27 +174,21 @@ Begin
     End;
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWProyecto_Enc.Validar_Campos_Master, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWProyecto', 'TFrIWProyecto_Enc.Validar_Campos_Master', E.Message);
   End;
 End;
 
-procedure TFrIWProyecto.CODIGO_PROYECTOAsyncExit(Sender: TObject;  EventParams: TStringList);
-begin
-  If FQRMAESTRO.Mode_Edition And (Not Vacio(FQRMAESTRO.QR.FieldByName('CODIGO_PROYECTO').AsString)) Then
-    FQRMAESTRO.QR.FieldByName('CODIGO_PROYECTO').AsString := Justificar(FQRMAESTRO.QR.FieldByName('CODIGO_PROYECTO').AsString, '0', FQRMAESTRO.QR.FieldByName('CODIGO_PROYECTO').Size);
-end;
-
 Procedure TFrIWProyecto.Estado_Controles;
 Begin
-  BTNCODIGO.Visible        := (FQRMAESTRO.DS.State In [dsInsert]) And Documento_Activo;
-  BTNNOMBRE.Visible        := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  BTNDESCRIPCION.Visible   := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  BTNFECHA_INICIAL.Visible := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  BTNFECHA_FINAL.Visible   := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  BTNACTIVO.Visible        := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  DATO.Visible             := (Not FQRMAESTRO.Mode_Edition);
-  PAG_00.Visible           := (Not FQRMAESTRO.Mode_Edition);
-  PAG_01.Visible           := True;
+  CODIGO_PROYECTO.Enabled := FQRMAESTRO.Mode_Insert  And Documento_Activo;
+  NOMBRE.Enabled          := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  DESCRIPCION.Enabled     := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  FECHA_INICIAL.Enabled   := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  FECHA_FINAL.Enabled     := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  ID_ACTIVO.Enabled       := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  DATO.Visible            := (Not FQRMAESTRO.Mode_Edition);
+  PAG_00.Visible          := (Not FQRMAESTRO.Mode_Edition);
+  PAG_01.Visible          := True;
 End;
 
 Procedure TFrIWProyecto.SetLabel;
@@ -295,11 +196,11 @@ Begin
   If Not FQRMAESTRO.Active Then
     Exit;
   Try
-    lbNombre_Activo.Caption := IfThen(FQRMAESTRO.QR.FieldByName('ID_ACTIVO').AsString = 'S', 'Proyecto activa', 'Proyecto inactivo');
+
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrIWProyecto.SetLabel, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWProyecto', 'TFrIWProyecto.SetLabel', E.Message);
     End;
   End;
 End;
@@ -311,7 +212,7 @@ Begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrIWProyecto.Documento_Activo, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWProyecto', 'TFrIWProyecto.Documento_Activo', E.Message);
     End;
   End;
 End;
@@ -330,7 +231,7 @@ begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrIWProyecto.DsDataChangeMaster, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWProyecto', 'TFrIWProyecto.DsDataChangeMaster', E.Message);
     End;
   End;
 end;
@@ -352,11 +253,11 @@ End;
 
 Function TFrIWProyecto.AbrirMaestro(Const pDato : String = '') : Boolean;
 Begin
-  FGRID_MAESTRO.Caption := gInfo_Tablas[Id_TBL_Proyecto].Caption;
+  FGRID_MAESTRO.Caption := Info_TablaGet(Id_TBL_Proyecto).Caption;
   Result := False;
   Try
     FQRMAESTRO.Active := False;
-    FQRMAESTRO.SENTENCE := ' SELECT ' + FCNX.Top_Sentence(Const_Max_Record) + ' * FROM ' + gInfo_Tablas[Id_TBL_Proyecto].Name + ' ';
+    FQRMAESTRO.SENTENCE := ' SELECT ' + FCNX.Top_Sentence(Const_Max_Record) + ' * FROM ' + Info_TablaGet(Id_TBL_Proyecto).Name + ' ';
     FQRMAESTRO.WHERE := '';
     If Trim(pDato) <> '' Then
     Begin
@@ -373,7 +274,7 @@ Begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrIWProyecto.AbrirMaestro, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWProyecto', 'TFrIWProyecto.AbrirMaestro', E.Message);
     End;
   End;
   FGRID_MAESTRO.RefreshData;
@@ -383,16 +284,12 @@ procedure TFrIWProyecto.IWAppFormCreate(Sender: TObject);
 Var
   lI : Integer;
 begin
-  FINFO := UserSession.FULL_INFO + gInfo_Tablas[Id_TBL_Proyecto].Caption;
+  FINFO := UserSession.FULL_INFO + Info_TablaGet(Id_TBL_Proyecto).Caption;
   Randomize;
-  Self.Name := gInfo_Tablas[Id_TBL_Proyecto].Name + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000) );
+  Self.Name := 'TFrIWProyecto' + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000) );
   FCNX := UserSession.CNX;
-  WebApplication.RegisterCallBack(Self.Name + '.Resultado_Codigo'       , Resultado_Codigo       );
-  WebApplication.RegisterCallBack(Self.Name + '.Resultado_Nombre'       , Resultado_Nombre       );
-  WebApplication.RegisterCallBack(Self.Name + '.Resultado_Descripcion'  , Resultado_Descripcion  );
-  WebApplication.RegisterCallBack(Self.Name + '.Resultado_Fecha_Inicial', Resultado_Fecha_Inicial);
-  WebApplication.RegisterCallBack(Self.Name + '.Resultado_Fecha_Final'  , Resultado_Fecha_Final  );
-  WebApplication.RegisterCallBack(Self.Name + '.Resultado_Activo'       , Resultado_Activo       );
+  FFRAME := TFrIWFrame.Create(Self);
+  FFRAME.Parent := Self;
   Try
     FGRID_MAESTRO        := TGRID_JQ.Create(PAG_00);
     FGRID_MAESTRO.Parent := PAG_00;
@@ -402,7 +299,7 @@ begin
     FGRID_MAESTRO.Height := 500;
 
 
-    FQRMAESTRO := UserSession.Create_Manager_Data(gInfo_Tablas[Id_TBL_Proyecto].Name, gInfo_Tablas[Id_TBL_Proyecto].Caption);
+    FQRMAESTRO := UserSession.Create_Manager_Data(Info_TablaGet(Id_TBL_Proyecto).Name, Info_TablaGet(Id_TBL_Proyecto).Caption);
 
     FQRMAESTRO.ON_NEW_RECORD   := NewRecordMaster;
     FQRMAESTRO.ON_DATA_CHANGE  := DsDataChangeMaster;
@@ -414,6 +311,7 @@ begin
     DESCRIPCION.DataSource     := FQRMAESTRO.DS;
     FECHA_INICIAL.DataSource   := FQRMAESTRO.DS;
     FECHA_FINAL.DataSource     := FQRMAESTRO.DS;
+    ID_ACTIVO.DataSource       := FQRMAESTRO.DS;
 
     FGRID_MAESTRO.SetGrid(FQRMAESTRO.DS, ['CODIGO_PROYECTO', 'NOMBRE'     ],
                                          ['Código'         , 'Nombre'     ],
@@ -440,7 +338,7 @@ begin
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrIWProyecto_Enc.IWAppFormCreate, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWProyecto', 'TFrIWProyecto_Enc.IWAppFormCreate', E.Message);
     End;
   End;
 end;
@@ -460,9 +358,12 @@ begin
     If Assigned(FGRID_MAESTRO) Then
       FreeAndNil(FGRID_MAESTRO);
 
+    If Assigned(FFRAME) Then
+      FreeAndNil(FFRAME);
+
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWProyecto_Enc.IWAppFormDestroy, ' + e.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWProyecto', 'TFrIWProyecto_Enc.IWAppFormDestroy', E.Message);
   End;
 end;
 
@@ -470,12 +371,12 @@ procedure TFrIWProyecto.NewRecordMaster(pSender: TObject);
 begin
   Inherited;
   Try
-    FQRMAESTRO.QR.FieldByName('CODIGO_PROYECTO').AsString := FCNX.Next(gInfo_Tablas[Id_TBL_Proyecto].Name, '0', ['CODIGO_PROYECTO'], [],[], FQRMAESTRO.QR.FieldByName('CODIGO_PROYECTO').Size);
+    FQRMAESTRO.QR.FieldByName('CODIGO_PROYECTO').AsString := FCNX.Next(Info_TablaGet(Id_TBL_Proyecto).Name, '0', ['CODIGO_PROYECTO'], [],[], FQRMAESTRO.QR.FieldByName('CODIGO_PROYECTO').Size);
     FQRMAESTRO.QR.FieldByName('ID_ACTIVO'  ).AsString := 'S';
   Except
     On E: Exception Do
     Begin
-      UtLog_Execute('TFrIWProyecto.NewRecordMaster, ' + E.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWProyecto', 'TFrIWProyecto.NewRecordMaster', E.Message);
     End;
   End;
 End;
@@ -483,15 +384,6 @@ End;
 procedure TFrIWProyecto.BtnAcarreoAsyncClick(Sender: TObject; EventParams: TStringList);
 begin
   FQRMAESTRO.SetAcarreo(Not FQRMAESTRO.ACARREO, ['CODIGO_PROYECTO'], [FQRMAESTRO.QR.FieldByName('CODIGO_PROYECTO').AsString]);
-//  If Not FQRMAESTRO.ACARREO Then
-//    BtnAcarreo.Caption := 'Acarreo Inactivo'
-//  Else
-//    BtnAcarreo.Caption := 'Acarreo Activo';
-end;
-
-procedure TFrIWProyecto.BTNACTIVOAsyncClick(Sender: TObject; EventParams: TStringList);
-begin
-  WebApplication.ShowConfirm('Está seguro(a) de activar el registro?', Self.Name + '.Resultado_Activo', 'Activar', 'Sí', 'No')
 end;
 
 Procedure TFrIWProyecto.BTNBACKAsyncClick(Sender: TObject; EventParams: TStringList);
@@ -514,76 +406,7 @@ begin
     End;
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWTercero_Enc.BTNBUSCARAsyncClick, ' + e.Message);
-  End;
-//AbrirMaestro(DATO.Text);
-end;
-
-procedure TFrIWProyecto.BTNCODIGOAsyncClick(Sender: TObject; EventParams: TStringList);
-begin
-  Try
-    If FQRMAESTRO.Mode_Edition Then
-    Begin
-      WebApplication.ShowPrompt('Ingrese el codigo del proyecto', Self.Name + '.Resultado_Codigo', 'Proyecto', FQRMAESTRO.QR.FieldByName('CODIGO_PROYECTO').AsString);
-    End;
-  Except
-    On E: Exception Do
-      UtLog_Execute('TFrIWProyecto.BTNCODIGOAsyncClick, ' + e.Message);
-  End;
-end;
-
-procedure TFrIWProyecto.BTNDESCRIPCIONAsyncClick(Sender: TObject; EventParams: TStringList);
-Var
-  ltmp : String;
-begin
-  Try
-    If FQRMAESTRO.Mode_Edition Then
-    Begin
-      ltmp := FQRMAESTRO.QR.FieldByName('DESCRIPCION').AsString;
-      WebApplication.ShowPrompt('Ingrese la descripción', Self.Name + '.Resultado_Descripcion', 'Descripción', ltmp);
-    End;
-  Except
-    On E: Exception Do
-      UtLog_Execute('TFrIWProyecto.BTNDESCRIPCIONAsyncClick, ' + e.Message);
-  End;
-end;
-
-procedure TFrIWProyecto.BTNNOMBREAsyncClick(Sender: TObject; EventParams: TStringList);
-begin
-  Try
-    If FQRMAESTRO.Mode_Edition Then
-    Begin
-      WebApplication.ShowPrompt('Ingrese el nombre del proyecto', Self.Name + '.Resultado_Nombre', 'Nombre', FQRMAESTRO.QR.FieldByName('NOMBRE').AsString);
-    End;
-  Except
-    On E: Exception Do
-      UtLog_Execute('TFrIWProyecto.BTNNOMBREAsyncClick, ' + e.Message);
-  End;
-end;
-
-procedure TFrIWProyecto.BTNFECHA_FINALAsyncClick(Sender: TObject; EventParams: TStringList);
-begin
-  Try
-    If FQRMAESTRO.Mode_Edition Then
-    Begin
-      WebApplication.ShowPrompt('Ingrese la fecha final del proyecto', Self.Name + '.Resultado_Fecha_Final', 'Fecha Final', FQRMAESTRO.QR.FieldByName('FECHA_FINAL').AsString);
-    End;
-  Except
-    On E: Exception Do
-      UtLog_Execute('TFrIWProyecto.BTNFECHA_FINALAsyncClick, ' + e.Message);
-  End;
-end;
-
-procedure TFrIWProyecto.BTNFECHA_INICIALAsyncClick(Sender: TObject; EventParams: TStringList);
-begin
-  Try
-    If FQRMAESTRO.Mode_Edition Then
-    Begin
-      WebApplication.ShowPrompt('Ingrese la fecha de inicio del proyecto', Self.Name + '.Resultado_Fecha_Inicial', 'Fecha Inicial', FQRMAESTRO.QR.FieldByName('FECHA_INICIAL').AsString);
-    End;
-  Except
-    On E: Exception Do
-      UtLog_Execute('TFrIWProyecto.BTNFECHA_INICIALAsyncClick, ' + e.Message);
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWProyecto', 'TFrIWProyecto.BTNBUSCARAsyncClick', E.Message);
   End;
 end;
 

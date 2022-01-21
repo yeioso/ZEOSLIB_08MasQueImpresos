@@ -43,7 +43,7 @@ type
 implementation
 {$R *.dfm}
 Uses
-  UtLog,
+  
   TBL00.Info_Tabla,
   ServerController,
   Form_Plantilla_Ercol,
@@ -77,7 +77,7 @@ begin
     End;
   Except
     On E: Exception Do
-      UtLog_Execute('TFrIWSI_Bodega.Buscar_Info, ' + e.Message);
+      Utils_ManagerLog_Add('TFrIWSI_Bodega.Buscar_Info, ' + e.Message);
   End;
 End;
 
@@ -109,7 +109,7 @@ end;
 procedure TFrIWInforme.IWAppFormCreate(Sender: TObject);
 begin
   Randomize;
-  Self.Name := 'INFORMES' + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000));
+  Self.Name := 'TFrIWInforme' + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000));
   FECHAINI.Text := '1900-01-01';
   FECHAFIN.Text := FormatDateTime('YYYY-MM-DD', Now);
 end;
