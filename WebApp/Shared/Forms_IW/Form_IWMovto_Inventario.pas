@@ -66,6 +66,7 @@ type
     procedure BTNCREARTERCEROAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNCREARPRODUCTOAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNOPAsyncClick(Sender: TObject; EventParams: TStringList);
+    procedure IWAppFormShow(Sender: TObject);
   private
     FCNX : TConexion;
     FINFO : String;
@@ -534,8 +535,8 @@ begin
     Exit;
 
   If FQRMAESTRO.Active Then
-    lbInfo.Caption := FINFO + ' [ ' + FQRMAESTRO.QR.FieldByName('NUMERO').AsString + ', '+ FQRMAESTRO.QR.FieldByName('NOMBRE') .AsString + ' ] ';
-
+    lbInfo.Caption :=  FINFO + ' [ ' + FCODIGO_DOCUMENTO + ', '+  FQRMAESTRO.QR.FieldByName('NUMERO').AsString + ', '+ FQRMAESTRO.QR.FieldByName('NOMBRE') .AsString + ' ] ';
+  Self.Title := Info_TablaGet(Id_TBL_Movto_Inventario).Caption + ', ' + lbInfo.Caption;
   SetLabel;
 
   Try
@@ -638,10 +639,11 @@ begin
   Randomize;
   Self.Name := 'TFrIWMovto_Inventario' + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000));
   FCNX := UserSession.CNX;
+  Self.Title := Info_TablaGet(Id_TBL_Movto_Inventario).Caption + ', ' + lbInfo.Caption;
   FFRAME := TFrIWFrame.Create(Self);
   FFRAME.Parent := Self;
   FCODIGO_ACTUAL := '';
-  FINFO := UserSession.FULL_INFO + Info_TablaGet(Id_TBL_Movto_Inventario).Caption;
+  FINFO := UserSession.FULL_INFO + ', ' +  Info_TablaGet(Id_TBL_Movto_Inventario).Caption;
   Try
     FGRID_MAESTRO        := TGRID_JQ.Create(PAG_00);
     FGRID_MAESTRO.Parent := PAG_00;
@@ -716,6 +718,12 @@ begin
     On E: Exception Do
       Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWMovto_Inventario', 'TFrIWMovto_Inventario.IWAppFormDestroy', E.Message);
   End;
+end;
+
+procedure TFrIWMovto_Inventario.IWAppFormShow(Sender: TObject);
+begin
+  If Assigned(FFRAME) Then
+    FFRAME.Sincronizar_Informacion;
 end;
 
 procedure TFrIWMovto_Inventario.NewRecordMaster(pSender: TObject);

@@ -8,6 +8,7 @@ object FrIWUsuario_Enc: TFrIWUsuario_Enc
   ConnectionMode = cmAny
   OnCreate = IWAppFormCreate
   OnDestroy = IWAppFormDestroy
+  OnShow = IWAppFormShow
   Background.Fixed = False
   HandleTabs = False
   LeftToRight = True
@@ -365,7 +366,7 @@ object FrIWUsuario_Enc: TFrIWUsuario_Enc
           JpegOptions.Smoothing = True
         end
         object CODIGO_PERFIL: TIWDBLabel
-          Left = 89
+          Left = 91
           Top = 192
           Width = 148
           Height = 21
@@ -411,24 +412,6 @@ object FrIWUsuario_Enc: TFrIWUsuario_Enc
           DataField = 'CONTRASENA'
           PasswordPrompt = True
           DataType = stPassword
-        end
-        object ID_ACTIVO: TIWDBCheckBox
-          Left = 10
-          Top = 221
-          Width = 121
-          Height = 21
-          Caption = 'Activo'
-          Editable = True
-          Font.Color = clNone
-          Font.Size = 10
-          Font.Style = []
-          SubmitOnAsyncEvent = True
-          Style = stNormal
-          AutoEditable = False
-          DataField = 'ID_ACTIVO'
-          FriendlyName = 'ID_ACTIVO'
-          ValueChecked = 'S'
-          ValueUnchecked = 'N'
         end
         object BTNCONTRASENA: TIWImage
           Left = 505
@@ -484,6 +467,42 @@ object FrIWUsuario_Enc: TFrIWUsuario_Enc
           JpegOptions.Performance = jpBestSpeed
           JpegOptions.ProgressiveEncoding = False
           JpegOptions.Smoothing = True
+        end
+        object ID_NOTIFICA_PRODUCTO: TIWDBCheckBox
+          Left = 10
+          Top = 222
+          Width = 183
+          Height = 21
+          Caption = 'Notificaci'#243'n de productos'
+          Editable = True
+          Font.Color = clNone
+          Font.Size = 10
+          Font.Style = []
+          SubmitOnAsyncEvent = True
+          Style = stNormal
+          AutoEditable = False
+          DataField = 'ID_NOTIFICA_PRODUCTO'
+          FriendlyName = 'ID_NOTIFICA_PRODUCTO'
+          ValueChecked = 'S'
+          ValueUnchecked = 'N'
+        end
+        object ID_ACTIVO: TIWDBCheckBox
+          Left = 474
+          Top = 222
+          Width = 121
+          Height = 21
+          Caption = 'Activo'
+          Editable = True
+          Font.Color = clNone
+          Font.Size = 10
+          Font.Style = []
+          SubmitOnAsyncEvent = True
+          Style = stNormal
+          AutoEditable = False
+          DataField = 'ID_ACTIVO'
+          FriendlyName = 'ID_ACTIVO'
+          ValueChecked = 'S'
+          ValueUnchecked = 'N'
         end
         object IWCambiarPassword: TIWRegion
           Left = 606

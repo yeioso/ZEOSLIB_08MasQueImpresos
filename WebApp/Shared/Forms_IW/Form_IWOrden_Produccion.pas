@@ -50,6 +50,7 @@ type
     FECHA_FINAL: TIWDBEdit;
     CANTIDAD: TIWDBEdit;
     ID_ACTIVO: TIWDBCheckBox;
+    BTNEXPLOSION_MATERIAL: TIWButton;
     procedure BTNBACKAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure IWAppFormCreate(Sender: TObject);
     procedure IWAppFormDestroy(Sender: TObject);
@@ -62,6 +63,8 @@ type
     procedure BTNCREARPROYECTOAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNCREARTERCEROAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNCREARPRODUCTOAsyncClick(Sender: TObject; EventParams: TStringList);
+    procedure BTNEXPLOSION_MATERIALAsyncClick(Sender: TObject; EventParams: TStringList);
+    procedure IWAppFormShow(Sender: TObject);
   private
     FCNX : TConexion;
     FINFO : String;
@@ -320,21 +323,22 @@ End;
 
 Procedure TFrIWOrden_Produccion.Estado_Controles;
 Begin
-  NUMERO.Enabled               := False;
-  BTNCODIGO_PROYECTO.Visible   := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  BTNCODIGO_TERCERO.Visible    := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  NOMBRE.Enabled               := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  DOCUMENTO_REFERENCIA.Enabled := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  DESCRIPCION.Editable         := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  FECHA_INICIAL.Enabled        := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  FECHA_FINAL.Enabled          := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  CANTIDAD.Enabled             := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  ID_ACTIVO.Enabled            := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  BTNCREARTERCERO.Visible      := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  BTNCREARPROYECTO.Visible     := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  DATO.Visible                 := (Not FQRMAESTRO.Mode_Edition);
-  PAG_00.Visible               := (Not FQRMAESTRO.Mode_Edition);
-  PAG_01.Visible               := True;
+  NUMERO.Enabled                := False;
+  BTNCODIGO_PROYECTO.Visible    := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  BTNCODIGO_TERCERO.Visible     := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  NOMBRE.Enabled                := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  DOCUMENTO_REFERENCIA.Enabled  := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  DESCRIPCION.Editable          := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  FECHA_INICIAL.Enabled         := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  FECHA_FINAL.Enabled           := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  CANTIDAD.Enabled              := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  ID_ACTIVO.Enabled             := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  BTNCREARTERCERO.Visible       := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  BTNCREARPROYECTO.Visible      := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  BTNEXPLOSION_MATERIAL.Visible := FQRMAESTRO.ACTIVE And (FQRMAESTRO.qr.RecordCount > 0) And (Not FQRMAESTRO.Mode_Edition);
+  DATO.Visible                  := (Not FQRMAESTRO.Mode_Edition);
+  PAG_00.Visible                := (Not FQRMAESTRO.Mode_Edition);
+  PAG_01.Visible                := True;
 End;
 
 Procedure TFrIWOrden_Produccion.SetLabel;
@@ -377,7 +381,7 @@ begin
 
   If FQRMAESTRO.Active Then
     lbInfo.Caption := FINFO + ' [ ' + FQRMAESTRO.QR.FieldByName('NUMERO').AsString + ', '+ FQRMAESTRO.QR.FieldByName('NOMBRE') .AsString + ' ] ';
-
+  Self.Title := Info_TablaGet(Id_TBL_Orden_Produccion).Caption + ', ' + lbInfo.Caption;
   SetLabel;
 
   Try
@@ -471,6 +475,7 @@ begin
   Randomize;
   Self.Name := 'TFrIWOrden_Produccion' + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000));
   FCNX := UserSession.CNX;
+  Self.Title := Info_TablaGet(Id_TBL_Orden_Produccion).Caption + ', ' + lbInfo.Caption;
   FFRAME := TFrIWFrame.Create(Self);
   FFRAME.Parent := Self;
   FCODIGO_ACTUAL := '';
@@ -548,6 +553,12 @@ begin
     On E: Exception Do
       Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWOrden_Produccion', 'TFrIWOrden_Produccion.IWAppFormDestroy', E.Message);
   End;
+end;
+
+procedure TFrIWOrden_Produccion.IWAppFormShow(Sender: TObject);
+begin
+  If Assigned(FFRAME) Then
+    FFRAME.Sincronizar_Informacion;
 end;
 
 procedure TFrIWOrden_Produccion.NewRecordMaster(pSender: TObject);
@@ -656,6 +667,11 @@ end;
 procedure TFrIWOrden_Produccion.BTNCREARTERCEROAsyncClick(Sender: TObject; EventParams: TStringList);
 begin
   Mostrar_BasicData(Id_TBL_Tercero, 'Ingreso del Tercero', 'Identificación', 'CODIGO_TERCERO', 'Nombre' , 'NOMBRE', 'CODIGO_TERCERO', Resultado_BasicData);
+end;
+
+procedure TFrIWOrden_Produccion.BTNEXPLOSION_MATERIALAsyncClick(Sender: TObject; EventParams: TStringList);
+begin
+  UserSession.ShowForm_Explosion_Material(FCODIGO_DOCUMENTO, lbInfo.Caption, SetToInt(NUMERO.Text));
 end;
 
 end.

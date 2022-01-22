@@ -6,6 +6,8 @@ object FrIWExplosion_Material: TFrIWExplosion_Material
   RenderInvisibleControls = True
   AllowPageAccess = True
   ConnectionMode = cmAny
+  OnDestroy = IWAppFormDestroy
+  OnShow = IWAppFormShow
   Background.Fixed = False
   HandleTabs = False
   LeftToRight = True
@@ -16,7 +18,7 @@ object FrIWExplosion_Material: TFrIWExplosion_Material
   DesignTop = 2
   object BTNADD: TIWImage
     Left = 10
-    Top = 10
+    Top = 146
     Width = 34
     Height = 34
     Cursor = crHandPoint
@@ -58,7 +60,7 @@ object FrIWExplosion_Material: TFrIWExplosion_Material
   end
   object BTNEDIT: TIWImage
     Left = 51
-    Top = 10
+    Top = 146
     Width = 34
     Height = 34
     Cursor = crHandPoint
@@ -96,7 +98,7 @@ object FrIWExplosion_Material: TFrIWExplosion_Material
   end
   object BTNDEL: TIWImage
     Left = 91
-    Top = 10
+    Top = 146
     Width = 34
     Height = 34
     Cursor = crHandPoint
@@ -134,7 +136,7 @@ object FrIWExplosion_Material: TFrIWExplosion_Material
   end
   object BTNSAVE: TIWImage
     Left = 129
-    Top = 10
+    Top = 146
     Width = 34
     Height = 34
     Cursor = crHandPoint
@@ -174,7 +176,7 @@ object FrIWExplosion_Material: TFrIWExplosion_Material
   end
   object BTNCANCEL: TIWImage
     Left = 169
-    Top = 10
+    Top = 146
     Width = 34
     Height = 34
     Cursor = crHandPoint
@@ -229,7 +231,7 @@ object FrIWExplosion_Material: TFrIWExplosion_Material
   end
   object BTNEXIT: TIWImage
     Left = 214
-    Top = 11
+    Top = 147
     Width = 34
     Height = 34
     Cursor = crHandPoint
@@ -279,7 +281,7 @@ object FrIWExplosion_Material: TFrIWExplosion_Material
   end
   object IWLabel6: TIWLabel
     Left = 11
-    Top = 61
+    Top = 197
     Width = 55
     Height = 16
     RenderSize = False
@@ -294,7 +296,7 @@ object FrIWExplosion_Material: TFrIWExplosion_Material
   end
   object BTNCODIGO_PRODUCTO: TIWImage
     Left = 75
-    Top = 60
+    Top = 196
     Width = 22
     Height = 21
     Cursor = crHandPoint
@@ -349,7 +351,7 @@ object FrIWExplosion_Material: TFrIWExplosion_Material
   end
   object lbNombre_Producto: TIWLabel
     Left = 11
-    Top = 91
+    Top = 227
     Width = 139
     Height = 16
     RenderSize = False
@@ -364,7 +366,7 @@ object FrIWExplosion_Material: TFrIWExplosion_Material
   end
   object IWLabel1: TIWLabel
     Left = 10
-    Top = 120
+    Top = 256
     Width = 118
     Height = 16
     Font.Color = clNone
@@ -377,7 +379,7 @@ object FrIWExplosion_Material: TFrIWExplosion_Material
   end
   object FECHA_PROGRAMADA: TIWDBEdit
     Left = 127
-    Top = 120
+    Top = 256
     Width = 200
     Height = 24
     StyleRenderOptions.RenderBorder = False
@@ -392,7 +394,7 @@ object FrIWExplosion_Material: TFrIWExplosion_Material
   end
   object IWLabel2: TIWLabel
     Left = 11
-    Top = 152
+    Top = 288
     Width = 71
     Height = 16
     Font.Color = clNone
@@ -405,7 +407,7 @@ object FrIWExplosion_Material: TFrIWExplosion_Material
   end
   object NOMBRE: TIWDBEdit
     Left = 127
-    Top = 150
+    Top = 286
     Width = 200
     Height = 24
     StyleRenderOptions.RenderBorder = False
@@ -420,7 +422,7 @@ object FrIWExplosion_Material: TFrIWExplosion_Material
   end
   object IWLabel3: TIWLabel
     Left = 11
-    Top = 188
+    Top = 324
     Width = 55
     Height = 16
     Font.Color = clNone
@@ -433,7 +435,7 @@ object FrIWExplosion_Material: TFrIWExplosion_Material
   end
   object CANTIDAD: TIWDBEdit
     Left = 127
-    Top = 180
+    Top = 316
     Width = 200
     Height = 24
     StyleRenderOptions.RenderBorder = False
@@ -449,7 +451,7 @@ object FrIWExplosion_Material: TFrIWExplosion_Material
   end
   object ID_ACTIVO: TIWDBCheckBox
     Left = 11
-    Top = 216
+    Top = 352
     Width = 121
     Height = 21
     Caption = 'Activo'
@@ -467,7 +469,7 @@ object FrIWExplosion_Material: TFrIWExplosion_Material
   end
   object DATO: TIWEdit
     Left = 10
-    Top = 246
+    Top = 382
     Width = 374
     Height = 28
     StyleRenderOptions.RenderBorder = False
@@ -480,7 +482,7 @@ object FrIWExplosion_Material: TFrIWExplosion_Material
   end
   object CODIGO_PRODUCTO: TIWDBLabel
     Left = 127
-    Top = 61
+    Top = 197
     Width = 200
     Height = 16
     Alignment = taRightJustify
@@ -493,8 +495,22 @@ object FrIWExplosion_Material: TFrIWExplosion_Material
     DataField = 'CODIGO_PRODUCTO'
     FriendlyName = 'CODIGO_PRODUCTO'
   end
+  object LBINFO: TIWLabel
+    Left = 11
+    Top = 75
+    Width = 373
+    Height = 61
+    Alignment = taCenter
+    Font.Color = clNone
+    Font.Size = 10
+    Font.Style = [fsBold]
+    HasTabOrder = False
+    AutoSize = False
+    FriendlyName = 'LBINFO'
+    Caption = 'LBINFO'
+  end
   object IWModalWindow1: TIWModalWindow
     Left = 304
-    Top = 8
+    Top = 144
   end
 end

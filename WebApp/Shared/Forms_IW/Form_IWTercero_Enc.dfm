@@ -8,6 +8,7 @@ object FrIWTercero_Enc: TFrIWTercero_Enc
   ConnectionMode = cmAny
   OnCreate = IWAppFormCreate
   OnDestroy = IWAppFormDestroy
+  OnShow = IWAppFormShow
   Background.Fixed = False
   HandleTabs = False
   LeftToRight = True

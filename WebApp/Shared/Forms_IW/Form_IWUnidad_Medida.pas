@@ -37,6 +37,7 @@ type
     procedure IWAppFormDestroy(Sender: TObject);
     procedure BTNBUSCARAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BtnAcarreoAsyncClick(Sender: TObject; EventParams: TStringList);
+    procedure IWAppFormShow(Sender: TObject);
   private
     FCNX : TConexion;
     FINFO : String;
@@ -218,7 +219,7 @@ begin
 
   If FQRMAESTRO.Active Then
     lbInfo.Caption := FINFO + ' [ ' + FQRMAESTRO.QR.FieldByName('CODIGO_UNIDAD_MEDIDA').AsString + ',' + FQRMAESTRO.QR.FieldByName('NOMBRE').AsString + ' ] ';
-
+  Self.Title := Info_TablaGet(Id_TBL_Unidad_Medida).Caption + ', ' + lbInfo.Caption;
   SetLabel;
   Try
 
@@ -281,6 +282,7 @@ begin
   FINFO := UserSession.FULL_INFO + Info_TablaGet(Id_TBL_Unidad_Medida).Caption;
   Randomize;
   Self.Name := 'TFrIWUnidad_Medida' + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000) );
+  Self.Title := Info_TablaGet(Id_TBL_Unidad_Medida).Caption;
   FCNX := UserSession.CNX;
   FFRAME := TFrIWFrame.Create(Self);
   FFRAME.Parent := Self;
@@ -357,6 +359,12 @@ begin
     On E: Exception Do
       Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWUnidad_Medida', 'TFrIWUnidad_Medida_Enc.IWAppFormDestroy', E.Message);
   End;
+end;
+
+procedure TFrIWUnidad_Medida.IWAppFormShow(Sender: TObject);
+begin
+  If Assigned(FFRAME) Then
+    FFRAME.Sincronizar_Informacion;
 end;
 
 procedure TFrIWUnidad_Medida.NewRecordMaster(pSender: TObject);

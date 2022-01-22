@@ -8,7 +8,8 @@ uses
   IWCompCheckbox, Vcl.Controls, IWVCLBaseControl, IWBaseControl,
   IWBaseHTMLControl, IWControl, IWCompLabel, IWCompGrids,
   UtConexion, Vcl.Forms, IWVCLBaseContainer, IWContainer,
-  IWHTMLContainer, IWHTML40Container, IWRegion, IWCompListbox, UtGrid_JQ;
+  IWHTMLContainer, IWHTML40Container, IWRegion, IWCompListbox,
+  UtGrid_JQ, Form_IWFrame;
 
 type
   TFrIWPerfil_Permiso = class(TIWAppForm)
@@ -33,8 +34,11 @@ type
     procedure BTNCANCELAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure DATOAsyncKeyUp(Sender: TObject; EventParams: TStringList);
     procedure BTNACTIVOAsyncClick(Sender: TObject; EventParams: TStringList);
+    procedure IWAppFormShow(Sender: TObject);
+    procedure IWAppFormDestroy(Sender: TObject);
   private
     FCNX : TConexion;
+    FFRAME : TFrIWFrame;
     FQRDETALLE : TMANAGER_DATA;
     FGRID_MAESTRO : TGRID_JQ;
     FEJECUTANDO_ONCHANGE : Boolean;
@@ -147,6 +151,10 @@ begin
   Try
     Randomize;
     Self.Name := 'TFrIWPerfil_Permiso' + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000));
+    FFRAME := TFrIWFrame.Create(Self);
+    FFRAME.Parent := Self;
+    Self.Title := Info_TablaGet(Id_TBL_Permiso_App).Caption + ', ' + pCodigo_Perfil;
+
     WebApplication.RegisterCallBack(Self.Name + '.Confirmacion_Guardar'    , Confirmacion_Guardar    );
     WebApplication.RegisterCallBack(Self.Name + '.Confirmacion_Eliminacion', Confirmacion_Eliminacion);
     WebApplication.RegisterCallBack(Self.Name + '.Resultado_Activo'        , Resultado_Activo        );
@@ -344,6 +352,7 @@ end;
 procedure TFrIWPerfil_Permiso.DsDataChangeDetalle(pSender: TObject);
 Begin
   Try
+    Self.Title := Info_TablaGet(Id_TBL_Permiso_App).Caption + ', ' + FCODIGO_PERFIL + ', ' + Trim(FQRDETALLE.QR.FieldByName('NOMBRE').AsString);
     lbNombre_Activo.Caption := IfThen(FQRDETALLE.QR.FieldByName('HABILITA_OPCION').AsString = 'S', 'Esta activo', 'No esta activo');
   Except
     On E: Exception Do
@@ -366,5 +375,17 @@ Begin
   NOMBRE.Editable      := FQRDETALLE.DS.State In [dsInsert, dsEdit];
   BTNACTIVO.Visible    := FQRDETALLE.DS.State In [dsInsert, dsEdit];
 End;
+
+procedure TFrIWPerfil_Permiso.IWAppFormDestroy(Sender: TObject);
+begin
+  If Assigned(FFRAME) Then
+    FreeAndNil(FFRAME);
+end;
+
+procedure TFrIWPerfil_Permiso.IWAppFormShow(Sender: TObject);
+begin
+  If Assigned(FFRAME) Then
+    FFRAME.Sincronizar_Informacion;
+end;
 
 end.

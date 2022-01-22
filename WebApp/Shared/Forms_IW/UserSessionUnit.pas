@@ -49,6 +49,7 @@ Uses
   Form_IWReporte,
 
   Form_IWNotificacion_Producto,
+  Form_IWVisualizador_Log,
 
   IWBaseComponent,
   IWBaseHTMLComponent,
@@ -79,7 +80,8 @@ Type
     FMovto_Inventario           : TFrIWMovto_Inventario;
     FExplosion_Material         : TFrIWExplosion_Material;
     FReporte                    : TFrIWReporte;
-    FNotificacion_Producto     : TFrIWNotificacion_Producto;
+    FNotificacion_Producto      : TFrIWNotificacion_Producto;
+    FVisualizador_Log           : TFrIWVisualizador_Log;
 
     FCNX                        : TConexion    ;
     FDB                         : TDB          ;
@@ -89,6 +91,7 @@ Type
     FFULL_INFO                  : String       ;
     FPATH_LOG                   : String       ;
     FPATH_FILES                 : String       ;
+    FPATH_CACHE                 : String       ;
     FGLOBAL_INFO                : String       ;
 
     FPATH_CONFIG                : String       ;
@@ -120,6 +123,7 @@ Type
     Property FULL_INFO                  : String        Read FFULL_INFO             ;
     Property PATH_LOG                   : String        Read FPATH_LOG              ;
     Property PATH_FILES                 : String        Read FPATH_FILES            ;
+    Property PATH_CACHE                 : String        Read FPATH_CACHE            ;
     Property GLOBAL_INFO                : String        Read FGLOBAL_INFO           ;
     Property PATH_CONFIG                : String        Read FPATH_CONFIG           ;
     Property CODE_PROFILE               : String        Read FCODE_PROFILE          ;
@@ -152,10 +156,11 @@ Type
     Procedure ShowForm_Producto;
     Procedure ShowForm_Proyecto;
     Procedure ShowForm_Orden_Produccion(Const pCodigo_Documento : String);
-    Procedure ShowForm_Explosion_Material(Const pCodigo_Documento : String; pNumero : Integer);
+    Procedure ShowForm_Explosion_Material(Const pCodigo_Documento, pNombre : String; pNumero : Integer);
     Procedure ShowForm_Movto_Inventario(Const pCodigo_Documento : String);
     Procedure ShowForm_Reporte;
     Procedure ShowForm_Notificacion_Producto;
+    Procedure ShowForm_Visualizador_Log;
 
     Procedure Update_Menu;
 
@@ -165,6 +170,7 @@ Type
     Procedure SetFULL_INFO      (Const pValue : String   );
     Procedure SetPATH_LOG       (Const pValue : String   );
     Procedure SetPATH_FILES     (Const pValue : String   );
+    Procedure SetPATH_CACHE     (Const pValue : String);
     Procedure SetGLOBAL_INFO    (Const pValue : String   );
     Procedure SetPATH_CONFIG    (Const pValue : String   );
     Procedure SetCODE_PROFILE   (Const pValue : String   );
@@ -221,6 +227,10 @@ begin
   FPERMISOS_APP := TPermisos_App.Create;
   FCNX := TConexion.Create(Nil);
   FCNX.Name  := 'MQIERP_DATABASE';
+  SetPATH_LOG(IWServerController.PATH_LOG);
+  SetPATH_FILES(IWServerController.PATH_FILES);
+  SetPATH_CACHE(IWServerController.PATH_CACHE);
+  SetPATH_CONFIG(IWServerController.PATH_CONFIG);
   Establecer_Conexion;
 end;
 
@@ -351,9 +361,9 @@ Begin
   FOrden_Produccion.Show;
 End;
 
-Procedure TIWUserSession.ShowForm_Explosion_Material(Const pCodigo_Documento : String; pNumero : Integer);
+Procedure TIWUserSession.ShowForm_Explosion_Material(Const pCodigo_Documento, pNombre : String; pNumero : Integer);
 Begin
-  FExplosion_Material := TFrIWExplosion_Material.Create(WebApplication, pCodigo_Documento, pNumero);
+  FExplosion_Material := TFrIWExplosion_Material.Create(WebApplication, pCodigo_Documento, pNombre, pNumero);
   FExplosion_Material.Show;
 End;
 
@@ -373,6 +383,12 @@ Procedure TIWUserSession.ShowForm_Notificacion_Producto;
 Begin
   FNotificacion_Producto := TFrIWNotificacion_Producto.Create(WebApplication);
   FNotificacion_Producto.Show;
+End;
+
+Procedure TIWUserSession.ShowForm_Visualizador_Log;
+Begin
+  FVisualizador_Log := TFrIWVisualizador_Log.Create(WebApplication);
+  FVisualizador_Log.Show;
 End;
 
 Procedure TIWUserSession.Update_Menu;
@@ -512,6 +528,11 @@ End;
 Procedure TIWUserSession.SetPATH_FILES(Const pValue : String);
 Begin
   FPATH_FILES := pValue;
+End;
+
+Procedure TIWUserSession.SetPATH_CACHE(Const pValue : String);
+Begin
+  FPATH_CACHE := pValue;
 End;
 
 Procedure TIWUserSession.SetGLOBAL_INFO(Const pValue : String);

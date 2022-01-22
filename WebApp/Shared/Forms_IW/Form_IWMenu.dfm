@@ -8,6 +8,7 @@ object FrIWMenu: TFrIWMenu
   ConnectionMode = cmAny
   OnCreate = IWAppFormCreate
   OnDestroy = IWAppFormDestroy
+  OnShow = IWAppFormShow
   Background.Fixed = False
   HandleTabs = False
   LeftToRight = True
@@ -19,7 +20,7 @@ object FrIWMenu: TFrIWMenu
   DesignTop = 2
   object IWLabel43: TIWLabel
     Left = 27
-    Top = 343
+    Top = 431
     Width = 421
     Height = 14
     Font.Color = clNone
@@ -32,7 +33,7 @@ object FrIWMenu: TFrIWMenu
   end
   object IWURL1: TIWURL
     Left = 27
-    Top = 365
+    Top = 453
     Width = 380
     Height = 17
     Hint = 'http://www.asoftwaree.com/'
@@ -53,7 +54,7 @@ object FrIWMenu: TFrIWMenu
   end
   object BTNAYUDA: TIWImage
     Left = 495
-    Top = 343
+    Top = 431
     Width = 28
     Height = 29
     Cursor = crHandPoint
@@ -217,7 +218,7 @@ object FrIWMenu: TFrIWMenu
   end
   object PAGINAS: TIWjQPageControl
     Left = 3
-    Top = 36
+    Top = 124
     Width = 1086
     Height = 285
     HorzScrollBar.Visible = False
@@ -5769,8 +5770,8 @@ object FrIWMenu: TFrIWMenu
     WindowLeft = 100
     WindowTop = 200
     Autosize = False
-    Left = 32
-    Top = 91
+    Left = 640
+    Top = 427
   end
   object IWProgressIndicator1: TIWProgressIndicator
     Mode = pimAsync

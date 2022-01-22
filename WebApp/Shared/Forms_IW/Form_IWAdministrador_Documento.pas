@@ -43,6 +43,7 @@ type
     procedure IWAppFormDestroy(Sender: TObject);
     procedure BTNBUSCARAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BtnAcarreoAsyncClick(Sender: TObject; EventParams: TStringList);
+    procedure IWAppFormShow(Sender: TObject);
   private
     FCNX : TConexion;
     FINFO : String;
@@ -224,7 +225,7 @@ begin
 
   If FQRMAESTRO.Active Then
     lbInfo.Caption := FINFO + ' [ ' + FQRMAESTRO.QR.FieldByName('CODIGO_DOCUMENTO').AsString + ',' + FQRMAESTRO.QR.FieldByName('NOMBRE').AsString + ' ] ';
-
+  Self.Title := Info_TablaGet(Id_TBL_Administrador_Documento).Caption + ', ' + lbInfo.Caption;
   SetLabel;
   Try
   Except
@@ -287,6 +288,7 @@ begin
   Self.Name := 'TFrIWAdministrador_Documento' + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000) );
   FINFO := UserSession.FULL_INFO + Info_TablaGet(Id_TBL_Administrador_Documento).Caption;
   FCNX := UserSession.CNX;
+  Self.Title := Info_TablaGet(Id_TBL_Administrador_Documento).Caption + ', ' + FINFO;
   FFRAME := TFrIWFrame.Create(Self);
   FFRAME.Parent := Self;
 
@@ -369,6 +371,12 @@ begin
     On E: Exception Do
       Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWAdministrador_Documento', 'TFrIWAdministrador_Documento_Enc.IWAppFormDestroy', E.Message);
   End;
+end;
+
+procedure TFrIWAdministrador_Documento.IWAppFormShow(Sender: TObject);
+begin
+  If Assigned(FFRAME) Then
+    FFRAME.Sincronizar_Informacion;
 end;
 
 procedure TFrIWAdministrador_Documento.NewRecordMaster(pSender: TObject);

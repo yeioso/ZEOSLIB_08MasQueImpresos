@@ -7,6 +7,7 @@ object FrIWInforme: TFrIWInforme
   AllowPageAccess = True
   ConnectionMode = cmAny
   OnCreate = IWAppFormCreate
+  OnShow = IWAppFormShow
   Background.Fixed = False
   HandleTabs = False
   LeftToRight = True

@@ -33,7 +33,7 @@ Begin
       pCnx.TMP.SQL.Add('      CANTIDAD  '            + pCNX.Return_Type(TYPE_FLOAT  ) + ' '       + ' NULL, '    );
       pCnx.TMP.SQL.Add('      ID_ACTIVO '            + pCNX.Return_Type(TYPE_VARCHAR) + ' (001) ' + ' NULL, '    );
       pCnx.TMP.SQL.Add('      TAG_INFO  '            + pCNX.Return_Type(TYPE_INT    ) + ' '       + ' NULL, '    );
-      pCnx.TMP.SQL.Add('      PRIMARY KEY (CODIGO_USUARIO, CODIGO_PRODUCTO, FECHA_REGISTRO), '                   );
+      pCnx.TMP.SQL.Add('      PRIMARY KEY (CODIGO_USUARIO, CODIGO_PRODUCTO, FECHA_REGISTRO, HORA_REGISTRO), '    );
       pCnx.TMP.SQL.Add(' ' + pCNX.FOREINGKEY(Info_TablaGet(Id_TBL_Notificacion_Producto).Fk[1],'CODIGO_PRODUCTO', Info_TablaGet(Id_TBL_Producto).Name, 'CODIGO_PRODUCTO' ) + ', ');
       pCnx.TMP.SQL.Add(' ' + pCNX.FOREINGKEY(Info_TablaGet(Id_TBL_Notificacion_Producto).Fk[2],'CODIGO_USUARIO' , Info_TablaGet(Id_TBL_Usuario ).Name, 'CODIGO_USUARIO'  ) + '  ');
       pCnx.TMP.SQL.Add('   ) ');

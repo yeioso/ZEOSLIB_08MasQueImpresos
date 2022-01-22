@@ -45,12 +45,13 @@ type
     CODIGO_PERFIL: TIWDBLabel;
     lbNombre_Perfil: TIWLabel;
     CONTRASENA: TIWDBEdit;
+    BTNCONTRASENA: TIWImage;
+    ID_NOTIFICA_PRODUCTO: TIWDBCheckBox;
     ID_ACTIVO: TIWDBCheckBox;
     IWRDETALLE: TIWRegion;
     GRID_DETALLE: TIWListbox;
     IWRBOTONDETALLE: TIWRegion;
     BtnGrid: TIWImage;
-    BTNCONTRASENA: TIWImage;
     procedure BTNBACKAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure IWAppFormCreate(Sender: TObject);
     procedure IWAppFormDestroy(Sender: TObject);
@@ -60,6 +61,7 @@ type
     procedure BTNDIRECCIONAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNCODIGO_PERFILAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BtnGridAsyncClick(Sender: TObject; EventParams: TStringList);
+    procedure IWAppFormShow(Sender: TObject);
   private
     FCNX : TConexion;
     FINFO : String;
@@ -271,20 +273,21 @@ End;
 
 Procedure TFrIWUsuario_Enc.Estado_Controles;
 Begin
-  CONTRASENA.Enabled       := False;
-  CODIGO_USUARIO.Enabled   := FQRMAESTRO.Mode_Insert  And Documento_Activo;
-  NOMBRE.Enabled           := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  DIRECCION.Enabled        := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  EMAIL.Enabled            := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  TELEFONO_1.Enabled       := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  TELEFONO_2.Enabled       := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  BTNCONTRASENA.Visible    := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  BTNCODIGO_PERFIL.Visible := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  ID_ACTIVO.Enabled        := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  IWRBOTONDETALLE.Visible  := FQRMAESTRO.ACTIVE And (Not FQRMAESTRO.Mode_Edition) And (FQRMAESTRO.QR.RecordCount > 0);
-  DATO.Visible             := (Not FQRMAESTRO.Mode_Edition);
-  PAG_00.Visible           := (Not FQRMAESTRO.Mode_Edition);
-  PAG_01.Visible           := True;
+  CONTRASENA.Enabled           := False;
+  CODIGO_USUARIO.Enabled       := FQRMAESTRO.Mode_Insert  And Documento_Activo;
+  NOMBRE.Enabled               := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  DIRECCION.Enabled            := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  EMAIL.Enabled                := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  TELEFONO_1.Enabled           := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  TELEFONO_2.Enabled           := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  BTNCONTRASENA.Visible        := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  BTNCODIGO_PERFIL.Visible     := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  ID_NOTIFICA_PRODUCTO.Enabled := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  ID_ACTIVO.Enabled            := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  IWRBOTONDETALLE.Visible      := FQRMAESTRO.ACTIVE And (Not FQRMAESTRO.Mode_Edition) And (FQRMAESTRO.QR.RecordCount > 0);
+  DATO.Visible                 := (Not FQRMAESTRO.Mode_Edition);
+  PAG_00.Visible               := (Not FQRMAESTRO.Mode_Edition);
+  PAG_01.Visible               := True;
 End;
 
 Procedure TFrIWUsuario_Enc.SetLabel;
@@ -323,6 +326,8 @@ begin
 
   If FQRMAESTRO.Active Then
     lbInfo.Caption := FINFO + ' [ ' + FQRMAESTRO.QR.FieldByName('CODIGO_USUARIO').AsString + ', '+ FQRMAESTRO.QR.FieldByName('NOMBRE') .AsString + ' ] ';
+  Self.Title := Info_TablaGet(Id_TBL_Usuario).Caption + ', ' + lbInfo.Caption;
+  Self.Title := lbInfo.Caption;
 
   SetLabel;
 
@@ -434,6 +439,7 @@ procedure TFrIWUsuario_Enc.IWAppFormCreate(Sender: TObject);
 begin
   Randomize;
   Self.Name := 'TFrIWUsuario_Enc' + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000));
+  Self.Title := Info_TablaGet(Id_TBL_Usuario).Caption;
   FCNX := UserSession.CNX;
   FFRAME := TFrIWFrame.Create(Self);
   FFRAME.Parent := Self;
@@ -454,16 +460,17 @@ begin
     FQRMAESTRO.ON_STATE_CHANGE := DsStateMaster;
     FQRMAESTRO.ON_BEFORE_POST  := Validar_Campos_Master;
 
-    CODIGO_USUARIO.DataSource := FQRMAESTRO.DS;
-    NOMBRE.DataSource         := FQRMAESTRO.DS;
-    DIRECCION.DataSource      := FQRMAESTRO.DS;
-    EMAIL.DataSource          := FQRMAESTRO.DS;
-    TELEFONO_1.DataSource     := FQRMAESTRO.DS;
-    TELEFONO_2.DataSource     := FQRMAESTRO.DS;
-    CONTRASENA.DataSource     := FQRMAESTRO.DS;
-    CODIGO_PERFIL.DataSource  := FQRMAESTRO.DS;
-    CODIGO_PERFIL.DataSource  := FQRMAESTRO.DS;
-    ID_ACTIVO.DataSource      := FQRMAESTRO.DS;
+    CODIGO_USUARIO.DataSource       := FQRMAESTRO.DS;
+    NOMBRE.DataSource               := FQRMAESTRO.DS;
+    DIRECCION.DataSource            := FQRMAESTRO.DS;
+    EMAIL.DataSource                := FQRMAESTRO.DS;
+    TELEFONO_1.DataSource           := FQRMAESTRO.DS;
+    TELEFONO_2.DataSource           := FQRMAESTRO.DS;
+    CONTRASENA.DataSource           := FQRMAESTRO.DS;
+    CODIGO_PERFIL.DataSource        := FQRMAESTRO.DS;
+    CODIGO_PERFIL.DataSource        := FQRMAESTRO.DS;
+    ID_NOTIFICA_PRODUCTO.DataSource := FQRMAESTRO.DS;
+    ID_ACTIVO.DataSource            := FQRMAESTRO.DS;
 
     FGRID_MAESTRO.SetGrid(FQRMAESTRO.DS, ['CODIGO_USUARIO', 'NOMBRE'     ],
                                          ['Usuario'       , 'Nombre'     ],
@@ -513,6 +520,12 @@ begin
     On E: Exception Do
       Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWUsuario_Enc', 'TFrIWUsuario_Enc.IWAppFormDestroy', E.Message);
   End;
+end;
+
+procedure TFrIWUsuario_Enc.IWAppFormShow(Sender: TObject);
+begin
+  If Assigned(FFRAME) Then
+    FFRAME.Sincronizar_Informacion;
 end;
 
 procedure TFrIWUsuario_Enc.NewRecordMaster(pSender: TObject);

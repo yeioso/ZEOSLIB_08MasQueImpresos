@@ -46,6 +46,7 @@ type
     procedure IWAppFormDestroy(Sender: TObject);
     procedure BTNBUSCARAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BtnAcarreoAsyncClick(Sender: TObject; EventParams: TStringList);
+    procedure IWAppFormShow(Sender: TObject);
   private
     FCNX : TConexion;
     FINFO : String;
@@ -235,7 +236,7 @@ begin
 
   If FQRMAESTRO.Active Then
     lbInfo.Caption := FINFO + ' [ ' + FQRMAESTRO.QR.FieldByName('CODIGO_TERCERO').AsString + ', '+ FQRMAESTRO.QR.FieldByName('NOMBRE') .AsString + ' ] ';
-
+  Self.Title := Info_TablaGet(Id_TBL_Tercero).Caption + ', ' + lbInfo.Caption;
   SetLabel;
 
   Try
@@ -303,6 +304,7 @@ procedure TFrIWTercero_Enc.IWAppFormCreate(Sender: TObject);
 begin
   Randomize;
   Self.Name := 'TFrIWTercero_Enc' + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000));
+  Self.Title := Info_TablaGet(Id_TBL_Tercero).Caption;
   FCNX := UserSession.CNX;
   FFRAME := TFrIWFrame.Create(Self);
   FFRAME.Parent := Self;
@@ -381,6 +383,12 @@ begin
     On E: Exception Do
       Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWTercero_Enc', 'TFrIWTercero_Enc.IWAppFormDestroy', E.Message);
   End;
+end;
+
+procedure TFrIWTercero_Enc.IWAppFormShow(Sender: TObject);
+begin
+  If Assigned(FFRAME) Then
+    FFRAME.Sincronizar_Informacion;
 end;
 
 procedure TFrIWTercero_Enc.NewRecordMaster(pSender: TObject);

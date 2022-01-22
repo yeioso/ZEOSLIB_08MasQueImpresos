@@ -9,7 +9,7 @@ uses
   IWBaseHTMLControl, IWControl, IWCompLabel, IWCompGrids,
   UtConexion, Vcl.Forms, IWVCLBaseContainer, IWContainer,
   IWHTMLContainer, IWHTML40Container, IWRegion, IWCompListbox, UtGrid_JQ,
-  IWBaseComponent, IWBaseHTMLComponent, IWBaseHTML40Component;
+  IWBaseComponent, IWBaseHTMLComponent, IWBaseHTML40Component, Form_IWFrame;
 
 type
   TFrIWExplosion_Material = class(TIWAppForm)
@@ -32,6 +32,7 @@ type
     DATO: TIWEdit;
     IWModalWindow1: TIWModalWindow;
     CODIGO_PRODUCTO: TIWDBLabel;
+    LBINFO: TIWLabel;
     procedure BTNEXITAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNADDAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNEDITAsyncClick(Sender: TObject; EventParams: TStringList);
@@ -40,13 +41,19 @@ type
     procedure BTNCANCELAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure DATOAsyncKeyUp(Sender: TObject; EventParams: TStringList);
     procedure BTNCODIGO_PRODUCTOAsyncClick(Sender: TObject; EventParams: TStringList);
+    procedure IWAppFormShow(Sender: TObject);
+    procedure IWAppFormDestroy(Sender: TObject);
   private
     FCNX : TConexion;
+    FNOMBRE : String;
     FNUMERO : Integer;
+    FFRAME : TFrIWFrame;
     FQRDETALLE : TMANAGER_DATA;
     FGRID_MAESTRO : TGRID_JQ;
     FEJECUTANDO_ONCHANGE : Boolean;
     FCODIGO_DOCUMENTO : String;
+    Procedure Actualizar_Notificacion(Const pCodigo_Usuario, pCodigo_Producto, pFecha, pHora : string; Const pMin, pMax, pCantidad, pSaldo : Double);
+    Procedure Verificar_Notificacion(pSender : TObject);
     Procedure Resultado_Producto(Sender: TObject; EventParams: TStringList);
     procedure Buscar_Info(pSD : Integer; pEvent : TIWAsyncEvent);
     Procedure Confirmacion_Guardar(EventParams: TStringList);
@@ -58,7 +65,7 @@ type
     procedure DsStateChangeDetalle(pSender: TObject);
     Function AbrirDetalle(Const pDato : String  = '') : Boolean;
   public
-    Constructor Create(AOwner: TComponent; Const pCodigo_Documento : String; Const pNumero : Integer);
+    Constructor Create(AOwner: TComponent; Const pCodigo_Documento, pNombre : String; Const pNumero : Integer);
     Destructor Destroy; override;
   end;
 
@@ -74,7 +81,8 @@ Uses
   UtilsIW.Busqueda,
   ServerController,
   TBL000.Info_Tabla,
-  UtilsIW.ManagerLog;
+  UtilsIW.ManagerLog,
+  Report.Saldo_Inventario;
 
 { TFrIWExplosion_Material }
 
@@ -84,6 +92,7 @@ Begin
     If FQRDETALLE.Mode_Edition Then
     Begin
       FQRDETALLE.QR.FieldByName('CODIGO_PRODUCTO').AsString := EventParams.Values ['CODIGO_PRODUCTO'];
+      FQRDETALLE.QR.FieldByName('NOMBRE').AsString := 'EXPLOSION DE ' + FQRDETALLE.QR.FieldByName('CODIGO_PRODUCTO').AsString;
     End;
   Except
    On E: Exception Do
@@ -181,14 +190,128 @@ begin
     UserSession.SetMessage(FQRDETALLE.LAST_ERROR, True);
 end;
 
+Procedure TFrIWExplosion_Material.Actualizar_Notificacion(Const pCodigo_Usuario, pCodigo_Producto, pFecha, pHora : string; Const pMin, pMax, pCantidad, pSaldo : Double);
+Var
+  lNombre : String;
+Begin
+  Try
+    lNombre := 'Saldo : ' + FormatFloat('###,###,##0.#0', pSaldo) + ', ' + 'Cantidad : ' + FormatFloat('###,###,##0.#0', pSaldo);
+    If (pMin > 0) And (pMin > pSaldo) Then
+      lNombre := lNombre + IfThen(Not Vacio(lNombre), ', ') +
+                 'Stock Minimo : ' + FormatFloat('###,###,##0.#0', pMin);
 
-constructor TFrIWExplosion_Material.Create(AOwner: TComponent; Const pCodigo_Documento : String; Const pNumero : Integer);
+    If (pMax > 0) And (pMax < pSaldo) Then
+      lNombre := lNombre + IfThen(Not Vacio(lNombre), ', ') +
+                 'Stock Maximo : ' + FormatFloat('###,###,##0.#0', pMax);
+
+    FCNX.TMP.Active := False;
+    FCNX.TMP.SQL.Clear;
+    FCNX.TMP.SQL.Add(' UPDATE ' + Info_TablaGet(Id_TBL_Notificacion_Producto).Name + ' ');
+    FCNX.TMP.SQL.Add(' SET ');
+    FCNX.TMP.SQL.Add('     CANTIDAD = :CANTIDAD ');
+    FCNX.TMP.SQL.Add('     , NOMBRE = :NOMBRE ');
+    FCNX.TMP.SQL.Add(' WHERE ' + FCNX.Trim_Sentence('CODIGO_USUARIO' ) + ' = ' + QuotedStr(Trim(pCodigo_Usuario )));
+    FCNX.TMP.SQL.Add(' AND '   + FCNX.Trim_Sentence('CODIGO_PRODUCTO') + ' = ' + QuotedStr(Trim(pCodigo_Producto)));
+    FCNX.TMP.SQL.Add(' AND '   + FCNX.Trim_Sentence('FECHA_REGISTRO' ) + ' = ' + QuotedStr(Trim(pFecha          )));
+    FCNX.TMP.SQL.Add(' AND '   + FCNX.Trim_Sentence('HORA_REGISTRO'  ) + ' = ' + QuotedStr(Trim(pFecha          )));
+    FCNX.TMP.ParamByName('CANTIDAD').AsFloat  := pCantidad;
+    FCNX.TMP.ParamByName('NOMBRE'  ).AsString := lNombre;
+
+    FCNX.TMP.ExecSQL;
+    If FCNX.TMP.RowsAffected <= 0 Then
+    Begin
+      FCNX.TMP.Active := False;
+      FCNX.TMP.SQL.Clear;
+      FCNX.TMP.SQL.Add(' INSERT INTO ' + Info_TablaGet(Id_TBL_Notificacion_Producto).Name + ' ');
+      FCNX.TMP.SQL.Add(' ( ');
+      FCNX.TMP.SQL.Add('     CODIGO_USUARIO ');
+      FCNX.TMP.SQL.Add('    ,CODIGO_PRODUCTO ');
+      FCNX.TMP.SQL.Add('    ,FECHA_REGISTRO ');
+      FCNX.TMP.SQL.Add('    ,HORA_REGISTRO ');
+      FCNX.TMP.SQL.Add('    ,NOMBRE ');
+      FCNX.TMP.SQL.Add('    ,CANTIDAD ');
+      FCNX.TMP.SQL.Add('    ,ID_ACTIVO ');
+      FCNX.TMP.SQL.Add(' ) ');
+      FCNX.TMP.SQL.Add(' VALUES ');
+      FCNX.TMP.SQL.Add(' ( ');
+      FCNX.TMP.SQL.Add('      :CODIGO_USUARIO ');
+      FCNX.TMP.SQL.Add('    , :CODIGO_PRODUCTO ');
+      FCNX.TMP.SQL.Add('    , :FECHA_REGISTRO ');
+      FCNX.TMP.SQL.Add('    , :HORA_REGISTRO ');
+      FCNX.TMP.SQL.Add('    , :NOMBRE ');
+      FCNX.TMP.SQL.Add('    , :CANTIDAD ');
+      FCNX.TMP.SQL.Add('    , :ID_ACTIVO ');
+      FCNX.TMP.SQL.Add(' ) ');
+      FCNX.TMP.ParamByName('CODIGO_USUARIO'  ).AsString := pCodigo_Usuario;
+      FCNX.TMP.ParamByName('CODIGO_PRODUCTO' ).AsString := pCodigo_Producto;
+      FCNX.TMP.ParamByName('FECHA_REGISTRO'  ).AsString := pFecha;
+      FCNX.TMP.ParamByName('HORA_REGISTRO'   ).AsString := pHora;
+      FCNX.TMP.ParamByName('NOMBRE'          ).AsString := lNombre;
+      FCNX.TMP.ParamByName('CANTIDAD'        ).AsFloat  := pCantidad;
+      FCNX.TMP.ParamByName('ID_ACTIVO'       ).AsString := 'S';
+      FCNX.TMP.ExecSQL;
+    End;
+    FCNX.TMP.Active := False;
+    FCNX.TMP.SQL.Clear;
+  Except
+    On E: Exception Do
+    Begin
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWExplosion_Material', 'TFrIWExplosion_Material.Actualizar_Notificacion', E.Message);
+    End;
+  End;
+End;
+
+Procedure TFrIWExplosion_Material.Verificar_Notificacion(pSender : TObject);
+Var
+  lMin : Double;
+  lMax : Double;
+  lSaldo : Double;
+Begin
+  Try
+    lMin := FCNX.GetValueDbl(Info_TablaGet(Id_TBL_Producto).Name, ['CODIGO_PRODUCTO'], [FQRDETALLE.QR.FieldByName('CODIGO_PRODUCTO').AsString], ['STOCK_MINIMO']);
+    lMax := FCNX.GetValueDbl(Info_TablaGet(Id_TBL_Producto).Name, ['CODIGO_PRODUCTO'], [FQRDETALLE.QR.FieldByName('CODIGO_PRODUCTO').AsString], ['STOCK_MAXIMO']);
+    lSaldo := Report_Saldo_Inventario_Saldo(FCNX, FQRDETALLE.QR.FieldByName('CODIGO_PRODUCTO').AsString, FQRDETALLE.QR.FieldByName('CODIGO_PRODUCTO').AsString);
+    If (lSaldo < FQRDETALLE.QR.FieldByName('CANTIDAD').AsFloat) Or((lMin > 0) And (lSaldo < lMin)) Or ((lMax > 0) And (lSaldo > lMax)) Then
+    Begin
+      FCNX.AUX.Active := False;
+      FCNX.AUX.SQL.Clear;
+      FCNX.AUX.SQL.Add(' SELECT CODIGO_USUARIO FROM ' + Info_TablaGet(Id_TBL_Usuario).Name + FCNX.No_Lock);
+      FCNX.AUX.SQL.Add(' WHERE ID_NOTIFICA_PRODUCTO = ' + QuotedStr('S'));
+      FCNX.AUX.Active := True;
+      FCNX.AUX.First;
+      While Not FCNX.AUX.Eof Do
+      Begin
+        Actualizar_Notificacion(FCNX.AUX.FieldByName('CODIGO_USUARIO').AsString,
+                                FQRDETALLE.QR.FieldByName('CODIGO_PRODUCTO').AsString,
+                                FQRDETALLE.QR.FieldByName('FECHA_PROGRAMADA').AsString,
+                                FQRDETALLE.QR.FieldByName('FECHA_REGISTRO'  ).AsString,
+                                lMin, lMax, FQRDETALLE.QR.FieldByName('CANTIDAD').AsFloat, lSaldo);
+        FCNX.AUX.Next;
+      End;
+      FCNX.AUX.Active := False;
+      FCNX.AUX.SQL.Clear;
+    End;
+  Except
+    On E: Exception Do
+    Begin
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWExplosion_Material', 'TFrIWExplosion_Material.Verificar_Notificacion', E.Message);
+    End;
+  End;
+End;
+
+
+constructor TFrIWExplosion_Material.Create(AOwner: TComponent; Const pCodigo_Documento, pNombre : String; Const pNumero : Integer);
 begin
   FCNX := UserSession.CNX;
   Inherited Create(AOwner);
   Try
     Randomize;
     Self.Name := 'TFrIWExplosion_Material' + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000));
+    FNOMBRE := pNombre;
+    LBINFO.Caption := pNombre;
+    Self.Title := Info_TablaGet(Id_TBL_Explosion_Material).Caption + ', ' + FNOMBRE + ', ' + lbNombre_Producto.Caption;
+    FFRAME := TFrIWFrame.Create(Self);
+    FFRAME.Parent := Self;
     WebApplication.RegisterCallBack(Self.Name + '.Confirmacion_Guardar'    , Confirmacion_Guardar    );
     WebApplication.RegisterCallBack(Self.Name + '.Confirmacion_Eliminacion', Confirmacion_Eliminacion);
 
@@ -205,6 +328,7 @@ begin
 
 
     FQRDETALLE := UserSession.Create_Manager_Data(Info_TablaGet(Id_TBL_Explosion_Material).Name, Info_TablaGet(Id_TBL_Explosion_Material).Caption);
+    FQRDETALLE.ON_AFTER_POST   := Verificar_Notificacion;
     FQRDETALLE.ON_NEW_RECORD   := NewRecordDetalle;
     FQRDETALLE.ON_BEFORE_POST  := Validar_Campos_Detalle;
     FQRDETALLE.ON_DATA_CHANGE  := DsDataChangeDetalle;
@@ -353,7 +477,7 @@ Begin
     If FQRDETALLE.Mode_Insert Then
     Begin
       If Vacio(FQRDETALLE.QR.FieldByName('CODIGO_PRODUCTO').AsString) Or
-        (Not FCNX.Record_Exist(Info_TablaGet(Id_TBL_Explosion_Material).Name, ['CODIGO_PRODUCTO'], [FQRDETALLE.QR.FieldByName('CODIGO_PRODUCTO').AsString])) Then
+        (Not FCNX.Record_Exist(Info_TablaGet(Id_TBL_Producto).Name, ['CODIGO_PRODUCTO'], [FQRDETALLE.QR.FieldByName('CODIGO_PRODUCTO').AsString])) Then
       Begin
         lMensaje := lMensaje + IfThen(Not Vacio(lMensaje), ', ') + 'Producto invalido';
         CODIGO_PRODUCTO.BGColor := UserSession.COLOR_ERROR;
@@ -373,19 +497,19 @@ Begin
         lMensaje := lMensaje + IfThen(Not Vacio(lMensaje), ', ') + 'Fecha programada invalida';
         FECHA_PROGRAMADA.BGColor := UserSession.COLOR_ERROR;
       End;
-    End;
 
-    If FQRDETALLE.QR.FieldByName('CANTIDAD').AsFloat <= 0 Then
-    Begin
-      lMensaje := lMensaje + IfThen(Not Vacio(lMensaje), ', ') + 'Cantidad invalida';
-      CANTIDAD.BGColor := UserSession.COLOR_ERROR;
-    End;
+      If FQRDETALLE.QR.FieldByName('CANTIDAD').AsFloat <= 0 Then
+      Begin
+        lMensaje := lMensaje + IfThen(Not Vacio(lMensaje), ', ') + 'Cantidad invalida';
+        CANTIDAD.BGColor := UserSession.COLOR_ERROR;
+      End;
 
-    FQRDETALLE.ERROR := IfThen(Vacio(lMensaje), 0, -1);
-    If FQRDETALLE.ERROR <> 0 Then
-    Begin
-      FQRDETALLE.LAST_ERROR := 'Datos invalidos, ' + lMensaje;
-      UserSession.SetMessage(FQRDETALLE.LAST_ERROR, True);
+      FQRDETALLE.ERROR := IfThen(Vacio(lMensaje), 0, -1);
+      If FQRDETALLE.ERROR <> 0 Then
+      Begin
+        FQRDETALLE.LAST_ERROR := 'Datos invalidos, ' + lMensaje;
+        UserSession.SetMessage(FQRDETALLE.LAST_ERROR, True);
+      End;
     End;
   Except
     On E: Exception Do
@@ -399,6 +523,10 @@ begin
   Try
     FQRDETALLE.QR.FieldByName('CODIGO_DOCUMENTO').AsString  := FCODIGO_DOCUMENTO;
     FQRDETALLE.QR.FieldByName('NUMERO'          ).AsInteger := FNUMERO;
+    FQRDETALLE.QR.FieldByName('FECHA_PROGRAMADA').AsString  := FormatDateTime('YYYY-MM-DD', Now);
+    FQRDETALLE.QR.FieldByName('FECHA_REGISTRO'  ).AsString  := FormatDateTime('YYYY-MM-DD', Now);
+    FQRDETALLE.QR.FieldByName('HORA_REGISTRO'   ).AsString  := FormatDateTime('HH:NN:SS.Z', Now);
+    FQRDETALLE.QR.FieldByName('CODIGO_USUARIO'  ).AsString  := UserSession.USER_CODE;
     FQRDETALLE.QR.FieldByName('ID_ACTIVO'       ).AsString := 'S';
   Except
     On E: Exception Do
@@ -411,6 +539,8 @@ end;
 procedure TFrIWExplosion_Material.DsDataChangeDetalle(pSender: TObject);
 Begin
   Try
+    lbNombre_Producto.Caption := FCNX.GetValue(Info_TablaGet(Id_TBL_Producto).Name, ['CODIGO_PRODUCTO'], [FQRDETALLE.QR.FieldByName('CODIGO_PRODUCTO').AsString], ['NOMBRE']);
+    Self.Title := Info_TablaGet(Id_TBL_Explosion_Material).Caption + ', ' + FNOMBRE + ', ' + lbNombre_Producto.Caption;
   Except
     On E: Exception Do
     Begin
@@ -436,5 +566,17 @@ Begin
   CANTIDAD.Enabled           := FQRDETALLE.Mode_Edition;
   ID_ACTIVO.Enabled          := FQRDETALLE.Mode_Edition;
 End;
+
+procedure TFrIWExplosion_Material.IWAppFormDestroy(Sender: TObject);
+begin
+  If Assigned(FFRAME) Then
+    FreeAndNil(FFRAME);
+end;
+
+procedure TFrIWExplosion_Material.IWAppFormShow(Sender: TObject);
+begin
+  If Assigned(FFRAME) Then
+    FFRAME.Sincronizar_Informacion;
+end;
 
 end.

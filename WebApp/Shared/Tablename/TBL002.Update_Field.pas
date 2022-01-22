@@ -70,7 +70,7 @@ Var
 Begin
   If (pCnx = Nil) Or (Not pCnx.Connected) Then
     Exit;
-//  Actualizar_Estructura(pCnx, Retornar_Info_Tabla(Id_Enlace_2_SCI      ).Name, 'VALOR_TOTAL'         , TYPE_FLOAT  , 000);
+  Actualizar_Estructura(pCnx, Info_TablaGet(Id_TBL_Usuario).Name, 'ID_NOTIFICA_PRODUCTO', TYPE_VARCHAR, 001);
 End;
 
 end.

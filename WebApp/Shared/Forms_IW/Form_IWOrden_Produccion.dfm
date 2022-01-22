@@ -8,6 +8,7 @@ object FrIWOrden_Produccion: TFrIWOrden_Produccion
   ConnectionMode = cmAny
   OnCreate = IWAppFormCreate
   OnDestroy = IWAppFormDestroy
+  OnShow = IWAppFormShow
   Background.Fixed = False
   HandleTabs = False
   LeftToRight = True
@@ -730,6 +731,19 @@ object FrIWOrden_Produccion: TFrIWOrden_Produccion
           FriendlyName = 'ID_ACTIVO'
           ValueChecked = 'S'
           ValueUnchecked = 'N'
+        end
+        object BTNEXPLOSION_MATERIAL: TIWButton
+          Left = 113
+          Top = 286
+          Width = 200
+          Height = 30
+          Caption = 'EXPLOSION DE MATERIALES'
+          Color = clBtnFace
+          Font.Color = clNone
+          Font.Size = 10
+          Font.Style = []
+          FriendlyName = 'BTNEXPLOSION_MATERIAL'
+          OnAsyncClick = BTNEXPLOSION_MATERIALAsyncClick
         end
       end
       object PAG_00: TIWTabPage

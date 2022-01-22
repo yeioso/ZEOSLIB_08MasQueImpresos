@@ -8,6 +8,7 @@ object FrIWUnidad_Medida: TFrIWUnidad_Medida
   ConnectionMode = cmAny
   OnCreate = IWAppFormCreate
   OnDestroy = IWAppFormDestroy
+  OnShow = IWAppFormShow
   Background.Fixed = False
   HandleTabs = False
   LeftToRight = True

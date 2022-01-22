@@ -33,6 +33,7 @@ type
     procedure IWAppFormCreate(Sender: TObject);
     procedure BTNTERCEROAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNCONSULTARAsyncClick(Sender: TObject; EventParams: TStringList);
+    procedure IWAppFormShow(Sender: TObject);
   private
     procedure Buscar_Info(pSD : Integer; pEvent : TIWAsyncEvent);
     Procedure Release_Me;
@@ -112,6 +113,12 @@ begin
   Self.Name := 'TFrIWInforme' + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000));
   FECHAINI.Text := '1900-01-01';
   FECHAFIN.Text := FormatDateTime('YYYY-MM-DD', Now);
+end;
+
+procedure TFrIWInforme.IWAppFormShow(Sender: TObject);
+begin
+  If Assigned(FFRAME) Then
+    FFRAME.Sincronizar_Informacion;
 end;
 
 Procedure TFrIWInforme.Release_Me;

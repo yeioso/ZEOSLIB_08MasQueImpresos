@@ -38,6 +38,7 @@ type
     procedure BTNBUSCARAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BtnAcarreoAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BtnGridAsyncClick(Sender: TObject; EventParams: TStringList);
+    procedure IWAppFormShow(Sender: TObject);
   private
     FCNX : TConexion;
     FINFO : String;
@@ -189,6 +190,7 @@ begin
   If FQRMAESTRO.Active Then
     lbInfo.Caption := FINFO + ' [ ' + FQRMAESTRO.QR.FieldByName('CODIGO_PERFIL').AsString + ', ' + FQRMAESTRO.QR.FieldByName('NOMBRE').AsString + ' ] ';
 
+  Self.Title := Info_TablaGet(Id_TBL_Perfil).Caption + ', ' + lbInfo.Caption;
   SetLabel;
 
   Try
@@ -306,6 +308,7 @@ begin
   Randomize;
   Self.Name := 'TFrIWPerfil_Enc' + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000));
   FCNX := UserSession.CNX;
+  Self.Title := Info_TablaGet(Id_TBL_Perfil).Caption + ', ' + lbInfo.Caption;
   FFRAME := TFrIWFrame.Create(Self);
   FFRAME.Parent := Self;
   FCODIGO_ACTUAL := '';
@@ -387,6 +390,12 @@ begin
       On E: Exception Do
         Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWPerfil_Enc', 'TFrIWPerfil_Enc.IWAppFormDestroy', E.Message);
     End;
+end;
+
+procedure TFrIWPerfil_Enc.IWAppFormShow(Sender: TObject);
+begin
+  If Assigned(FFRAME) Then
+    FFRAME.Sincronizar_Informacion;
 end;
 
 procedure TFrIWPerfil_Enc.NewRecordMaster(pSender: TObject);

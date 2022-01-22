@@ -8,6 +8,7 @@ object FrIWAdministrador_Documento: TFrIWAdministrador_Documento
   ConnectionMode = cmAny
   OnCreate = IWAppFormCreate
   OnDestroy = IWAppFormDestroy
+  OnShow = IWAppFormShow
   Background.Fixed = False
   HandleTabs = False
   LeftToRight = True

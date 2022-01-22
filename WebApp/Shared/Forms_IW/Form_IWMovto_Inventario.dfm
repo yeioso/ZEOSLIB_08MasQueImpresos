@@ -8,6 +8,7 @@ object FrIWMovto_Inventario: TFrIWMovto_Inventario
   ConnectionMode = cmAny
   OnCreate = IWAppFormCreate
   OnDestroy = IWAppFormDestroy
+  OnShow = IWAppFormShow
   Background.Fixed = False
   HandleTabs = False
   LeftToRight = True

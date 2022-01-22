@@ -9,7 +9,7 @@ uses
   IWBaseControl, IWBaseHTMLControl, IWControl, IWCompExtCtrls, IWCompButton,
   IWCompLabel, IWBaseComponent, IWBaseHTMLComponent, IWBaseHTML40Component,
   IWCompListbox, IWHTMLControls, UtType, IWCompProgressIndicator,
-  IWjQPageControl;
+  IWjQPageControl, Form_IWFrame;
 
 Type
 
@@ -70,7 +70,9 @@ Type
     procedure BTNEJECUTAR_UTILIDADESAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNEJECUTAR_SALIRAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNAYUDAAsyncClick(Sender: TObject; EventParams: TStringList);
+    procedure IWAppFormShow(Sender: TObject);
   Private
+    FFRAME : TFrIWFrame;
     Procedure Validar_Carga_Opciones(pOptions : TIWRadioGroup; Const pId : Integer);
     Procedure Cargar_Opciones(pOptions : TIWRadioGroup);
     Procedure Ejecutar_Item(pOption : TIWRadioGroup);
@@ -126,6 +128,7 @@ Begin
       CONST_OPCION_INVENTARIO_SALIDA            : UserSession.ShowForm_Movto_Inventario(UserSession.DOCUMENTO_SALIDA_DE_INVENTARIO    );
       CONST_OPCION_INVENTARIO_DEVOLUCION        : UserSession.ShowForm_Movto_Inventario(UserSession.DOCUMENTO_DEVOLUCION_AL_INVENTARIO);
       CONST_OPCION_REPORTE                      : UserSession.ShowForm_Reporte;
+      CONST_OPCION_VISUALIZADOR_LOG             : UserSession.ShowForm_Visualizador_Log;
       CONST_OPCION_SALIR                        : WebApplication.ShowConfirm('Está seguro(a) de salir?', Self.Name + '.Ejecutar_Salida', 'Salir', 'Sí', 'No');
       Else UserSession.SetMessage('Opcion no disponible', True);
     End;
@@ -330,6 +333,7 @@ Begin
       Validar_Carga_Opciones(pOptions, CONST_OPCION_VER_SESIONES_ACTIVAS        );
       Validar_Carga_Opciones(pOptions, CONST_OPCION_PERFIL                      );
       Validar_Carga_Opciones(pOptions, CONST_OPCION_USUARIO                     );
+      Validar_Carga_Opciones(pOptions, CONST_OPCION_VISUALIZADOR_LOG            );
       PAG_UTILIDADES.Visible := RG_UTILIDADES.Items.Count > 0;
     End;
 
@@ -380,6 +384,10 @@ procedure TFrIWMenu.IWAppFormCreate(Sender: TObject);
 begin
   Randomize;
   Self.Name := 'TFrIWMenu' + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000));
+  Self.Title := 'Menu Principal';
+  FFRAME := TFrIWFrame.Create(Self);
+  FFRAME.Parent := Self;
+
   WebApplication.RegisterCallBack(Self.Name + '.Ejecutar_Salida', Ejecutar_Salida);
   Actualizar_Info;
   Cargar_Opciones(RG_MAESTROS      );
@@ -392,11 +400,21 @@ begin
   Cargar_Opciones(RG_UTILIDADES    );
   Cargar_Opciones(RG_SALIR         );
   SetNameCompontent(Self);
+  If Assigned(FFRAME) Then
+    FFRAME.Sincronizar_Informacion;
 End;
 
 procedure TFrIWMenu.IWAppFormDestroy(Sender: TObject);
 begin
   WebApplication.UnregisterCallBack(Self.Name + '.Ejecutar_Salida');
+  If Assigned(FFRAME) Then
+    FreeAndNil(FFRAME);
+end;
+
+procedure TFrIWMenu.IWAppFormShow(Sender: TObject);
+begin
+  If Assigned(FFRAME) Then
+    FFRAME.Sincronizar_Informacion;
 end;
 
 end.

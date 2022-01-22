@@ -57,6 +57,7 @@ type
     procedure BTNCREARAREAAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNCODIGO_UNIDAD_MEDIDAAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNCREARUNIDAD_MEDIDAAsyncClick(Sender: TObject;  EventParams: TStringList);
+    procedure IWAppFormShow(Sender: TObject);
   private
     FCNX : TConexion;
     FINFO : String;
@@ -335,7 +336,7 @@ begin
 
   If FQRMAESTRO.Active Then
     lbInfo.Caption := FINFO + ' [ ' + FQRMAESTRO.QR.FieldByName('CODIGO_PRODUCTO').AsString + ',' + FQRMAESTRO.QR.FieldByName('NOMBRE').AsString + ' ] ';
-
+  Self.Title := Info_TablaGet(Id_TBL_Producto).Caption + ', ' + lbInfo.Caption;
   SetLabel;
   Try
   Except
@@ -397,6 +398,7 @@ begin
   FINFO := UserSession.FULL_INFO + Info_TablaGet(Id_TBL_Producto).Caption;
   Randomize;
   Self.Name := 'TFrIWProducto' + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000) );
+  Self.Title := Info_TablaGet(Id_TBL_Producto).Caption;
   FCNX := UserSession.CNX;
   FFRAME := TFrIWFrame.Create(Self);
   FFRAME.Parent := Self;
@@ -479,12 +481,18 @@ begin
   End;
 end;
 
+procedure TFrIWProducto.IWAppFormShow(Sender: TObject);
+begin
+  If Assigned(FFRAME) Then
+    FFRAME.Sincronizar_Informacion;
+end;
+
 procedure TFrIWProducto.NewRecordMaster(pSender: TObject);
 begin
   Inherited;
   Try
     FQRMAESTRO.QR.FieldByName('CODIGO_PRODUCTO').AsString := FCNX.Next(Info_TablaGet(Id_TBL_Producto).Name, '0', ['CODIGO_PRODUCTO'], [],[], FQRMAESTRO.QR.FieldByName('CODIGO_PRODUCTO').Size);
-    FQRMAESTRO.QR.FieldByName('ID_ACTIVO'  ).AsString := 'S';
+    FQRMAESTRO.QR.FieldByName('ID_ACTIVO'      ).AsString := 'S';
   Except
     On E: Exception Do
     Begin

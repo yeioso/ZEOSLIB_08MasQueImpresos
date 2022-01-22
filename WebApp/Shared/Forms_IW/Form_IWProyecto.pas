@@ -41,6 +41,7 @@ type
     procedure IWAppFormDestroy(Sender: TObject);
     procedure BTNBUSCARAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BtnAcarreoAsyncClick(Sender: TObject; EventParams: TStringList);
+    procedure IWAppFormShow(Sender: TObject);
   private
     FCNX : TConexion;
     FINFO : String;
@@ -225,7 +226,7 @@ begin
 
   If FQRMAESTRO.Active Then
     lbInfo.Caption := FINFO + ' [ ' + FQRMAESTRO.QR.FieldByName('CODIGO_PROYECTO').AsString + ',' + FQRMAESTRO.QR.FieldByName('NOMBRE').AsString + ' ] ';
-
+  Self.Title := Info_TablaGet(Id_TBL_Proyecto).Caption + ', ' + lbInfo.Caption;
   SetLabel;
   Try
   Except
@@ -287,6 +288,7 @@ begin
   FINFO := UserSession.FULL_INFO + Info_TablaGet(Id_TBL_Proyecto).Caption;
   Randomize;
   Self.Name := 'TFrIWProyecto' + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000) );
+  Self.Title := Info_TablaGet(Id_TBL_Proyecto).Caption;
   FCNX := UserSession.CNX;
   FFRAME := TFrIWFrame.Create(Self);
   FFRAME.Parent := Self;
@@ -365,6 +367,12 @@ begin
     On E: Exception Do
       Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWProyecto', 'TFrIWProyecto_Enc.IWAppFormDestroy', E.Message);
   End;
+end;
+
+procedure TFrIWProyecto.IWAppFormShow(Sender: TObject);
+begin
+  If Assigned(FFRAME) Then
+    FFRAME.Sincronizar_Informacion;
 end;
 
 procedure TFrIWProyecto.NewRecordMaster(pSender: TObject);

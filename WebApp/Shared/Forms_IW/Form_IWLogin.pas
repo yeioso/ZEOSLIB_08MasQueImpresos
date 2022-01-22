@@ -40,6 +40,7 @@ type
     FCNX : TConexion;
     FCaptcha : String;
     procedure Recuperar_Password(EventParams: TStringList);
+    Procedure Verificar_Notificacion;
     Function Usuario_Valido : Boolean;
     Function Authentication_Validated : Boolean;
   public
@@ -92,6 +93,27 @@ begin
   Else
   Begin
     WebApplication.ShowNotification('Recuperación no realizada', TIWNotifyType.ntError);
+  End;
+End;
+
+Procedure TFrIWLogin.Verificar_Notificacion;
+Begin
+  Try
+    FCNX.SQL.Active := False;
+    FCNX.SQL.SQL.Clear;
+    FCNX.SQL.SQL.Add(' SELECT COUNT(*) AS REGISTROS ');
+    FCNX.SQL.SQL.Add(' FROM ' + Info_TablaGet(Id_TBL_Notificacion_Producto).Name + ' ');
+    FCNX.SQL.SQL.Add(' WHERE ' + FCNX.Trim_Sentence('CODIGO_USUARIO') + ' = ' + QuotedStr(Trim(UserSession.USER_CODE)) + ' ');
+    FCNX.SQL.SQL.Add(' AND '   + FCNX.Trim_Sentence('ID_ACTIVO') + ' = ' + QuotedStr(Trim('S')) + ' ');
+    FCNX.SQL.Active := True;
+    If FCNX.SQL.FieldByName('REGISTROS').AsInteger > 0 Then
+      UserSession.ShowForm_Notificacion_Producto;
+
+    FCNX.SQL.Active := False;
+    FCNX.SQL.SQL.Clear;
+  Except
+    On E: Exception Do
+      Utils_ManagerLog_Add(UserSession.USER_CODE,  'Form_IWLogin', 'TFrIWLogin.Verificar_Notificacion', E.Message);
   End;
 End;
 
@@ -184,6 +206,7 @@ begin
   If Authentication_Validated Then
   Begin
     UserSession.ShowForm_Menu;
+    Verificar_Notificacion;
     Self.Release;
   End
   Else

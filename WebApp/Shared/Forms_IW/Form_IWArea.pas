@@ -37,6 +37,7 @@ type
     procedure IWAppFormDestroy(Sender: TObject);
     procedure BTNBUSCARAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BtnAcarreoAsyncClick(Sender: TObject; EventParams: TStringList);
+    procedure IWAppFormShow(Sender: TObject);
   private
     FCNX : TConexion;
     FINFO : String;
@@ -219,7 +220,7 @@ begin
 
   If FQRMAESTRO.Active Then
     lbInfo.Caption := FINFO + ' [ ' + FQRMAESTRO.QR.FieldByName('CODIGO_AREA').AsString + ',' + FQRMAESTRO.QR.FieldByName('NOMBRE').AsString + ' ] ';
-
+  Self.Title := Info_TablaGet(Id_TBL_Area).Caption + ', ' + lbInfo.Caption;
   SetLabel;
   Try
   Except
@@ -280,7 +281,8 @@ Var
 begin
   FINFO := UserSession.FULL_INFO + Info_TablaGet(Id_TBL_Area).Caption;
   Randomize;
-  Self.Name := 'TFrIWArea' + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000) );
+  Self.Name := 'TFrIWArea' + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000));
+  Self.Title := Info_TablaGet(Id_TBL_Area).Caption + ', ' + lbInfo.Caption;
   FCNX := UserSession.CNX;
   FFRAME := TFrIWFrame.Create(Self);
   FFRAME.Parent := Self;
@@ -356,6 +358,12 @@ begin
     On E: Exception Do
       Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWArea', 'TFrIWArea_Enc.IWAppFormDestroy', E.Message);
   End;
+end;
+
+procedure TFrIWArea.IWAppFormShow(Sender: TObject);
+begin
+  If Assigned(FFRAME) Then
+    FFRAME.Sincronizar_Informacion;
 end;
 
 procedure TFrIWArea.NewRecordMaster(pSender: TObject);

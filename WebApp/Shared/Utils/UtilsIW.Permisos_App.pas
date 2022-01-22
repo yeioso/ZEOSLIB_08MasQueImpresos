@@ -26,7 +26,8 @@ Const
   CONST_OPCION_INVENTARIO_SALIDA              = 0019;
   CONST_OPCION_INVENTARIO_DEVOLUCION          = 0020;
   CONST_OPCION_REPORTE                        = 0021;
-  CONST_OPCION_SALIR                          = 0022;
+  CONST_OPCION_VISUALIZADOR_LOG               = 0022;
+  CONST_OPCION_SALIR                          = 0023;
 
 Type
   TItem_App = Class
@@ -127,6 +128,7 @@ Begin
                          CONST_OPCION_INVENTARIO_SALIDA,
                          CONST_OPCION_INVENTARIO_DEVOLUCION,
                          CONST_OPCION_REPORTE,
+                         CONST_OPCION_VISUALIZADOR_LOG,
                          CONST_OPCION_SALIR
                        ];
 End;
@@ -198,6 +200,7 @@ Begin
   Add(CONST_OPCION_INVENTARIO_SALIDA           , 'OPCION_INVENTARIO_SALIDA'           );
   Add(CONST_OPCION_INVENTARIO_DEVOLUCION       , 'OPCION_INVENTARIO_DEVOLUCION'       );
   Add(CONST_OPCION_REPORTE                     , 'OPCION_REPORTE'                     );
+  Add(CONST_OPCION_VISUALIZADOR_LOG            , 'OPCION_VISUALIZADOR_LOG'            );
   Add(CONST_OPCION_SALIR                       , 'OPCION_SALIR'                       );
 End;
 

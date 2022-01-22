@@ -6,6 +6,8 @@ object FrIWPerfil_Permiso: TFrIWPerfil_Permiso
   RenderInvisibleControls = True
   AllowPageAccess = True
   ConnectionMode = cmAny
+  OnDestroy = IWAppFormDestroy
+  OnShow = IWAppFormShow
   Background.Fixed = False
   HandleTabs = False
   LeftToRight = True
@@ -16,7 +18,7 @@ object FrIWPerfil_Permiso: TFrIWPerfil_Permiso
   DesignTop = 2
   object BTNADD: TIWImage
     Left = 10
-    Top = 10
+    Top = 98
     Width = 34
     Height = 34
     Cursor = crHandPoint
@@ -58,7 +60,7 @@ object FrIWPerfil_Permiso: TFrIWPerfil_Permiso
   end
   object BTNEDIT: TIWImage
     Left = 51
-    Top = 10
+    Top = 98
     Width = 34
     Height = 34
     Cursor = crHandPoint
@@ -96,7 +98,7 @@ object FrIWPerfil_Permiso: TFrIWPerfil_Permiso
   end
   object BTNDEL: TIWImage
     Left = 91
-    Top = 10
+    Top = 98
     Width = 34
     Height = 34
     Cursor = crHandPoint
@@ -134,7 +136,7 @@ object FrIWPerfil_Permiso: TFrIWPerfil_Permiso
   end
   object BTNSAVE: TIWImage
     Left = 129
-    Top = 10
+    Top = 98
     Width = 34
     Height = 34
     Cursor = crHandPoint
@@ -174,7 +176,7 @@ object FrIWPerfil_Permiso: TFrIWPerfil_Permiso
   end
   object BTNCANCEL: TIWImage
     Left = 169
-    Top = 10
+    Top = 98
     Width = 34
     Height = 34
     Cursor = crHandPoint
@@ -229,7 +231,7 @@ object FrIWPerfil_Permiso: TFrIWPerfil_Permiso
   end
   object BTNEXIT: TIWImage
     Left = 350
-    Top = 10
+    Top = 98
     Width = 34
     Height = 34
     Cursor = crHandPoint
@@ -279,7 +281,7 @@ object FrIWPerfil_Permiso: TFrIWPerfil_Permiso
   end
   object DATO: TIWEdit
     Left = 10
-    Top = 142
+    Top = 230
     Width = 374
     Height = 28
     StyleRenderOptions.RenderBorder = False
@@ -292,7 +294,7 @@ object FrIWPerfil_Permiso: TFrIWPerfil_Permiso
   end
   object IWLabel23: TIWLabel
     Left = 11
-    Top = 60
+    Top = 148
     Width = 74
     Height = 16
     RenderSize = False
@@ -306,7 +308,7 @@ object FrIWPerfil_Permiso: TFrIWPerfil_Permiso
   end
   object IWLabel25: TIWLabel
     Left = 11
-    Top = 86
+    Top = 174
     Width = 71
     Height = 16
     RenderSize = False
@@ -320,7 +322,7 @@ object FrIWPerfil_Permiso: TFrIWPerfil_Permiso
   end
   object NOMBRE: TIWDBComboBox
     Left = 91
-    Top = 85
+    Top = 173
     Width = 296
     Height = 21
     StyleRenderOptions.RenderBorder = False
@@ -341,7 +343,7 @@ object FrIWPerfil_Permiso: TFrIWPerfil_Permiso
   end
   object CONSECUTIVO: TIWDBLabel
     Left = 89
-    Top = 59
+    Top = 147
     Width = 104
     Height = 21
     Alignment = taRightJustify
@@ -456,7 +458,7 @@ object FrIWPerfil_Permiso: TFrIWPerfil_Permiso
   end
   object lbNombre_Activo: TIWLabel
     Left = 47
-    Top = 116
+    Top = 204
     Width = 121
     Height = 16
     RenderSize = False

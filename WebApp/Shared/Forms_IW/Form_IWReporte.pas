@@ -8,7 +8,7 @@ uses
   IWHTML40Container, IWRegion, IWVCLBaseControl, IWBaseControl,
   IWBaseHTMLControl, IWControl, IWCompButton, IWBaseComponent,
   IWBaseHTMLComponent, IWBaseHTML40Component, IWCompExtCtrls,
-  Vcl.Imaging.pngimage, IWCompEdit, IWCompProgressIndicator;
+  Vcl.Imaging.pngimage, IWCompEdit, IWCompProgressIndicator, Form_IWFrame;
 
 type
   TFrIWReporte = class(TIWAppForm)
@@ -27,7 +27,10 @@ type
     procedure BTNCODIGO_PRODUCTO_FINAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNPRODUCTOAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure IWAppFormCreate(Sender: TObject);
+    procedure IWAppFormShow(Sender: TObject);
+    procedure IWAppFormDestroy(Sender: TObject);
   private
+    FFRAME : TFrIWFrame;
     Procedure Resultado_Codigo_Producto_Ini(Sender: TObject; EventParams: TStringList);
     Procedure Resultado_Codigo_Producto_Fin(Sender: TObject; EventParams: TStringList);
     procedure Buscar_Info(pSD : Integer; pEvent : TIWAsyncEvent);
@@ -81,6 +84,21 @@ procedure TFrIWReporte.IWAppFormCreate(Sender: TObject);
 begin
   Randomize;
   Self.Name := 'TFrIWReporte' + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000) );
+  Self.Title := 'Reportes';
+  FFRAME := TFrIWFrame.Create(Self);
+  FFRAME.Parent := Self;
+end;
+
+procedure TFrIWReporte.IWAppFormDestroy(Sender: TObject);
+begin
+    If Assigned(FFRAME) Then
+      FreeAndNil(FFRAME);
+end;
+
+procedure TFrIWReporte.IWAppFormShow(Sender: TObject);
+begin
+  If Assigned(FFRAME) Then
+    FFRAME.Sincronizar_Informacion;
 end;
 
 procedure TFrIWReporte.BTNCODIGO_PRODUCTO_INIAsyncClick(Sender: TObject; EventParams: TStringList);
@@ -124,7 +142,6 @@ Begin
      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWReporte', 'TFrIWReporte.Resultado_Codigo_Producto_Fin', E.Message);
   End;
 End;
-
 
 
 procedure TFrIWReporte.BTNBACKAsyncClick(Sender: TObject; EventParams: TStringList);
