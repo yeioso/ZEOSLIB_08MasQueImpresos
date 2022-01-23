@@ -37,6 +37,11 @@ type
     FECHA_FIN: TIWEdit;
     ID_FECHA: TIWRadioGroup;
     IWLabel6: TIWLabel;
+    PAG03: TIWjQTabPage;
+    BTNOP: TIWImage;
+    OP: TIWEdit;
+    IWLabel7: TIWLabel;
+    BTNCOMPARATIVO: TIWButton;
     procedure BTNBACKAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNCODIGO_PRODUCTO_INIAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNCODIGO_PRODUCTO_FINAsyncClick(Sender: TObject; EventParams: TStringList);
@@ -44,10 +49,14 @@ type
     procedure IWAppFormCreate(Sender: TObject);
     procedure BTNCODIGO_AREAAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNAREAAsyncClick(Sender: TObject; EventParams: TStringList);
+    procedure BTNCOMPARATIVOAsyncClick(Sender: TObject;
+      EventParams: TStringList);
+    procedure BTNOPAsyncClick(Sender: TObject; EventParams: TStringList);
   private
     Procedure Resultado_Codigo_Producto_Ini(Sender: TObject; EventParams: TStringList);
     Procedure Resultado_Codigo_Producto_Fin(Sender: TObject; EventParams: TStringList);
     Procedure Resultado_Codigo_Area(Sender: TObject; EventParams: TStringList);
+    Procedure Resultado_Orden_Produccion(Sender: TObject; EventParams: TStringList);
     procedure Buscar_Info(pSD : Integer; pEvent : TIWAsyncEvent);
   public
   end;
@@ -62,7 +71,8 @@ Uses
   UtilsIW.ManagerLog,
   Report.Consumo_Area,
   Report.Saldo_Inventario,
-  Form_Plantilla_Documento;
+  Form_Plantilla_Documento,
+  Report.Comparativo_OP_Inventario;
 
 procedure TFrIWReporte.Buscar_Info(pSD : Integer; pEvent : TIWAsyncEvent);
 Var
@@ -110,6 +120,22 @@ begin
   Buscar_Info(Id_TBL_Producto, Resultado_Codigo_Producto_Ini);
 end;
 
+procedure TFrIWReporte.BTNCOMPARATIVOAsyncClick(Sender: TObject; EventParams: TStringList);
+Var
+  lMsg : String;
+begin
+  If Vacio(OP.Text) Or (SetToInt(OP.Text) <= 0) Then
+  Begin
+    UserSession.SetMessage('Debe elegir una orden de produccion', True);
+    Exit;
+  End;
+
+  If Report_Comparativo_OP_Inventario_Reporte(UserSession.CNX, UserSession.DOCUMENTO_ORDEN_DE_PRODUCCION, SetToInt(OP.Text)) Then
+    If Not Form_Plantilla_Reporte_Generico(UserSession.WebApplication, lMsg) Then
+      UserSession.SetMessage(lMsg, True);
+end;
+
+
 procedure TFrIWReporte.BTNGENERAR_INVENTARIOAsyncClick(Sender: TObject; EventParams: TStringList);
 Var
   lFin : String;
@@ -120,6 +146,11 @@ begin
   If Report_Saldo_Inventario_Reporte(UserSession.CNX, CODIGO_PRODUCTO_INI.Text, lFin) Then
      If Not Form_Plantilla_Reporte_Generico(UserSession.WebApplication, lFin) Then
        UserSession.SetMessage(lFin, True);
+end;
+
+procedure TFrIWReporte.BTNOPAsyncClick(Sender: TObject; EventParams: TStringList);
+begin
+  Buscar_Info(Id_TBL_Orden_Produccion, Resultado_Orden_Produccion);
 end;
 
 procedure TFrIWReporte.BTNCODIGO_AREAAsyncClick(Sender: TObject; EventParams: TStringList);
@@ -159,6 +190,16 @@ Begin
   Except
    On E: Exception Do
      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWReporte', 'TFrIWReporte.Resultado_Codigo_Area', E.Message);
+  End;
+End;
+
+Procedure TFrIWReporte.Resultado_Orden_Produccion(Sender: TObject; EventParams: TStringList);
+Begin
+  Try
+    OP.Text := EventParams.Values ['NUMERO'];
+  Except
+   On E: Exception Do
+     Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWReporte', 'TFrIWReporte.Resultado_Orden_Produccion', E.Message);
   End;
 End;
 
