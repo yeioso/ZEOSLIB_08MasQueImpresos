@@ -156,7 +156,7 @@ Type
     Procedure ShowForm_Producto;
     Procedure ShowForm_Proyecto;
     Procedure ShowForm_Orden_Produccion(Const pCodigo_Documento : String);
-    Procedure ShowForm_Explosion_Material(Const pCodigo_Documento, pNombre : String; pNumero : Integer);
+    Procedure ShowForm_Explosion_Material(Const pCodigo_Documento, pNombre, pReferencia, pProyecto : String; pNumero : Integer);
     Procedure ShowForm_Movto_Inventario(Const pCodigo_Documento : String);
     Procedure ShowForm_Reporte;
     Procedure ShowForm_Notificacion_Producto;
@@ -361,9 +361,9 @@ Begin
   FOrden_Produccion.Show;
 End;
 
-Procedure TIWUserSession.ShowForm_Explosion_Material(Const pCodigo_Documento, pNombre : String; pNumero : Integer);
+Procedure TIWUserSession.ShowForm_Explosion_Material(Const pCodigo_Documento, pNombre, pReferencia, pProyecto : String; pNumero : Integer);
 Begin
-  FExplosion_Material := TFrIWExplosion_Material.Create(WebApplication, pCodigo_Documento, pNombre, pNumero);
+  FExplosion_Material := TFrIWExplosion_Material.Create(WebApplication, pCodigo_Documento, pNombre, pReferencia, pProyecto, pNumero);
   FExplosion_Material.Show;
 End;
 

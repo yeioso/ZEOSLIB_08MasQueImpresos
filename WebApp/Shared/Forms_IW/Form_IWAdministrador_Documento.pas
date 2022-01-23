@@ -11,7 +11,7 @@ uses
   IWBaseHTML40Component, UtConexion, Data.DB, IWCompGrids, IWDBStdCtrls,
   IWCompEdit, IWCompCheckbox, IWCompMemo, IWDBExtCtrls, IWCompButton,
   IWCompListbox, IWCompGradButton, UtGrid_JQ, UtNavegador_ASE,
-  UtilsIW.Busqueda, Form_IWFrame;
+  UtilsIW.Busqueda;
 
 type
   TFrIWAdministrador_Documento = class(TIWAppForm)
@@ -43,11 +43,9 @@ type
     procedure IWAppFormDestroy(Sender: TObject);
     procedure BTNBUSCARAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BtnAcarreoAsyncClick(Sender: TObject; EventParams: TStringList);
-    procedure IWAppFormShow(Sender: TObject);
   private
     FCNX : TConexion;
     FINFO : String;
-    FFRAME : TFrIWFrame;
     FQRMAESTRO : TMANAGER_DATA;
     FNAVEGADOR : TNavegador_ASE;
     FGRID_MAESTRO : TGRID_JQ;
@@ -179,13 +177,22 @@ End;
 
 Procedure TFrIWAdministrador_Documento.Estado_Controles;
 Begin
-  CODIGO_DOCUMENTO.Enabled  := FQRMAESTRO.Mode_Insert  And Documento_Activo;
-  NOMBRE.Enabled            := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  DOCUMENTO_INICIAL.Visible := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  DOCUMENTO_ACTUAL.Visible  := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  DOCUMENTO_FINAL.Visible   := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  CODIGO_DOCUMENTO.Enabled   := FQRMAESTRO.Mode_Insert  And Documento_Activo;
+  NOMBRE.Enabled             := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  DOCUMENTO_INICIAL.Enabled  := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  DOCUMENTO_ACTUAL.Enabled   := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  DOCUMENTO_FINAL.Enabled    := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  ID_ACTIVO.Enabled          := FQRMAESTRO.Mode_Edition And Documento_Activo;
+
+  CODIGO_DOCUMENTO.Editable  := FQRMAESTRO.Mode_Insert  And Documento_Activo;
+  NOMBRE.Editable            := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  DOCUMENTO_INICIAL.Editable := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  DOCUMENTO_ACTUAL.Editable  := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  DOCUMENTO_FINAL.Editable   := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  ID_ACTIVO.Editable         := FQRMAESTRO.Mode_Edition And Documento_Activo;
+
   DESCRIPCION.Editable      := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  ID_ACTIVO.Visible         := FQRMAESTRO.Mode_Edition And Documento_Activo;
+
   DATO.Visible              := (Not FQRMAESTRO.Mode_Edition);
   PAG_00.Visible            := (Not FQRMAESTRO.Mode_Edition);
   PAG_01.Visible            := True;
@@ -289,9 +296,6 @@ begin
   FINFO := UserSession.FULL_INFO + Info_TablaGet(Id_TBL_Administrador_Documento).Caption;
   FCNX := UserSession.CNX;
   Self.Title := Info_TablaGet(Id_TBL_Administrador_Documento).Caption + ', ' + FINFO;
-  FFRAME := TFrIWFrame.Create(Self);
-  FFRAME.Parent := Self;
-
   CODIGO_DOCUMENTO.Items.Add(UserSession.DOCUMENTO_ENTRADA_DE_INVENTARIO   );
   CODIGO_DOCUMENTO.Items.Add(UserSession.DOCUMENTO_SALIDA_DE_INVENTARIO    );
   CODIGO_DOCUMENTO.Items.Add(UserSession.DOCUMENTO_DEVOLUCION_AL_INVENTARIO);
@@ -364,19 +368,10 @@ begin
     If Assigned(FGRID_MAESTRO) Then
       FreeAndNil(FGRID_MAESTRO);
 
-    If Assigned(FFRAME) Then
-      FreeAndNil(FFRAME);
-
   Except
     On E: Exception Do
       Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWAdministrador_Documento', 'TFrIWAdministrador_Documento_Enc.IWAppFormDestroy', E.Message);
   End;
-end;
-
-procedure TFrIWAdministrador_Documento.IWAppFormShow(Sender: TObject);
-begin
-  If Assigned(FFRAME) Then
-    FFRAME.Sincronizar_Informacion;
 end;
 
 procedure TFrIWAdministrador_Documento.NewRecordMaster(pSender: TObject);

@@ -10,7 +10,7 @@ uses
   IWCompTabControl, IWBaseComponent, IWBaseHTMLComponent, IWBaseHTML40Component,
   UtConexion, Data.DB, IWCompGrids, IWDBStdCtrls, IWCompEdit,
   IWCompCheckbox, IWCompMemo, IWDBExtCtrls, IWCompButton, IWCompListbox,
-  UtGrid_JQ, UtNavegador_ASE, UtilsIW.Busqueda, Form_IWFrame;
+  UtGrid_JQ, UtNavegador_ASE, UtilsIW.Busqueda;
 
 type
   TFrIWTercero_Enc = class(TIWAppForm)
@@ -46,11 +46,9 @@ type
     procedure IWAppFormDestroy(Sender: TObject);
     procedure BTNBUSCARAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BtnAcarreoAsyncClick(Sender: TObject; EventParams: TStringList);
-    procedure IWAppFormShow(Sender: TObject);
   private
     FCNX : TConexion;
     FINFO : String;
-    FFRAME : TFrIWFrame;
     FQRMAESTRO : TMANAGER_DATA;
 
     FNAVEGADOR : TNavegador_ASE;
@@ -149,6 +147,9 @@ Begin
     lMensaje := '';
     CODIGO_TERCERO.BGColor := UserSession.COLOR_OK;
     NOMBRE.BGColor := UserSession.COLOR_OK;
+    CONTACTO.BGColor := UserSession.COLOR_OK;
+    DIRECCION.BGColor := UserSession.COLOR_OK;
+    TELEFONO_1.BGColor := UserSession.COLOR_OK;
     If FQRMAESTRO.Mode_Insert Then
     Begin
       If Vacio(FQRMAESTRO.QR.FieldByName('CODIGO_TERCERO').AsString) Then
@@ -167,10 +168,32 @@ Begin
       End;
     End;
 
-    If FQRMAESTRO.Mode_Edition And Vacio(FQRMAESTRO.QR.FieldByName('NOMBRE').AsString) Then
+    If FQRMAESTRO.Mode_Edition Then
     Begin
-      lMensaje := lMensaje + IfThen(Not Vacio(lMensaje), ', ') + 'Nombre invalido';
-      NOMBRE.BGColor := UserSession.COLOR_ERROR;
+      If Vacio(FQRMAESTRO.QR.FieldByName('NOMBRE').AsString) Then
+      Begin
+        lMensaje := lMensaje + IfThen(Not Vacio(lMensaje), ', ') + 'Nombre invalido';
+        NOMBRE.BGColor := UserSession.COLOR_ERROR;
+      End;
+
+      If Vacio(FQRMAESTRO.QR.FieldByName('CONTACTO').AsString) Then
+      Begin
+        lMensaje := lMensaje + IfThen(Not Vacio(lMensaje), ', ') + 'Contacto invalido';
+        CONTACTO.BGColor := UserSession.COLOR_ERROR;
+      End;
+
+      If Vacio(FQRMAESTRO.QR.FieldByName('DIRECCION').AsString) Then
+      Begin
+        lMensaje := lMensaje + IfThen(Not Vacio(lMensaje), ', ') + 'Direccion invalida';
+        DIRECCION.BGColor := UserSession.COLOR_ERROR;
+      End;
+
+      If Vacio(FQRMAESTRO.QR.FieldByName('TELEFONO_1').AsString) Then
+      Begin
+        lMensaje := lMensaje + IfThen(Not Vacio(lMensaje), ', ') + 'Telefono invalido';
+        TELEFONO_1.BGColor := UserSession.COLOR_ERROR;
+      End;
+
     End;
 
     FQRMAESTRO.ERROR := IfThen(Vacio(lMensaje), 0, -1);
@@ -187,16 +210,28 @@ End;
 
 Procedure TFrIWTercero_Enc.Estado_Controles;
 Begin
-  CODIGO_TERCERO.Enabled := FQRMAESTRO.Mode_Insert  And Documento_Activo;
-  NOMBRE.Enabled         := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  CONTACTO.Enabled       := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  DIRECCION.Enabled      := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  EMAIL.Enabled          := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  TELEFONO_1.Enabled     := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  TELEFONO_2.Enabled     := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  ID_CLIENTE.Enabled     := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  ID_PROVEEDOR.Enabled   := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  ID_ACTIVO.Enabled      := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  CODIGO_TERCERO.Enabled  := FQRMAESTRO.Mode_Insert  And Documento_Activo;
+  NOMBRE.Enabled          := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  CONTACTO.Enabled        := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  DIRECCION.Enabled       := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  EMAIL.Enabled           := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  TELEFONO_1.Enabled      := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  TELEFONO_2.Enabled      := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  ID_CLIENTE.Enabled      := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  ID_PROVEEDOR.Enabled    := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  ID_ACTIVO.Enabled       := FQRMAESTRO.Mode_Edition And Documento_Activo;
+
+  CODIGO_TERCERO.Editable := FQRMAESTRO.Mode_Insert  And Documento_Activo;
+  NOMBRE.Editable         := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  CONTACTO.Editable       := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  DIRECCION.Editable      := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  EMAIL.Editable          := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  TELEFONO_1.Editable     := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  TELEFONO_2.Editable     := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  ID_CLIENTE.Editable     := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  ID_PROVEEDOR.Editable   := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  ID_ACTIVO.Editable      := FQRMAESTRO.Mode_Edition And Documento_Activo;
+
   DATO.Visible           := (Not FQRMAESTRO.Mode_Edition);
   PAG_00.Visible         := (Not FQRMAESTRO.Mode_Edition);
   PAG_01.Visible         := True;
@@ -306,8 +341,6 @@ begin
   Self.Name := 'TFrIWTercero_Enc' + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000));
   Self.Title := Info_TablaGet(Id_TBL_Tercero).Caption;
   FCNX := UserSession.CNX;
-  FFRAME := TFrIWFrame.Create(Self);
-  FFRAME.Parent := Self;
   FCODIGO_ACTUAL := '';
   FINFO := UserSession.FULL_INFO + Info_TablaGet(Id_TBL_Tercero).Caption;
   Try
@@ -376,19 +409,10 @@ begin
     If Assigned(FNAVEGADOR) Then
       FreeAndNil(FNAVEGADOR);
 
-    If Assigned(FFRAME) Then
-      FreeAndNil(FFRAME);
-
   Except
     On E: Exception Do
       Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWTercero_Enc', 'TFrIWTercero_Enc.IWAppFormDestroy', E.Message);
   End;
-end;
-
-procedure TFrIWTercero_Enc.IWAppFormShow(Sender: TObject);
-begin
-  If Assigned(FFRAME) Then
-    FFRAME.Sincronizar_Informacion;
 end;
 
 procedure TFrIWTercero_Enc.NewRecordMaster(pSender: TObject);

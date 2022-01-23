@@ -10,7 +10,7 @@ uses
   IWCompTabControl, IWCompJQueryWidget, IWBaseComponent, IWBaseHTMLComponent,
   IWBaseHTML40Component, UtConexion, Data.DB, IWCompGrids, IWDBStdCtrls,
   IWCompEdit, IWCompCheckbox, IWCompMemo, IWDBExtCtrls, IWCompButton,
-  IWCompListbox, IWCompGradButton, UtGrid_JQ, UtNavegador_ASE, Form_IWFrame;
+  IWCompListbox, IWCompGradButton, UtGrid_JQ, UtNavegador_ASE;
 
 type
   TFrIWPerfil_Enc = class(TIWAppForm)
@@ -38,11 +38,9 @@ type
     procedure BTNBUSCARAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BtnAcarreoAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BtnGridAsyncClick(Sender: TObject; EventParams: TStringList);
-    procedure IWAppFormShow(Sender: TObject);
   private
     FCNX : TConexion;
     FINFO : String;
-    FFRAME : TFrIWFrame;
     FQRMAESTRO : TMANAGER_DATA;
 
     FNAVEGADOR : TNavegador_ASE;
@@ -142,8 +140,10 @@ End;
 
 Procedure TFrIWPerfil_Enc.Estado_Controles;
 Begin
-  CODIGO_PERFIL.Enabled := FQRMAESTRO.Mode_Insert  And Documento_Activo;
-  NOMBRE.Enabled        := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  CODIGO_PERFIL.Enabled  := FQRMAESTRO.Mode_Insert  And Documento_Activo;
+  NOMBRE.Enabled         := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  CODIGO_PERFIL.Editable := FQRMAESTRO.Mode_Insert  And Documento_Activo;
+  NOMBRE.Editable        := FQRMAESTRO.Mode_Edition And Documento_Activo;
 
   IWRBOTONDETALLE.Visible := FQRMAESTRO.Active And (Not FQRMAESTRO.Mode_Edition) And (FQRMAESTRO.QR.RecordCount >= 1);
 
@@ -309,8 +309,6 @@ begin
   Self.Name := 'TFrIWPerfil_Enc' + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000));
   FCNX := UserSession.CNX;
   Self.Title := Info_TablaGet(Id_TBL_Perfil).Caption + ', ' + lbInfo.Caption;
-  FFRAME := TFrIWFrame.Create(Self);
-  FFRAME.Parent := Self;
   FCODIGO_ACTUAL := '';
   FCODIGO_PERFIL := '';
 
@@ -383,19 +381,10 @@ begin
       If Assigned(FGRID_MAESTRO) Then
         FreeAndNil(FGRID_MAESTRO);
 
-    If Assigned(FFRAME) Then
-      FreeAndNil(FFRAME);
-
     Except
       On E: Exception Do
         Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWPerfil_Enc', 'TFrIWPerfil_Enc.IWAppFormDestroy', E.Message);
     End;
-end;
-
-procedure TFrIWPerfil_Enc.IWAppFormShow(Sender: TObject);
-begin
-  If Assigned(FFRAME) Then
-    FFRAME.Sincronizar_Informacion;
 end;
 
 procedure TFrIWPerfil_Enc.NewRecordMaster(pSender: TObject);

@@ -9,7 +9,7 @@ uses
   IWBaseHTMLControl, IWControl, IWCompLabel, IWCompGrids,
   UtConexion, Vcl.Forms, IWVCLBaseContainer, IWContainer,
   IWHTMLContainer, IWHTML40Container, IWRegion, IWCompListbox,
-  UtGrid_JQ, Form_IWFrame;
+  UtGrid_JQ;
 
 type
   TFrIWPerfil_Permiso = class(TIWAppForm)
@@ -19,13 +19,12 @@ type
     BTNSAVE: TIWImage;
     BTNCANCEL: TIWImage;
     BTNEXIT: TIWImage;
-    DATO: TIWEdit;
     IWLabel23: TIWLabel;
     IWLabel25: TIWLabel;
     NOMBRE: TIWDBComboBox;
     CONSECUTIVO: TIWDBLabel;
-    BTNACTIVO: TIWImage;
-    lbNombre_Activo: TIWLabel;
+    HABILITA_OPCION: TIWDBCheckBox;
+    DATO: TIWEdit;
     procedure BTNEXITAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNADDAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNEDITAsyncClick(Sender: TObject; EventParams: TStringList);
@@ -34,11 +33,8 @@ type
     procedure BTNCANCELAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure DATOAsyncKeyUp(Sender: TObject; EventParams: TStringList);
     procedure BTNACTIVOAsyncClick(Sender: TObject; EventParams: TStringList);
-    procedure IWAppFormShow(Sender: TObject);
-    procedure IWAppFormDestroy(Sender: TObject);
   private
     FCNX : TConexion;
-    FFRAME : TFrIWFrame;
     FQRDETALLE : TMANAGER_DATA;
     FGRID_MAESTRO : TGRID_JQ;
     FEJECUTANDO_ONCHANGE : Boolean;
@@ -151,8 +147,6 @@ begin
   Try
     Randomize;
     Self.Name := 'TFrIWPerfil_Permiso' + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000));
-    FFRAME := TFrIWFrame.Create(Self);
-    FFRAME.Parent := Self;
     Self.Title := Info_TablaGet(Id_TBL_Permiso_App).Caption + ', ' + pCodigo_Perfil;
 
     WebApplication.RegisterCallBack(Self.Name + '.Confirmacion_Guardar'    , Confirmacion_Guardar    );
@@ -185,6 +179,7 @@ begin
 
     CONSECUTIVO.DataSource     := FQRDETALLE.DS;
     NOMBRE.DataSource          := FQRDETALLE.DS;
+    HABILITA_OPCION.DataSource := FQRDETALLE.DS;
 
     FGRID_MAESTRO.VisibleRowCount := 11;
     FGRID_MAESTRO.SetGrid(FQRDETALLE.DS, ['CONSECUTIVO' , 'NOMBRE'     , 'HABILITA_OPCION'],
@@ -353,7 +348,6 @@ procedure TFrIWPerfil_Permiso.DsDataChangeDetalle(pSender: TObject);
 Begin
   Try
     Self.Title := Info_TablaGet(Id_TBL_Permiso_App).Caption + ', ' + FCODIGO_PERFIL + ', ' + Trim(FQRDETALLE.QR.FieldByName('NOMBRE').AsString);
-    lbNombre_Activo.Caption := IfThen(FQRDETALLE.QR.FieldByName('HABILITA_OPCION').AsString = 'S', 'Esta activo', 'No esta activo');
   Except
     On E: Exception Do
     Begin
@@ -371,21 +365,10 @@ Begin
   BTNCANCEL.Visible    := FQRDETALLE.Mode_Edition;
   DATO.Visible         := Not FQRDETALLE.Mode_Edition;
 
-  NOMBRE.Enabled       := FQRDETALLE.DS.State In [dsInsert, dsEdit];
-  NOMBRE.Editable      := FQRDETALLE.DS.State In [dsInsert, dsEdit];
-  BTNACTIVO.Visible    := FQRDETALLE.DS.State In [dsInsert, dsEdit];
+  NOMBRE.Enabled           := FQRDETALLE.DS.State In [dsInsert, dsEdit];
+  NOMBRE.Editable          := FQRDETALLE.DS.State In [dsInsert, dsEdit];
+  HABILITA_OPCION.Enabled  := FQRDETALLE.DS.State In [dsInsert, dsEdit];
+  HABILITA_OPCION.Editable := FQRDETALLE.DS.State In [dsInsert, dsEdit];
 End;
-
-procedure TFrIWPerfil_Permiso.IWAppFormDestroy(Sender: TObject);
-begin
-  If Assigned(FFRAME) Then
-    FreeAndNil(FFRAME);
-end;
-
-procedure TFrIWPerfil_Permiso.IWAppFormShow(Sender: TObject);
-begin
-  If Assigned(FFRAME) Then
-    FFRAME.Sincronizar_Informacion;
-end;
 
 end.

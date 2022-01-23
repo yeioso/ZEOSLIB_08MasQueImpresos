@@ -8,31 +8,46 @@ uses
   IWHTML40Container, IWRegion, IWVCLBaseControl, IWBaseControl,
   IWBaseHTMLControl, IWControl, IWCompButton, IWBaseComponent,
   IWBaseHTMLComponent, IWBaseHTML40Component, IWCompExtCtrls,
-  Vcl.Imaging.pngimage, IWCompEdit, IWCompProgressIndicator, Form_IWFrame;
+  Vcl.Imaging.pngimage, IWCompEdit, IWCompProgressIndicator, IWjQPageControl,
+  IWCompLabel;
 
 type
   TFrIWReporte = class(TIWAppForm)
     IWRegion_HEAD: TIWRegion;
     BTNBACK: TIWButton;
     IWModalWindow1: TIWModalWindow;
-    IWRegion_PRODUCTO: TIWRegion;
+    IWProgressIndicator1: TIWProgressIndicator;
+    PAGINAS: TIWjQPageControl;
+    PAG00: TIWjQTabPage;
+    PAG01: TIWjQTabPage;
     BTNCODIGO_PRODUCTO_INI: TIWImage;
     BTNCODIGO_PRODUCTO_FIN: TIWImage;
     CODIGO_PRODUCTO_INI: TIWEdit;
     CODIGO_PRODUCTO_FIN: TIWEdit;
-    IWProgressIndicator1: TIWProgressIndicator;
-    BTNPRODUCTO: TIWButton;
+    BTNGENERAR_INVENTARIO: TIWButton;
+    CODIGO_AREA: TIWEdit;
+    BTNCODIGO_AREA: TIWImage;
+    BTNAREA: TIWButton;
+    IWLabel1: TIWLabel;
+    IWLabel2: TIWLabel;
+    IWLabel3: TIWLabel;
+    IWLabel4: TIWLabel;
+    IWLabel5: TIWLabel;
+    FECHA_INI: TIWEdit;
+    FECHA_FIN: TIWEdit;
+    ID_FECHA: TIWRadioGroup;
+    IWLabel6: TIWLabel;
     procedure BTNBACKAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNCODIGO_PRODUCTO_INIAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNCODIGO_PRODUCTO_FINAsyncClick(Sender: TObject; EventParams: TStringList);
-    procedure BTNPRODUCTOAsyncClick(Sender: TObject; EventParams: TStringList);
+    procedure BTNGENERAR_INVENTARIOAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure IWAppFormCreate(Sender: TObject);
-    procedure IWAppFormShow(Sender: TObject);
-    procedure IWAppFormDestroy(Sender: TObject);
+    procedure BTNCODIGO_AREAAsyncClick(Sender: TObject; EventParams: TStringList);
+    procedure BTNAREAAsyncClick(Sender: TObject; EventParams: TStringList);
   private
-    FFRAME : TFrIWFrame;
     Procedure Resultado_Codigo_Producto_Ini(Sender: TObject; EventParams: TStringList);
     Procedure Resultado_Codigo_Producto_Fin(Sender: TObject; EventParams: TStringList);
+    Procedure Resultado_Codigo_Area(Sender: TObject; EventParams: TStringList);
     procedure Buscar_Info(pSD : Integer; pEvent : TIWAsyncEvent);
   public
   end;
@@ -45,6 +60,7 @@ Uses
   ServerController,
   TBL000.Info_Tabla,
   UtilsIW.ManagerLog,
+  Report.Consumo_Area,
   Report.Saldo_Inventario,
   Form_Plantilla_Documento;
 
@@ -85,20 +101,8 @@ begin
   Randomize;
   Self.Name := 'TFrIWReporte' + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000) );
   Self.Title := 'Reportes';
-  FFRAME := TFrIWFrame.Create(Self);
-  FFRAME.Parent := Self;
-end;
-
-procedure TFrIWReporte.IWAppFormDestroy(Sender: TObject);
-begin
-    If Assigned(FFRAME) Then
-      FreeAndNil(FFRAME);
-end;
-
-procedure TFrIWReporte.IWAppFormShow(Sender: TObject);
-begin
-  If Assigned(FFRAME) Then
-    FFRAME.Sincronizar_Informacion;
+  FECHA_INI.Text := FormatDateTime('YYYY-MM-DD', Now);
+  FECHA_FIN.Text := FormatDateTime('YYYY-MM-DD', Now);
 end;
 
 procedure TFrIWReporte.BTNCODIGO_PRODUCTO_INIAsyncClick(Sender: TObject; EventParams: TStringList);
@@ -106,7 +110,7 @@ begin
   Buscar_Info(Id_TBL_Producto, Resultado_Codigo_Producto_Ini);
 end;
 
-procedure TFrIWReporte.BTNPRODUCTOAsyncClick(Sender: TObject; EventParams: TStringList);
+procedure TFrIWReporte.BTNGENERAR_INVENTARIOAsyncClick(Sender: TObject; EventParams: TStringList);
 Var
   lFin : String;
 begin
@@ -116,6 +120,11 @@ begin
   If Report_Saldo_Inventario_Reporte(UserSession.CNX, CODIGO_PRODUCTO_INI.Text, lFin) Then
      If Not Form_Plantilla_Reporte_Generico(UserSession.WebApplication, lFin) Then
        UserSession.SetMessage(lFin, True);
+end;
+
+procedure TFrIWReporte.BTNCODIGO_AREAAsyncClick(Sender: TObject; EventParams: TStringList);
+begin
+  Buscar_Info(Id_TBL_Area, Resultado_Codigo_Area);
 end;
 
 procedure TFrIWReporte.BTNCODIGO_PRODUCTO_FINAsyncClick(Sender: TObject; EventParams: TStringList);
@@ -143,6 +152,31 @@ Begin
   End;
 End;
 
+Procedure TFrIWReporte.Resultado_Codigo_Area(Sender: TObject; EventParams: TStringList);
+Begin
+  Try
+    CODIGO_AREA.Text := EventParams.Values ['CODIGO_AREA'];
+  Except
+   On E: Exception Do
+     Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWReporte', 'TFrIWReporte.Resultado_Codigo_Area', E.Message);
+  End;
+End;
+
+
+procedure TFrIWReporte.BTNAREAAsyncClick(Sender: TObject; EventParams: TStringList);
+Var
+  lMsg : String;
+begin
+  If Vacio(CODIGO_AREA.Text) Then
+  Begin
+    UserSession.SetMessage('Debe elegir una  area', True);
+    Exit;
+  End;
+
+  If Report_Consumo_Area_Reporte(UserSession.CNX, CODIGO_AREA.Text, FECHA_INI.Text, FECHA_FIN.Text, ID_FECHA.ItemIndex) Then
+    If Not Form_Plantilla_Reporte_Generico(UserSession.WebApplication, lMsg) Then
+      UserSession.SetMessage(lMsg, True);
+end;
 
 procedure TFrIWReporte.BTNBACKAsyncClick(Sender: TObject; EventParams: TStringList);
 Begin

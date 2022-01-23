@@ -8,7 +8,6 @@ object FrIWUnidad_Medida: TFrIWUnidad_Medida
   ConnectionMode = cmAny
   OnCreate = IWAppFormCreate
   OnDestroy = IWAppFormDestroy
-  OnShow = IWAppFormShow
   Background.Fixed = False
   HandleTabs = False
   LeftToRight = True
@@ -191,7 +190,7 @@ object FrIWUnidad_Medida: TFrIWUnidad_Medida
           FriendlyName = 'DESCRIPCION'
         end
         object ID_ACTIVO: TIWDBCheckBox
-          Left = 10
+          Left = 3
           Top = 132
           Width = 121
           Height = 21
@@ -268,7 +267,7 @@ object FrIWUnidad_Medida: TFrIWUnidad_Medida
     WindowTop = 200
     Autosize = False
     CloseOnClick = True
-    Left = 53
+    Left = 61
     Top = 11
   end
 end

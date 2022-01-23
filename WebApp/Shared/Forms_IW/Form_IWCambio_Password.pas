@@ -85,7 +85,7 @@ Begin
       FCNX.AUX.Active := False;
       FCNX.AUX.SQL.Clear;
       FCNX.AUX.SQL.Add(' SELECT * FROM ' + Info_TablaGet(Id_TBL_Usuario).Name + ' ' + FCNX.No_Lock);
-      FCNX.AUX.SQL.Add(' WHERE ID_SISTEMA = ' + QuotedStr('S'));
+      FCNX.AUX.SQL.Add(' WHERE ID_ACTIVO = ' + QuotedStr('S'));
       FCNX.AUX.SQL.Add(' AND ' + FCNX.Trim_Sentence('CODIGO_USUARIO') + ' = ' + QuotedStr(Trim(UserSession.USER_CODE)));
       FCNX.AUX.Active := True;
       If FCNX.AUX.Active And (FCNX.AUX.RecordCount > 0) Then
@@ -118,7 +118,7 @@ Begin
       FCNX.AUX.Active := False;
       FCNX.AUX.SQL.Clear;
       FCNX.AUX.SQL.Add(' SELECT * FROM ' + Info_TablaGet(Id_TBL_Usuario).Name + FCNX.No_Lock);
-      FCNX.AUX.SQL.Add(' WHERE ID_SISTEMA = ' + QuotedStr('S'));
+      FCNX.AUX.SQL.Add(' WHERE ID_ACTIVO = ' + QuotedStr('S'));
       FCNX.AUX.SQL.Add(' AND ' + FCNX.Trim_Sentence('CODIGO_USUARIO') + ' = ' + QuotedStr(Trim(UserSession.USER_CODE)));
       FCNX.AUX.Active := True;
       If FCNX.AUX.Active And (FCNX.AUX.RecordCount > 0) Then

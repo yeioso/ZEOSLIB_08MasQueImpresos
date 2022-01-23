@@ -9,7 +9,7 @@ uses
   IWBaseHTMLControl, IWControl, IWCompLabel, IWCompGrids,
   UtConexion, Vcl.Forms, IWVCLBaseContainer, IWContainer,
   IWHTMLContainer, IWHTML40Container, IWRegion, IWCompListbox, UtGrid_JQ,
-  IWBaseComponent, IWBaseHTMLComponent, IWBaseHTML40Component, Form_IWFrame;
+  IWBaseComponent, IWBaseHTMLComponent, IWBaseHTML40Component;
 
 type
   TFrIWExplosion_Material = class(TIWAppForm)
@@ -41,14 +41,13 @@ type
     procedure BTNCANCELAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure DATOAsyncKeyUp(Sender: TObject; EventParams: TStringList);
     procedure BTNCODIGO_PRODUCTOAsyncClick(Sender: TObject; EventParams: TStringList);
-    procedure IWAppFormShow(Sender: TObject);
-    procedure IWAppFormDestroy(Sender: TObject);
   private
     FCNX : TConexion;
     FNOMBRE : String;
     FNUMERO : Integer;
-    FFRAME : TFrIWFrame;
+    FPROYECTO : String;
     FQRDETALLE : TMANAGER_DATA;
+    FREFERENCIA : String;
     FGRID_MAESTRO : TGRID_JQ;
     FEJECUTANDO_ONCHANGE : Boolean;
     FCODIGO_DOCUMENTO : String;
@@ -65,7 +64,7 @@ type
     procedure DsStateChangeDetalle(pSender: TObject);
     Function AbrirDetalle(Const pDato : String  = '') : Boolean;
   public
-    Constructor Create(AOwner: TComponent; Const pCodigo_Documento, pNombre : String; Const pNumero : Integer);
+    Constructor Create(AOwner: TComponent; Const pCodigo_Documento, pNombre, pReferencia, pProyecto : String; Const pNumero : Integer);
     Destructor Destroy; override;
   end;
 
@@ -92,7 +91,9 @@ Begin
     If FQRDETALLE.Mode_Edition Then
     Begin
       FQRDETALLE.QR.FieldByName('CODIGO_PRODUCTO').AsString := EventParams.Values ['CODIGO_PRODUCTO'];
-      FQRDETALLE.QR.FieldByName('NOMBRE').AsString := 'EXPLOSION DE ' + FQRDETALLE.QR.FieldByName('CODIGO_PRODUCTO').AsString;
+      FQRDETALLE.QR.FieldByName('NOMBRE').AsString := 'OP: ' + FormatFloat('###,###,###', FNUMERO)+ ', '+
+                                                      'REFERENCIA: ' + FREFERENCIA  +', '+
+                                                      'PROYECTO: ' + FPROYECTO;
     End;
   Except
    On E: Exception Do
@@ -300,22 +301,21 @@ Begin
 End;
 
 
-constructor TFrIWExplosion_Material.Create(AOwner: TComponent; Const pCodigo_Documento, pNombre : String; Const pNumero : Integer);
+constructor TFrIWExplosion_Material.Create(AOwner: TComponent; Const pCodigo_Documento, pNombre, pReferencia, pProyecto : String; Const pNumero : Integer);
 begin
   FCNX := UserSession.CNX;
   Inherited Create(AOwner);
   Try
     Randomize;
     Self.Name := 'TFrIWExplosion_Material' + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000));
-    FNOMBRE := pNombre;
-    LBINFO.Caption := pNombre;
+    FNUMERO := pNumero;
+    FNOMBRE := AnsiUpperCase(pNombre);
+    FPROYECTO := pProyecto;
+    FREFERENCIA := pReferencia;
+    LBINFO.Caption := FNOMBRE;
     Self.Title := Info_TablaGet(Id_TBL_Explosion_Material).Caption + ', ' + FNOMBRE + ', ' + lbNombre_Producto.Caption;
-    FFRAME := TFrIWFrame.Create(Self);
-    FFRAME.Parent := Self;
     WebApplication.RegisterCallBack(Self.Name + '.Confirmacion_Guardar'    , Confirmacion_Guardar    );
     WebApplication.RegisterCallBack(Self.Name + '.Confirmacion_Eliminacion', Confirmacion_Eliminacion);
-
-    FNUMERO := pNumero;
     FCODIGO_DOCUMENTO := pCodigo_Documento;
 
     FGRID_MAESTRO        := TGRID_JQ.Create(Self);
@@ -344,7 +344,7 @@ begin
     FGRID_MAESTRO.SetGrid(FQRDETALLE.DS, ['CODIGO_PRODUCTO', 'NOMBRE'     , 'FECHA_PROGRAMADA'],
                                          ['Producto'       , 'Nombre'     , 'Fecha Programada'],
                                          ['S'              , 'N'          , 'N'               ],
-                                         [100              , 150          , 100               ],
+                                         [150              , 450          , 100               ],
                                          [taRightJustify   , taLeftJustify, taLeftJustify     ]);
     AbrirDetalle;
 
@@ -560,23 +560,16 @@ Begin
   DATO.Visible             := Not FQRDETALLE.Mode_Edition;
 
   BTNCODIGO_PRODUCTO.Visible := FQRDETALLE.Mode_Insert ;
-  CODIGO_PRODUCTO.Enabled    := FQRDETALLE.Mode_Insert ;
-  FECHA_PROGRAMADA.Enabled   := FQRDETALLE.Mode_Insert ;
-  NOMBRE.Enabled             := FQRDETALLE.Mode_Edition;
-  CANTIDAD.Enabled           := FQRDETALLE.Mode_Edition;
-  ID_ACTIVO.Enabled          := FQRDETALLE.Mode_Edition;
+
+  FECHA_PROGRAMADA.Enabled  := FQRDETALLE.Mode_Insert ;
+  NOMBRE.Enabled            := FQRDETALLE.Mode_Edition;
+  CANTIDAD.Enabled          := FQRDETALLE.Mode_Edition;
+  ID_ACTIVO.Enabled         := FQRDETALLE.Mode_Edition;
+
+  FECHA_PROGRAMADA.Editable := FQRDETALLE.Mode_Insert ;
+  NOMBRE.Editable           := FQRDETALLE.Mode_Edition;
+  CANTIDAD.Editable         := FQRDETALLE.Mode_Edition;
+  ID_ACTIVO.Editable        := FQRDETALLE.Mode_Edition;
 End;
-
-procedure TFrIWExplosion_Material.IWAppFormDestroy(Sender: TObject);
-begin
-  If Assigned(FFRAME) Then
-    FreeAndNil(FFRAME);
-end;
-
-procedure TFrIWExplosion_Material.IWAppFormShow(Sender: TObject);
-begin
-  If Assigned(FFRAME) Then
-    FFRAME.Sincronizar_Informacion;
-end;
 
 end.

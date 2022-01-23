@@ -8,7 +8,6 @@ object FrIWMovto_Inventario: TFrIWMovto_Inventario
   ConnectionMode = cmAny
   OnCreate = IWAppFormCreate
   OnDestroy = IWAppFormDestroy
-  OnShow = IWAppFormShow
   Background.Fixed = False
   HandleTabs = False
   LeftToRight = True
@@ -830,7 +829,7 @@ object FrIWMovto_Inventario: TFrIWMovto_Inventario
     end
   end
   object IWModalWindow1: TIWModalWindow
-    Left = 56
+    Left = 64
     Top = 8
   end
 end

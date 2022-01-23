@@ -11,7 +11,7 @@ uses
   IWBaseHTML40Component, UtConexion, Data.DB, IWCompGrids, IWDBStdCtrls,
   IWCompEdit, IWCompCheckbox, IWCompMemo, IWDBExtCtrls, IWCompButton,
   IWCompListbox, IWCompGradButton, UtGrid_JQ, UtNavegador_ASE,
-  UtilsIW.Busqueda, Form_IWFrame;
+  UtilsIW.Busqueda;
 
 type
   TFrIWProducto = class(TIWAppForm)
@@ -22,12 +22,16 @@ type
     PAG_00: TIWTabPage;
     PAG_01: TIWTabPage;
     RNAVEGADOR: TIWRegion;
-    IWLabel1: TIWLabel;
-    IWLabel8: TIWLabel;
     DATO: TIWEdit;
-    IWLabel2: TIWLabel;
     IWRegion_Navegador: TIWRegion;
     IWModalWindow1: TIWModalWindow;
+    IWLabel7: TIWLabel;
+    BTNCODIGO_AREA: TIWImage;
+    CODIGO_AREA: TIWDBLabel;
+    BTNCREARAREA: TIWImage;
+    IWLabel1: TIWLabel;
+    IWLabel8: TIWLabel;
+    IWLabel2: TIWLabel;
     CODIGO_PRODUCTO: TIWDBEdit;
     NOMBRE: TIWDBEdit;
     DESCRIPCION: TIWDBMemo;
@@ -36,10 +40,6 @@ type
     IWLabel4: TIWLabel;
     IWLabel5: TIWLabel;
     CODIGO_UNIDAD_MEDIDA: TIWDBLabel;
-    IWLabel7: TIWLabel;
-    BTNCODIGO_AREA: TIWImage;
-    CODIGO_AREA: TIWDBLabel;
-    BTNCREARAREA: TIWImage;
     lbNombre_Area: TIWLabel;
     BTNCODIGO_UNIDAD_MEDIDA: TIWImage;
     BTNCREARUNIDAD_MEDIDA: TIWImage;
@@ -57,15 +57,13 @@ type
     procedure BTNCREARAREAAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNCODIGO_UNIDAD_MEDIDAAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNCREARUNIDAD_MEDIDAAsyncClick(Sender: TObject;  EventParams: TStringList);
-    procedure IWAppFormShow(Sender: TObject);
   private
     FCNX : TConexion;
     FINFO : String;
-    FFRAME : TFrIWFrame;
     FQRMAESTRO : TMANAGER_DATA;
     FNAVEGADOR : TNavegador_ASE;
     FGRID_MAESTRO : TGRID_JQ;
-
+    Procedure Asignar_Codigo_Producto;
     Procedure Resultado_Area(Sender: TObject; EventParams: TStringList);
     Procedure Resultado_Unidad_Medida(Sender: TObject; EventParams: TStringList);
     procedure Resultado_BasicData(Sender: TObject; EventParams: TStringList);
@@ -108,12 +106,45 @@ Uses
   UtilsIW.ManagerLog,
   Report.Saldo_Inventario;
 
+Procedure TFrIWProducto.Asignar_Codigo_Producto;
+Var
+  lI : Integer;
+  lCode : string;
+  lPrefix : string;
+  lNumber : string;
+  lAvailable : Boolean;
+Begin
+  Try
+    If Not Vacio(lbNombre_Area.Caption) Then
+    Begin
+      lI := 0;
+      lCode := '';
+      lPrefix := Trim(Copy(lbNombre_Area.Caption, 1, 12));
+      lAvailable := False;
+      While (lI <= 9999999) And (Not lAvailable) Do
+      Begin
+        Inc(lI);
+        lNumber := Justificar(IntToStr(lI), '0', 7);
+        lCode := lPrefix + '-' + lNumber;
+        lCode := Justificar(lCode, '0', FQRMAESTRO.QR.FieldByName('CODIGO_PRODUCTO').Size);
+        lAvailable := Not FCNX.Record_Exist(Info_TablaGet(Id_TBL_Producto).Name, ['CODIGO_PRODUCTO'], [lCode]);
+      End;
+      If Not Vacio(lCode) And lAvailable Then
+        FQRMAESTRO.QR.FieldByName('CODIGO_PRODUCTO').AsString := lCode;
+    End;
+  Except
+   On E: Exception Do
+     Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWProducto', 'TFrIWProducto.Asignar_Codigo_Producto', E.Message);
+  End;
+End;
+
 Procedure TFrIWProducto.Resultado_Area(Sender: TObject; EventParams: TStringList);
 Begin
   Try
     If FQRMAESTRO.Mode_Edition Then
     Begin
       FQRMAESTRO.QR.FieldByName('CODIGO_AREA').AsString := EventParams.Values ['CODIGO_AREA' ];
+      Asignar_Codigo_Producto;
     End;
   Except
    On E: Exception Do
@@ -152,6 +183,8 @@ Begin
            FQRMAESTRO.QR.FieldByName(lBD.DESTINY).AsString := lBD.VALUECODE;
          IWModalWindow1.ContentElement := Nil;
          lBD.Free;
+         If lBD.FIELDCODE <> 'CODIGO_AREA' Then
+           Asignar_Codigo_Producto;
        End;
     End;
   Except
@@ -247,7 +280,9 @@ Begin
     lMensaje := '';
     FQRMAESTRO.LAST_ERROR := '';
     NOMBRE.BGColor := UserSession.COLOR_OK;
+    CODIGO_AREA.BGColor := UserSession.COLOR_OK;
     CODIGO_PRODUCTO.BGColor := UserSession.COLOR_OK;
+    CODIGO_UNIDAD_MEDIDA.BGColor := UserSession.COLOR_OK;
 
     If FQRMAESTRO.Mode_Insert And (Not Vacio(FQRMAESTRO.QR.FieldByName('CODIGO_PRODUCTO').AsString)) Then
     Begin
@@ -267,6 +302,18 @@ Begin
       NOMBRE.BGColor := UserSession.COLOR_ERROR;
     End;
 
+    If FQRMAESTRO.Mode_Edition And Vacio(FQRMAESTRO.QR.FieldByName('CODIGO_AREA').AsString) Then
+    Begin
+      lMensaje := lMensaje + IfThen(Not Vacio(lMensaje), ', ') + 'Area invalida';
+      CODIGO_AREA.BGColor := UserSession.COLOR_ERROR;
+    End;
+
+    If FQRMAESTRO.Mode_Edition And Vacio(FQRMAESTRO.QR.FieldByName('CODIGO_UNIDAD_MEDIDA').AsString) Then
+    Begin
+      lMensaje := lMensaje + IfThen(Not Vacio(lMensaje), ', ') + 'Unidad de medida invalida';
+      CODIGO_UNIDAD_MEDIDA.BGColor := UserSession.COLOR_ERROR;
+    End;
+
     FQRMAESTRO.ERROR := IfThen(Vacio(lMensaje), 0, -1);
     If FQRMAESTRO.ERROR <> 0 Then
     Begin
@@ -281,17 +328,26 @@ End;
 
 Procedure TFrIWProducto.Estado_Controles;
 Begin
-  CODIGO_PRODUCTO.Enabled         := FQRMAESTRO.Mode_Insert  And Documento_Activo;
-  NOMBRE.Enabled                  := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  CODIGO_PRODUCTO.Enabled  := FQRMAESTRO.Mode_Insert  And Documento_Activo;
+  NOMBRE.Enabled           := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  VALOR_UNITARIO.Enabled   := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  STOCK_MINIMO.Enabled     := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  STOCK_MAXIMO.Enabled     := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  ID_ACTIVO.Enabled        := FQRMAESTRO.Mode_Edition And Documento_Activo;
+
+  CODIGO_PRODUCTO.Editable := FQRMAESTRO.Mode_Insert  And Documento_Activo;
+  NOMBRE.Editable          := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  VALOR_UNITARIO.Editable  := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  STOCK_MINIMO.Editable    := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  STOCK_MAXIMO.Editable    := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  ID_ACTIVO.Editable       := FQRMAESTRO.Mode_Edition And Documento_Activo;
+
   DESCRIPCION.Editable            := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  BTNCODIGO_AREA.Visible          := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  BTNCODIGO_UNIDAD_MEDIDA.Visible := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  VALOR_UNITARIO.Enabled          := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  STOCK_MINIMO.Enabled            := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  STOCK_MAXIMO.Enabled            := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  ID_ACTIVO.Visible               := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  BTNCREARAREA.Visible            := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  BTNCREARUNIDAD_MEDIDA.Visible   := FQRMAESTRO.Mode_Edition And Documento_Activo;
+
+  BTNCREARAREA.Visible            := FQRMAESTRO.Mode_Insert And Documento_Activo;
+  BTNCREARUNIDAD_MEDIDA.Visible   := FQRMAESTRO.Mode_Insert And Documento_Activo;
+  BTNCODIGO_AREA.Visible          := FQRMAESTRO.Mode_Insert And Documento_Activo;
+  BTNCODIGO_UNIDAD_MEDIDA.Visible := FQRMAESTRO.Mode_Insert And Documento_Activo;
   DATO.Visible                    := (Not FQRMAESTRO.Mode_Edition);
   PAG_00.Visible                  := (Not FQRMAESTRO.Mode_Edition);
   PAG_01.Visible                  := True;
@@ -400,8 +456,6 @@ begin
   Self.Name := 'TFrIWProducto' + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000) );
   Self.Title := Info_TablaGet(Id_TBL_Producto).Caption;
   FCNX := UserSession.CNX;
-  FFRAME := TFrIWFrame.Create(Self);
-  FFRAME.Parent := Self;
   Try
     FGRID_MAESTRO        := TGRID_JQ.Create(PAG_00);
     FGRID_MAESTRO.Parent := PAG_00;
@@ -472,19 +526,10 @@ begin
     If Assigned(FGRID_MAESTRO) Then
       FreeAndNil(FGRID_MAESTRO);
 
-    If Assigned(FFRAME) Then
-      FreeAndNil(FFRAME);
-
   Except
     On E: Exception Do
       Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWProducto', 'TFrIWProducto.IWAppFormDestroy', E.Message);
   End;
-end;
-
-procedure TFrIWProducto.IWAppFormShow(Sender: TObject);
-begin
-  If Assigned(FFRAME) Then
-    FFRAME.Sincronizar_Informacion;
 end;
 
 procedure TFrIWProducto.NewRecordMaster(pSender: TObject);

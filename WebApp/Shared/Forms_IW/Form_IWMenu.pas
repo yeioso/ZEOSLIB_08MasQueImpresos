@@ -9,7 +9,7 @@ uses
   IWBaseControl, IWBaseHTMLControl, IWControl, IWCompExtCtrls, IWCompButton,
   IWCompLabel, IWBaseComponent, IWBaseHTMLComponent, IWBaseHTML40Component,
   IWCompListbox, IWHTMLControls, UtType, IWCompProgressIndicator,
-  IWjQPageControl, Form_IWFrame;
+  IWjQPageControl;
 
 Type
 
@@ -70,9 +70,7 @@ Type
     procedure BTNEJECUTAR_UTILIDADESAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNEJECUTAR_SALIRAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNAYUDAAsyncClick(Sender: TObject; EventParams: TStringList);
-    procedure IWAppFormShow(Sender: TObject);
   Private
-    FFRAME : TFrIWFrame;
     Procedure Validar_Carga_Opciones(pOptions : TIWRadioGroup; Const pId : Integer);
     Procedure Cargar_Opciones(pOptions : TIWRadioGroup);
     Procedure Ejecutar_Item(pOption : TIWRadioGroup);
@@ -385,9 +383,6 @@ begin
   Randomize;
   Self.Name := 'TFrIWMenu' + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000));
   Self.Title := 'Menu Principal';
-  FFRAME := TFrIWFrame.Create(Self);
-  FFRAME.Parent := Self;
-
   WebApplication.RegisterCallBack(Self.Name + '.Ejecutar_Salida', Ejecutar_Salida);
   Actualizar_Info;
   Cargar_Opciones(RG_MAESTROS      );
@@ -400,21 +395,11 @@ begin
   Cargar_Opciones(RG_UTILIDADES    );
   Cargar_Opciones(RG_SALIR         );
   SetNameCompontent(Self);
-  If Assigned(FFRAME) Then
-    FFRAME.Sincronizar_Informacion;
 End;
 
 procedure TFrIWMenu.IWAppFormDestroy(Sender: TObject);
 begin
   WebApplication.UnregisterCallBack(Self.Name + '.Ejecutar_Salida');
-  If Assigned(FFRAME) Then
-    FreeAndNil(FFRAME);
-end;
-
-procedure TFrIWMenu.IWAppFormShow(Sender: TObject);
-begin
-  If Assigned(FFRAME) Then
-    FFRAME.Sincronizar_Informacion;
 end;
 
 end.

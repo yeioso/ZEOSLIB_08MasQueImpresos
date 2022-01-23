@@ -8,7 +8,6 @@ object FrIWUsuario_Enc: TFrIWUsuario_Enc
   ConnectionMode = cmAny
   OnCreate = IWAppFormCreate
   OnDestroy = IWAppFormDestroy
-  OnShow = IWAppFormShow
   Background.Fixed = False
   HandleTabs = False
   LeftToRight = True
@@ -681,7 +680,7 @@ object FrIWUsuario_Enc: TFrIWUsuario_Enc
     end
   end
   object IWModalWindow1: TIWModalWindow
-    Left = 640
+    Left = 320
     Top = 16
   end
 end

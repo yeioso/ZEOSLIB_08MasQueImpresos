@@ -10,7 +10,7 @@ uses
   IWCompTabControl, IWBaseComponent, IWBaseHTMLComponent, IWBaseHTML40Component,
   UtConexion, Data.DB, IWCompGrids, IWDBStdCtrls, IWCompEdit,
   IWCompCheckbox, IWCompMemo, IWDBExtCtrls, IWCompButton, IWCompListbox,
-  UtGrid_JQ, UtNavegador_ASE, UtilsIW.Busqueda, Form_IWFrame;
+  UtGrid_JQ, UtNavegador_ASE, UtilsIW.Busqueda;
 
 type
   TFrIWOrden_Produccion = class(TIWAppForm)
@@ -64,11 +64,9 @@ type
     procedure BTNCREARTERCEROAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNCREARPRODUCTOAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNEXPLOSION_MATERIALAsyncClick(Sender: TObject; EventParams: TStringList);
-    procedure IWAppFormShow(Sender: TObject);
   private
     FCNX : TConexion;
     FINFO : String;
-    FFRAME : TFrIWFrame;
     FCODIGO_DOCUMENTO : String;
 
     FQRMAESTRO : TMANAGER_DATA;
@@ -271,6 +269,8 @@ Begin
     NOMBRE.BGColor := UserSession.COLOR_OK;
     CODIGO_PROYECTO.BGColor := UserSession.COLOR_OK;
     CODIGO_TERCERO.BGColor := UserSession.COLOR_OK;
+    CANTIDAD.BGColor := UserSession.COLOR_OK;
+    DOCUMENTO_REFERENCIA.BGColor := UserSession.COLOR_OK;
 
     If FQRMAESTRO.DS.State In [dsInsert] Then
     Begin
@@ -297,6 +297,12 @@ Begin
       NOMBRE.BGColor := UserSession.COLOR_ERROR;
     End;
 
+    If FQRMAESTRO.Mode_Edition And Vacio(FQRMAESTRO.QR.FieldByName('DOCUMENTO_REFERENCIA').AsString) Then
+    Begin
+      lMensaje := lMensaje + IfThen(Not Vacio(lMensaje), ', ') + 'Documento referencia invalido';
+      DOCUMENTO_REFERENCIA.BGColor := UserSession.COLOR_ERROR;
+    End;
+
     If FQRMAESTRO.Mode_Edition And Vacio(FQRMAESTRO.QR.FieldByName('CODIGO_PROYECTO').AsString) Then
     Begin
       lMensaje := lMensaje + IfThen(Not Vacio(lMensaje), ', ') + 'Proyecto invalido';
@@ -307,6 +313,13 @@ Begin
     Begin
       lMensaje := lMensaje + IfThen(Not Vacio(lMensaje), ', ') + 'Tercero invalido';
       CODIGO_TERCERO.BGColor := UserSession.COLOR_ERROR;
+    End;
+
+
+    If FQRMAESTRO.Mode_Edition And (FQRMAESTRO.QR.FieldByName('CANTIDAD').AsFloat <= 0) Then
+    Begin
+      lMensaje := lMensaje + IfThen(Not Vacio(lMensaje), ', ') + 'Cantidad invalida';
+      CANTIDAD.BGColor := UserSession.COLOR_ERROR;
     End;
 
     FQRMAESTRO.ERROR := IfThen(Vacio(lMensaje), 0, -1);
@@ -324,18 +337,27 @@ End;
 Procedure TFrIWOrden_Produccion.Estado_Controles;
 Begin
   NUMERO.Enabled                := False;
-  BTNCODIGO_PROYECTO.Visible    := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  BTNCODIGO_TERCERO.Visible     := FQRMAESTRO.Mode_Edition And Documento_Activo;
   NOMBRE.Enabled                := FQRMAESTRO.Mode_Edition And Documento_Activo;
   DOCUMENTO_REFERENCIA.Enabled  := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  DESCRIPCION.Editable          := FQRMAESTRO.Mode_Edition And Documento_Activo;
   FECHA_INICIAL.Enabled         := FQRMAESTRO.Mode_Edition And Documento_Activo;
   FECHA_FINAL.Enabled           := FQRMAESTRO.Mode_Edition And Documento_Activo;
   CANTIDAD.Enabled              := FQRMAESTRO.Mode_Edition And Documento_Activo;
   ID_ACTIVO.Enabled             := FQRMAESTRO.Mode_Edition And Documento_Activo;
+
+  NOMBRE.Editable               := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  DOCUMENTO_REFERENCIA.Editable := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  FECHA_INICIAL.Editable        := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  FECHA_FINAL.Editable          := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  CANTIDAD.Editable             := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  ID_ACTIVO.Editable            := FQRMAESTRO.Mode_Edition And Documento_Activo;
+
+  DESCRIPCION.Editable          := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  BTNCODIGO_PROYECTO.Visible    := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  BTNCODIGO_TERCERO.Visible     := FQRMAESTRO.Mode_Edition And Documento_Activo;
   BTNCREARTERCERO.Visible       := FQRMAESTRO.Mode_Edition And Documento_Activo;
   BTNCREARPROYECTO.Visible      := FQRMAESTRO.Mode_Edition And Documento_Activo;
   BTNEXPLOSION_MATERIAL.Visible := FQRMAESTRO.ACTIVE And (FQRMAESTRO.qr.RecordCount > 0) And (Not FQRMAESTRO.Mode_Edition);
+
   DATO.Visible                  := (Not FQRMAESTRO.Mode_Edition);
   PAG_00.Visible                := (Not FQRMAESTRO.Mode_Edition);
   PAG_01.Visible                := True;
@@ -428,13 +450,13 @@ Begin
     Begin
       FQRMAESTRO.WHERE := FQRMAESTRO.WHERE + ' AND ' + #13;
       FQRMAESTRO.WHERE := FQRMAESTRO.WHERE + ' ( ' + #13;
-      FQRMAESTRO.WHERE := FQRMAESTRO.WHERE + '    NOMBRE LIKE '          + QuotedStr('%' + Trim(pDato) + '%') + #13;
-      FQRMAESTRO.WHERE := FQRMAESTRO.WHERE + ' OR CODIGO_TERCERO LIKE '  + QuotedStr('%' + Trim(pDato) + '%') + #13;
-      FQRMAESTRO.WHERE := FQRMAESTRO.WHERE + ' OR CODIGO_PRODUCTO LIKE ' + QuotedStr('%' + Trim(pDato) + '%') + #13;
+      FQRMAESTRO.WHERE := FQRMAESTRO.WHERE + '    NUMERO LIKE '          + QuotedStr('%' + Trim(pDato) + '%') + #13;
+      FQRMAESTRO.WHERE := FQRMAESTRO.WHERE + ' OR NOMBRE LIKE '          + QuotedStr('%' + Trim(pDato) + '%') + #13;
+      FQRMAESTRO.WHERE := FQRMAESTRO.WHERE + ' OR CODIGO_PROYECTO LIKE ' + QuotedStr('%' + Trim(pDato) + '%') + #13;
       FQRMAESTRO.WHERE := FQRMAESTRO.WHERE + ' OR CODIGO_USUARIO LIKE '  + QuotedStr('%' + Trim(pDato) + '%') + #13;
       FQRMAESTRO.WHERE := FQRMAESTRO.WHERE + ' OR FECHA_REGISTRO LIKE '  + QuotedStr('%' + Trim(pDato) + '%') + #13;
       FQRMAESTRO.WHERE := FQRMAESTRO.WHERE + ' OR HORA_REGISTRO LIKE '   + QuotedStr('%' + Trim(pDato) + '%') + #13;
-      FQRMAESTRO.WHERE := FQRMAESTRO.WHERE + ' OR CODIGO_PROYECTO LIKE '     + QuotedStr('%' + Trim(pDato) + '%') + #13;
+      FQRMAESTRO.WHERE := FQRMAESTRO.WHERE + ' OR CODIGO_PROYECTO LIKE ' + QuotedStr('%' + Trim(pDato) + '%') + #13;
       FQRMAESTRO.WHERE := FQRMAESTRO.WHERE + ' ) ';
     End;
     FQRMAESTRO.ORDER := ' ORDER BY NUMERO DESC ';
@@ -476,8 +498,6 @@ begin
   Self.Name := 'TFrIWOrden_Produccion' + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000));
   FCNX := UserSession.CNX;
   Self.Title := Info_TablaGet(Id_TBL_Orden_Produccion).Caption + ', ' + lbInfo.Caption;
-  FFRAME := TFrIWFrame.Create(Self);
-  FFRAME.Parent := Self;
   FCODIGO_ACTUAL := '';
   FINFO := UserSession.FULL_INFO + Info_TablaGet(Id_TBL_Orden_Produccion).Caption;
   Try
@@ -546,19 +566,10 @@ begin
     If Assigned(FNAVEGADOR) Then
       FreeAndNil(FNAVEGADOR);
 
-    If Assigned(FFRAME) Then
-      FreeAndNil(FFRAME);
-
   Except
     On E: Exception Do
       Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWOrden_Produccion', 'TFrIWOrden_Produccion.IWAppFormDestroy', E.Message);
   End;
-end;
-
-procedure TFrIWOrden_Produccion.IWAppFormShow(Sender: TObject);
-begin
-  If Assigned(FFRAME) Then
-    FFRAME.Sincronizar_Informacion;
 end;
 
 procedure TFrIWOrden_Produccion.NewRecordMaster(pSender: TObject);
@@ -671,7 +682,7 @@ end;
 
 procedure TFrIWOrden_Produccion.BTNEXPLOSION_MATERIALAsyncClick(Sender: TObject; EventParams: TStringList);
 begin
-  UserSession.ShowForm_Explosion_Material(FCODIGO_DOCUMENTO, lbInfo.Caption, SetToInt(NUMERO.Text));
+  UserSession.ShowForm_Explosion_Material(FCODIGO_DOCUMENTO, lbInfo.Caption, DOCUMENTO_REFERENCIA.Text, lbNombre_Proyecto.Caption, SetToInt(NUMERO.Text));
 end;
 
 end.

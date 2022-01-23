@@ -8,7 +8,6 @@ object FrIWProducto: TFrIWProducto
   ConnectionMode = cmAny
   OnCreate = IWAppFormCreate
   OnDestroy = IWAppFormDestroy
-  OnShow = IWAppFormShow
   Background.Fixed = False
   HandleTabs = False
   LeftToRight = True
@@ -66,7 +65,7 @@ object FrIWProducto: TFrIWProducto
       InactiveTabFont.Style = []
       ActiveTabColor = clWebDARKGRAY
       InactiveTabColor = clWebLIGHTGRAY
-      ActivePage = 0
+      ActivePage = 1
       Align = alClient
       BorderOptions.NumericWidth = 0
       BorderOptions.Style = cbsNone
@@ -83,6 +82,17 @@ object FrIWProducto: TFrIWProducto
       DesignSize = (
         1339
         533)
+      object PAG_00: TIWTabPage
+        Left = 0
+        Top = 30
+        Width = 1339
+        Height = 503
+        RenderInvisibleControls = True
+        Title = '[          Registros          ]'
+        BorderOptions.NumericWidth = 0
+        BorderOptions.Style = cbsNone
+        Color = clWebWHITE
+      end
       object PAG_01: TIWTabPage
         Left = 0
         Top = 30
@@ -94,182 +104,9 @@ object FrIWProducto: TFrIWProducto
         BorderOptions.NumericWidth = 0
         BorderOptions.Style = cbsNone
         Color = clWebWHITE
-        object IWLabel1: TIWLabel
-          Left = 10
-          Top = 11
-          Width = 42
-          Height = 16
-          RenderSize = False
-          StyleRenderOptions.RenderSize = False
-          Font.Color = clNone
-          Font.Size = 10
-          Font.Style = []
-          NoWrap = True
-          HasTabOrder = False
-          FriendlyName = 'IWLabel1'
-          Caption = 'C'#243'digo'
-        end
-        object IWLabel8: TIWLabel
-          Left = 10
-          Top = 34
-          Width = 49
-          Height = 16
-          RenderSize = False
-          StyleRenderOptions.RenderSize = False
-          Font.Color = clNone
-          Font.Size = 10
-          Font.Style = []
-          NoWrap = True
-          HasTabOrder = False
-          FriendlyName = 'IWLabel1'
-          Caption = 'Nombre'
-        end
-        object IWLabel2: TIWLabel
-          Left = 10
-          Top = 91
-          Width = 71
-          Height = 16
-          RenderSize = False
-          StyleRenderOptions.RenderSize = False
-          Font.Color = clNone
-          Font.Size = 10
-          Font.Style = []
-          NoWrap = True
-          HasTabOrder = False
-          FriendlyName = 'IWLabel1'
-          Caption = 'Descripci'#243'n'
-        end
-        object CODIGO_PRODUCTO: TIWDBEdit
-          Left = 145
-          Top = 4
-          Width = 148
-          Height = 24
-          StyleRenderOptions.RenderBorder = False
-          Alignment = taRightJustify
-          Font.Color = clNone
-          Font.Size = 10
-          Font.Style = []
-          FriendlyName = 'CODIGO_PRODUCTO'
-          SubmitOnAsyncEvent = True
-          AutoEditable = False
-          DataField = 'CODIGO_PRODUCTO'
-          PasswordPrompt = False
-        end
-        object NOMBRE: TIWDBEdit
-          Left = 145
-          Top = 31
-          Width = 447
-          Height = 24
-          StyleRenderOptions.RenderBorder = False
-          Font.Color = clNone
-          Font.Size = 10
-          Font.Style = []
-          FriendlyName = 'NOMBRE'
-          SubmitOnAsyncEvent = True
-          AutoEditable = False
-          DataField = 'NOMBRE'
-          PasswordPrompt = False
-        end
-        object DESCRIPCION: TIWDBMemo
-          Left = 145
-          Top = 58
-          Width = 447
-          Height = 65
-          StyleRenderOptions.RenderBorder = False
-          BGColor = clNone
-          Editable = True
-          Font.Color = clNone
-          Font.Size = 10
-          Font.Style = []
-          InvisibleBorder = False
-          HorizScrollBar = False
-          VertScrollBar = True
-          Required = False
-          SubmitOnAsyncEvent = True
-          ResizeDirection = rdNone
-          AutoEditable = False
-          DataField = 'DESCRIPCION'
-          FriendlyName = 'DESCRIPCION'
-        end
-        object IWLabel11: TIWLabel
-          Left = 10
-          Top = 208
-          Width = 83
-          Height = 16
-          RenderSize = False
-          StyleRenderOptions.RenderSize = False
-          Font.Color = clNone
-          Font.Size = 10
-          Font.Style = []
-          NoWrap = True
-          HasTabOrder = False
-          FriendlyName = 'IWLabel11'
-          Caption = 'Stock Minimo'
-        end
-        object IWLabel3: TIWLabel
-          Left = 10
-          Top = 232
-          Width = 86
-          Height = 16
-          RenderSize = False
-          StyleRenderOptions.RenderSize = False
-          Font.Color = clNone
-          Font.Size = 10
-          Font.Style = []
-          NoWrap = True
-          HasTabOrder = False
-          FriendlyName = 'IWLabel3'
-          Caption = 'Stock Maximo'
-        end
-        object IWLabel4: TIWLabel
-          Left = 10
-          Top = 183
-          Width = 85
-          Height = 16
-          RenderSize = False
-          StyleRenderOptions.RenderSize = False
-          Font.Color = clNone
-          Font.Size = 10
-          Font.Style = []
-          NoWrap = True
-          HasTabOrder = False
-          FriendlyName = 'IWLabel4'
-          Caption = 'Valor Unitario'
-        end
-        object IWLabel5: TIWLabel
-          Left = 10
-          Top = 152
-          Width = 112
-          Height = 16
-          RenderSize = False
-          StyleRenderOptions.RenderSize = False
-          Font.Color = clNone
-          Font.Size = 10
-          Font.Style = []
-          NoWrap = True
-          HasTabOrder = False
-          FriendlyName = 'IWLabel4'
-          Caption = 'Unidad de Medida'
-        end
-        object CODIGO_UNIDAD_MEDIDA: TIWDBLabel
-          Left = 145
-          Top = 152
-          Width = 148
-          Height = 21
-          Alignment = taRightJustify
-          BGColor = cl3DLight
-          Font.Color = clNone
-          Font.Size = 10
-          Font.Style = []
-          NoWrap = True
-          HasTabOrder = False
-          AutoSize = False
-          DataField = 'CODIGO_UNIDAD_MEDIDA'
-          FriendlyName = 'CODIGO_UNIDAD_MEDIDA'
-        end
         object IWLabel7: TIWLabel
           Left = 10
-          Top = 131
+          Top = 12
           Width = 29
           Height = 16
           RenderSize = False
@@ -283,8 +120,8 @@ object FrIWProducto: TFrIWProducto
           Caption = 'Area'
         end
         object BTNCODIGO_AREA: TIWImage
-          Left = 117
-          Top = 127
+          Left = 301
+          Top = 8
           Width = 22
           Height = 21
           Cursor = crHandPoint
@@ -339,7 +176,7 @@ object FrIWProducto: TFrIWProducto
         end
         object CODIGO_AREA: TIWDBLabel
           Left = 143
-          Top = 127
+          Top = 8
           Width = 148
           Height = 21
           Alignment = taRightJustify
@@ -354,8 +191,8 @@ object FrIWProducto: TFrIWProducto
           FriendlyName = 'CODIGO_AREA'
         end
         object BTNCREARAREA: TIWImage
-          Left = 297
-          Top = 125
+          Left = 329
+          Top = 6
           Width = 22
           Height = 21
           Cursor = crHandPoint
@@ -444,9 +281,182 @@ object FrIWProducto: TFrIWProducto
           JpegOptions.ProgressiveEncoding = False
           JpegOptions.Smoothing = True
         end
+        object IWLabel1: TIWLabel
+          Left = 10
+          Top = 38
+          Width = 42
+          Height = 16
+          RenderSize = False
+          StyleRenderOptions.RenderSize = False
+          Font.Color = clNone
+          Font.Size = 10
+          Font.Style = []
+          NoWrap = True
+          HasTabOrder = False
+          FriendlyName = 'IWLabel1'
+          Caption = 'C'#243'digo'
+        end
+        object IWLabel8: TIWLabel
+          Left = 10
+          Top = 61
+          Width = 49
+          Height = 16
+          RenderSize = False
+          StyleRenderOptions.RenderSize = False
+          Font.Color = clNone
+          Font.Size = 10
+          Font.Style = []
+          NoWrap = True
+          HasTabOrder = False
+          FriendlyName = 'IWLabel1'
+          Caption = 'Nombre'
+        end
+        object IWLabel2: TIWLabel
+          Left = 10
+          Top = 118
+          Width = 71
+          Height = 16
+          RenderSize = False
+          StyleRenderOptions.RenderSize = False
+          Font.Color = clNone
+          Font.Size = 10
+          Font.Style = []
+          NoWrap = True
+          HasTabOrder = False
+          FriendlyName = 'IWLabel1'
+          Caption = 'Descripci'#243'n'
+        end
+        object CODIGO_PRODUCTO: TIWDBEdit
+          Left = 145
+          Top = 31
+          Width = 148
+          Height = 24
+          StyleRenderOptions.RenderBorder = False
+          Alignment = taRightJustify
+          Font.Color = clNone
+          Font.Size = 10
+          Font.Style = []
+          FriendlyName = 'CODIGO_PRODUCTO'
+          SubmitOnAsyncEvent = True
+          AutoEditable = False
+          DataField = 'CODIGO_PRODUCTO'
+          PasswordPrompt = False
+        end
+        object NOMBRE: TIWDBEdit
+          Left = 145
+          Top = 58
+          Width = 447
+          Height = 24
+          StyleRenderOptions.RenderBorder = False
+          Font.Color = clNone
+          Font.Size = 10
+          Font.Style = []
+          FriendlyName = 'NOMBRE'
+          SubmitOnAsyncEvent = True
+          AutoEditable = False
+          DataField = 'NOMBRE'
+          PasswordPrompt = False
+        end
+        object DESCRIPCION: TIWDBMemo
+          Left = 145
+          Top = 85
+          Width = 447
+          Height = 65
+          StyleRenderOptions.RenderBorder = False
+          BGColor = clNone
+          Editable = True
+          Font.Color = clNone
+          Font.Size = 10
+          Font.Style = []
+          InvisibleBorder = False
+          HorizScrollBar = False
+          VertScrollBar = True
+          Required = False
+          SubmitOnAsyncEvent = True
+          ResizeDirection = rdNone
+          AutoEditable = False
+          DataField = 'DESCRIPCION'
+          FriendlyName = 'DESCRIPCION'
+        end
+        object IWLabel11: TIWLabel
+          Left = 10
+          Top = 209
+          Width = 83
+          Height = 16
+          RenderSize = False
+          StyleRenderOptions.RenderSize = False
+          Font.Color = clNone
+          Font.Size = 10
+          Font.Style = []
+          NoWrap = True
+          HasTabOrder = False
+          FriendlyName = 'IWLabel11'
+          Caption = 'Stock Minimo'
+        end
+        object IWLabel3: TIWLabel
+          Left = 10
+          Top = 233
+          Width = 86
+          Height = 16
+          RenderSize = False
+          StyleRenderOptions.RenderSize = False
+          Font.Color = clNone
+          Font.Size = 10
+          Font.Style = []
+          NoWrap = True
+          HasTabOrder = False
+          FriendlyName = 'IWLabel3'
+          Caption = 'Stock Maximo'
+        end
+        object IWLabel4: TIWLabel
+          Left = 10
+          Top = 184
+          Width = 85
+          Height = 16
+          RenderSize = False
+          StyleRenderOptions.RenderSize = False
+          Font.Color = clNone
+          Font.Size = 10
+          Font.Style = []
+          NoWrap = True
+          HasTabOrder = False
+          FriendlyName = 'IWLabel4'
+          Caption = 'Valor Unitario'
+        end
+        object IWLabel5: TIWLabel
+          Left = 10
+          Top = 153
+          Width = 112
+          Height = 16
+          RenderSize = False
+          StyleRenderOptions.RenderSize = False
+          Font.Color = clNone
+          Font.Size = 10
+          Font.Style = []
+          NoWrap = True
+          HasTabOrder = False
+          FriendlyName = 'IWLabel4'
+          Caption = 'Unidad de Medida'
+        end
+        object CODIGO_UNIDAD_MEDIDA: TIWDBLabel
+          Left = 145
+          Top = 153
+          Width = 148
+          Height = 21
+          Alignment = taRightJustify
+          BGColor = cl3DLight
+          Font.Color = clNone
+          Font.Size = 10
+          Font.Style = []
+          NoWrap = True
+          HasTabOrder = False
+          AutoSize = False
+          DataField = 'CODIGO_UNIDAD_MEDIDA'
+          FriendlyName = 'CODIGO_UNIDAD_MEDIDA'
+        end
         object lbNombre_Area: TIWLabel
           Left = 323
-          Top = 130
+          Top = 35
           Width = 110
           Height = 16
           RenderSize = False
@@ -459,7 +469,7 @@ object FrIWProducto: TFrIWProducto
           Caption = 'lbNombre_Area'
         end
         object BTNCODIGO_UNIDAD_MEDIDA: TIWImage
-          Left = 117
+          Left = 300
           Top = 151
           Width = 22
           Height = 21
@@ -514,8 +524,8 @@ object FrIWProducto: TFrIWProducto
           JpegOptions.Smoothing = True
         end
         object BTNCREARUNIDAD_MEDIDA: TIWImage
-          Left = 297
-          Top = 149
+          Left = 329
+          Top = 150
           Width = 22
           Height = 21
           Cursor = crHandPoint
@@ -606,7 +616,7 @@ object FrIWProducto: TFrIWProducto
         end
         object lbNombre_Unidad_Medida: TIWLabel
           Left = 323
-          Top = 154
+          Top = 176
           Width = 181
           Height = 16
           RenderSize = False
@@ -620,7 +630,7 @@ object FrIWProducto: TFrIWProducto
         end
         object VALOR_UNITARIO: TIWDBEdit
           Left = 145
-          Top = 178
+          Top = 179
           Width = 148
           Height = 24
           StyleRenderOptions.RenderBorder = False
@@ -636,7 +646,7 @@ object FrIWProducto: TFrIWProducto
         end
         object STOCK_MINIMO: TIWDBEdit
           Left = 145
-          Top = 206
+          Top = 207
           Width = 148
           Height = 24
           StyleRenderOptions.RenderBorder = False
@@ -652,7 +662,7 @@ object FrIWProducto: TFrIWProducto
         end
         object STOCK_MAXIMO: TIWDBEdit
           Left = 145
-          Top = 236
+          Top = 237
           Width = 148
           Height = 24
           StyleRenderOptions.RenderBorder = False
@@ -668,7 +678,7 @@ object FrIWProducto: TFrIWProducto
         end
         object ID_ACTIVO: TIWDBCheckBox
           Left = 10
-          Top = 265
+          Top = 266
           Width = 121
           Height = 21
           Caption = 'Activo'
@@ -684,17 +694,6 @@ object FrIWProducto: TFrIWProducto
           ValueChecked = 'S'
           ValueUnchecked = 'N'
         end
-      end
-      object PAG_00: TIWTabPage
-        Left = 0
-        Top = 30
-        Width = 1339
-        Height = 503
-        RenderInvisibleControls = True
-        Title = '[          Registros          ]'
-        BorderOptions.NumericWidth = 0
-        BorderOptions.Style = cbsNone
-        Color = clWebWHITE
       end
     end
   end
@@ -744,7 +743,7 @@ object FrIWProducto: TFrIWProducto
     WindowTop = 200
     Autosize = False
     CloseOnClick = True
-    Left = 101
+    Left = 93
     Top = 11
   end
 end

@@ -10,7 +10,7 @@ uses
   IWCompTabControl, IWBaseComponent, IWBaseHTMLComponent, IWBaseHTML40Component,
   UtConexion, Data.DB, IWCompGrids, IWDBStdCtrls, IWCompEdit,
   IWCompCheckbox, IWCompMemo, IWDBExtCtrls, IWCompButton, IWCompListbox,
-  UtGrid_JQ, UtNavegador_ASE, UtilsIW.Busqueda, Form_IWFrame;
+  UtGrid_JQ, UtNavegador_ASE, UtilsIW.Busqueda;
 
 type
   TFrIWUsuario_Enc = class(TIWAppForm)
@@ -61,11 +61,9 @@ type
     procedure BTNDIRECCIONAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNCODIGO_PERFILAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BtnGridAsyncClick(Sender: TObject; EventParams: TStringList);
-    procedure IWAppFormShow(Sender: TObject);
   private
     FCNX : TConexion;
     FINFO : String;
-    FFRAME : TFrIWFrame;
     FCODIGO_USUARIO : String;
 
     FQRMAESTRO : TMANAGER_DATA;
@@ -273,17 +271,29 @@ End;
 
 Procedure TFrIWUsuario_Enc.Estado_Controles;
 Begin
-  CONTRASENA.Enabled           := False;
-  CODIGO_USUARIO.Enabled       := FQRMAESTRO.Mode_Insert  And Documento_Activo;
-  NOMBRE.Enabled               := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  DIRECCION.Enabled            := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  EMAIL.Enabled                := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  TELEFONO_1.Enabled           := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  TELEFONO_2.Enabled           := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  CONTRASENA.Enabled            := False;
+  CODIGO_USUARIO.Enabled        := FQRMAESTRO.Mode_Insert  And Documento_Activo;
+  NOMBRE.Enabled                := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  DIRECCION.Enabled             := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  EMAIL.Enabled                 := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  TELEFONO_1.Enabled            := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  TELEFONO_2.Enabled            := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  ID_NOTIFICA_PRODUCTO.Enabled  := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  ID_ACTIVO.Enabled             := FQRMAESTRO.Mode_Edition And Documento_Activo;
+
+  CONTRASENA.Editable           := False;
+  CODIGO_USUARIO.Editable       := FQRMAESTRO.Mode_Insert  And Documento_Activo;
+  NOMBRE.Editable               := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  DIRECCION.Editable            := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  EMAIL.Editable                := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  TELEFONO_1.Editable           := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  TELEFONO_2.Editable           := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  ID_NOTIFICA_PRODUCTO.Editable := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  ID_ACTIVO.Editable            := FQRMAESTRO.Mode_Edition And Documento_Activo;
+
   BTNCONTRASENA.Visible        := FQRMAESTRO.Mode_Edition And Documento_Activo;
   BTNCODIGO_PERFIL.Visible     := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  ID_NOTIFICA_PRODUCTO.Enabled := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  ID_ACTIVO.Enabled            := FQRMAESTRO.Mode_Edition And Documento_Activo;
+
   IWRBOTONDETALLE.Visible      := FQRMAESTRO.ACTIVE And (Not FQRMAESTRO.Mode_Edition) And (FQRMAESTRO.QR.RecordCount > 0);
   DATO.Visible                 := (Not FQRMAESTRO.Mode_Edition);
   PAG_00.Visible               := (Not FQRMAESTRO.Mode_Edition);
@@ -441,8 +451,6 @@ begin
   Self.Name := 'TFrIWUsuario_Enc' + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000));
   Self.Title := Info_TablaGet(Id_TBL_Usuario).Caption;
   FCNX := UserSession.CNX;
-  FFRAME := TFrIWFrame.Create(Self);
-  FFRAME.Parent := Self;
   FCODIGO_ACTUAL := '';
   FINFO := UserSession.FULL_INFO + Info_TablaGet(Id_TBL_Usuario).Caption;
   Try
@@ -513,19 +521,10 @@ begin
     If Assigned(FNAVEGADOR) Then
       FreeAndNil(FNAVEGADOR);
 
-    If Assigned(FFRAME) Then
-      FreeAndNil(FFRAME);
-
   Except
     On E: Exception Do
       Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWUsuario_Enc', 'TFrIWUsuario_Enc.IWAppFormDestroy', E.Message);
   End;
-end;
-
-procedure TFrIWUsuario_Enc.IWAppFormShow(Sender: TObject);
-begin
-  If Assigned(FFRAME) Then
-    FFRAME.Sincronizar_Informacion;
 end;
 
 procedure TFrIWUsuario_Enc.NewRecordMaster(pSender: TObject);

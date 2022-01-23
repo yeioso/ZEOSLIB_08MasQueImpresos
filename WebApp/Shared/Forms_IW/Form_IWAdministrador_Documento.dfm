@@ -8,7 +8,6 @@ object FrIWAdministrador_Documento: TFrIWAdministrador_Documento
   ConnectionMode = cmAny
   OnCreate = IWAppFormCreate
   OnDestroy = IWAppFormDestroy
-  OnShow = IWAppFormShow
   Background.Fixed = False
   HandleTabs = False
   LeftToRight = True
@@ -286,7 +285,7 @@ object FrIWAdministrador_Documento: TFrIWAdministrador_Documento
         end
         object ID_ACTIVO: TIWDBCheckBox
           Left = 10
-          Top = 225
+          Top = 252
           Width = 121
           Height = 21
           Caption = 'Activo'

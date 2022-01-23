@@ -8,7 +8,6 @@ object FrIWOrden_Produccion: TFrIWOrden_Produccion
   ConnectionMode = cmAny
   OnCreate = IWAppFormCreate
   OnDestroy = IWAppFormDestroy
-  OnShow = IWAppFormShow
   Background.Fixed = False
   HandleTabs = False
   LeftToRight = True
@@ -347,7 +346,7 @@ object FrIWOrden_Produccion: TFrIWOrden_Produccion
         end
         object lbInfoRegistro: TIWLabel
           Left = 10
-          Top = 325
+          Top = 349
           Width = 101
           Height = 16
           RenderSize = False
@@ -733,8 +732,8 @@ object FrIWOrden_Produccion: TFrIWOrden_Produccion
           ValueUnchecked = 'N'
         end
         object BTNEXPLOSION_MATERIAL: TIWButton
-          Left = 113
-          Top = 286
+          Left = 319
+          Top = 225
           Width = 200
           Height = 30
           Caption = 'EXPLOSION DE MATERIALES'

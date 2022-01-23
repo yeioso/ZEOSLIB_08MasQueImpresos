@@ -8,7 +8,6 @@ object FrIWTercero_Enc: TFrIWTercero_Enc
   ConnectionMode = cmAny
   OnCreate = IWAppFormCreate
   OnDestroy = IWAppFormDestroy
-  OnShow = IWAppFormShow
   Background.Fixed = False
   HandleTabs = False
   LeftToRight = True
@@ -418,10 +417,12 @@ object FrIWTercero_Enc: TFrIWTercero_Enc
       Align = alLeft
       BorderOptions.NumericWidth = 0
       Color = clWebMEDIUMBLUE
+      ExplicitLeft = 1
+      ExplicitTop = 6
     end
   end
   object IWModalWindow1: TIWModalWindow
-    Left = 656
-    Top = 16
+    Left = 648
+    Top = 24
   end
 end

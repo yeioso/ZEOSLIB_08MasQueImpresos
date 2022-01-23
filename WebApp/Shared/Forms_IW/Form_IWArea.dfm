@@ -8,7 +8,6 @@ object FrIWArea: TFrIWArea
   ConnectionMode = cmAny
   OnCreate = IWAppFormCreate
   OnDestroy = IWAppFormDestroy
-  OnShow = IWAppFormShow
   Background.Fixed = False
   HandleTabs = False
   LeftToRight = True
@@ -193,7 +192,7 @@ object FrIWArea: TFrIWArea
         end
         object ID_ACTIVO: TIWDBCheckBox
           Left = 10
-          Top = 153
+          Top = 193
           Width = 121
           Height = 21
           Caption = 'Activo'
@@ -269,7 +268,7 @@ object FrIWArea: TFrIWArea
     WindowTop = 200
     Autosize = False
     CloseOnClick = True
-    Left = 77
+    Left = 85
     Top = 11
   end
 end

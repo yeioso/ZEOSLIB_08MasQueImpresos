@@ -8,7 +8,6 @@ object FrIWPerfil_Enc: TFrIWPerfil_Enc
   ConnectionMode = cmAny
   OnCreate = IWAppFormCreate
   OnDestroy = IWAppFormDestroy
-  OnShow = IWAppFormShow
   Background.Fixed = False
   HandleTabs = False
   LeftToRight = True
@@ -294,7 +293,7 @@ object FrIWPerfil_Enc: TFrIWPerfil_Enc
     WindowTop = 200
     Autosize = False
     CloseOnClick = True
-    Left = 117
+    Left = 125
     Top = 11
   end
 end

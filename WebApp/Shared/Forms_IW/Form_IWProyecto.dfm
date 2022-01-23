@@ -8,7 +8,6 @@ object FrIWProyecto: TFrIWProyecto
   ConnectionMode = cmAny
   OnCreate = IWAppFormCreate
   OnDestroy = IWAppFormDestroy
-  OnShow = IWAppFormShow
   Background.Fixed = False
   HandleTabs = False
   LeftToRight = True
@@ -329,7 +328,7 @@ object FrIWProyecto: TFrIWProyecto
     WindowTop = 200
     Autosize = False
     CloseOnClick = True
-    Left = 53
+    Left = 61
     Top = 11
   end
 end

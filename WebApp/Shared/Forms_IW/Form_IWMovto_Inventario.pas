@@ -10,7 +10,7 @@ uses
   IWCompTabControl, IWBaseComponent, IWBaseHTMLComponent, IWBaseHTML40Component,
   UtConexion, Data.DB, IWCompGrids, IWDBStdCtrls, IWCompEdit,
   IWCompCheckbox, IWCompMemo, IWDBExtCtrls, IWCompButton, IWCompListbox,
-  UtGrid_JQ, UtNavegador_ASE, Form_IWFrame;
+  UtGrid_JQ, UtNavegador_ASE;
 
 type
   TFrIWMovto_Inventario = class(TIWAppForm)
@@ -66,11 +66,9 @@ type
     procedure BTNCREARTERCEROAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNCREARPRODUCTOAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNOPAsyncClick(Sender: TObject; EventParams: TStringList);
-    procedure IWAppFormShow(Sender: TObject);
   private
     FCNX : TConexion;
     FINFO : String;
-    FFRAME : TFrIWFrame;
     FCODIGO_DOCUMENTO : String;
 
     FQRMAESTRO : TMANAGER_DATA;
@@ -400,21 +398,22 @@ End;
 
 Procedure TFrIWMovto_Inventario.Estado_Controles;
 Begin
-  NUMERO.Enabled               := False;
-  BTNOP.Visible                := FQRMAESTRO.Mode_Edition And Documento_Activo And
-                                  (Trim(FCODIGO_DOCUMENTO) = Trim(UserSession.DOCUMENTO_SALIDA_DE_INVENTARIO));
-  lbInfoOP.Visible             := BTNOP.Visible;
-  BTNCREARTERCERO.Visible      := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  BTNCODIGO_TERCERO.Visible    := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  BTNCODIGO_PRODUCTO.Visible   := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  NUMERO.Enabled             := False;
+  BTNOP.Visible              := FQRMAESTRO.Mode_Edition And Documento_Activo And
+                                (Trim(FCODIGO_DOCUMENTO) = Trim(UserSession.DOCUMENTO_SALIDA_DE_INVENTARIO));
+  lbInfoOP.Visible           := BTNOP.Visible;
+  BTNCREARTERCERO.Visible    := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  BTNCODIGO_TERCERO.Visible  := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  BTNCODIGO_PRODUCTO.Visible := FQRMAESTRO.Mode_Edition And Documento_Activo;
 
-  NOMBRE.Enabled               := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  DESCRIPCION.Editable         := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  FECHA_MOVIMIENTO.Enabled     := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  FECHA_VENCIMIENTO.Enabled    := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  CANTIDAD.Enabled             := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  VALOR_UNITARIO.Enabled       := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  ID_ACTIVO.Enabled            := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  NOMBRE.Editable            := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  FECHA_MOVIMIENTO.Editable  := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  FECHA_VENCIMIENTO.Editable := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  CANTIDAD.Editable          := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  VALOR_UNITARIO.Editable    := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  ID_ACTIVO.Editable         := FQRMAESTRO.Mode_Edition And Documento_Activo;
+
+  DESCRIPCION.Editable       := FQRMAESTRO.Mode_Edition And Documento_Activo;
 
   DATO.Visible                 := (Not FQRMAESTRO.Mode_Edition);
   PAG_00.Visible               := (Not FQRMAESTRO.Mode_Edition);
@@ -640,8 +639,6 @@ begin
   Self.Name := 'TFrIWMovto_Inventario' + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000));
   FCNX := UserSession.CNX;
   Self.Title := Info_TablaGet(Id_TBL_Movto_Inventario).Caption + ', ' + lbInfo.Caption;
-  FFRAME := TFrIWFrame.Create(Self);
-  FFRAME.Parent := Self;
   FCODIGO_ACTUAL := '';
   FINFO := UserSession.FULL_INFO + ', ' +  Info_TablaGet(Id_TBL_Movto_Inventario).Caption;
   Try
@@ -671,6 +668,7 @@ begin
     FECHA_VENCIMIENTO.DataSource   := FQRMAESTRO.DS;
     CANTIDAD.DataSource            := FQRMAESTRO.DS;
     VALOR_UNITARIO.DataSource      := FQRMAESTRO.DS;
+    ID_ACTIVO.DataSource           := FQRMAESTRO.DS;
 
     FGRID_MAESTRO.SetGrid(FQRMAESTRO.DS, ['NUMERO'        , 'NOMBRE'     , 'CODIGO_PRODUCTO', 'FECHA_REGISTRO', 'FECHA_MOVIMIENTO'],
                                          ['numero'        , 'Nombre'     , 'Producto'       , 'Registro'      , 'Movimiento'      ],
@@ -711,19 +709,10 @@ begin
     If Assigned(FNAVEGADOR) Then
       FreeAndNil(FNAVEGADOR);
 
-    If Assigned(FFRAME) Then
-      FreeAndNil(FFRAME);
-
   Except
     On E: Exception Do
       Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWMovto_Inventario', 'TFrIWMovto_Inventario.IWAppFormDestroy', E.Message);
   End;
-end;
-
-procedure TFrIWMovto_Inventario.IWAppFormShow(Sender: TObject);
-begin
-  If Assigned(FFRAME) Then
-    FFRAME.Sincronizar_Informacion;
 end;
 
 procedure TFrIWMovto_Inventario.NewRecordMaster(pSender: TObject);

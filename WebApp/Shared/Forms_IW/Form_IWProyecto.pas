@@ -11,7 +11,7 @@ uses
   IWBaseHTML40Component, UtConexion, Data.DB, IWCompGrids, IWDBStdCtrls,
   IWCompEdit, IWCompCheckbox, IWCompMemo, IWDBExtCtrls, IWCompButton,
   IWCompListbox, IWCompGradButton, UtGrid_JQ, UtNavegador_ASE,
-  UtilsIW.Busqueda, Form_IWFrame;
+  UtilsIW.Busqueda;
 
 type
   TFrIWProyecto = class(TIWAppForm)
@@ -41,11 +41,9 @@ type
     procedure IWAppFormDestroy(Sender: TObject);
     procedure BTNBUSCARAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BtnAcarreoAsyncClick(Sender: TObject; EventParams: TStringList);
-    procedure IWAppFormShow(Sender: TObject);
   private
     FCNX : TConexion;
     FINFO : String;
-    FFRAME : TFrIWFrame;
     FQRMAESTRO : TMANAGER_DATA;
     FNAVEGADOR : TNavegador_ASE;
     FGRID_MAESTRO : TGRID_JQ;
@@ -181,12 +179,20 @@ End;
 
 Procedure TFrIWProyecto.Estado_Controles;
 Begin
-  CODIGO_PROYECTO.Enabled := FQRMAESTRO.Mode_Insert  And Documento_Activo;
-  NOMBRE.Enabled          := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  DESCRIPCION.Enabled     := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  FECHA_INICIAL.Enabled   := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  FECHA_FINAL.Enabled     := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  ID_ACTIVO.Enabled       := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  CODIGO_PROYECTO.Enabled  := FQRMAESTRO.Mode_Insert  And Documento_Activo;
+  NOMBRE.Enabled           := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  DESCRIPCION.Enabled      := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  FECHA_INICIAL.Enabled    := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  FECHA_FINAL.Enabled      := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  ID_ACTIVO.Enabled        := FQRMAESTRO.Mode_Edition And Documento_Activo;
+
+  CODIGO_PROYECTO.Editable := FQRMAESTRO.Mode_Insert  And Documento_Activo;
+  NOMBRE.Editable          := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  DESCRIPCION.Editable     := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  FECHA_INICIAL.Editable   := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  FECHA_FINAL.Editable     := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  ID_ACTIVO.Editable       := FQRMAESTRO.Mode_Edition And Documento_Activo;
+
   DATO.Visible            := (Not FQRMAESTRO.Mode_Edition);
   PAG_00.Visible          := (Not FQRMAESTRO.Mode_Edition);
   PAG_01.Visible          := True;
@@ -290,8 +296,6 @@ begin
   Self.Name := 'TFrIWProyecto' + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000) );
   Self.Title := Info_TablaGet(Id_TBL_Proyecto).Caption;
   FCNX := UserSession.CNX;
-  FFRAME := TFrIWFrame.Create(Self);
-  FFRAME.Parent := Self;
   Try
     FGRID_MAESTRO        := TGRID_JQ.Create(PAG_00);
     FGRID_MAESTRO.Parent := PAG_00;
@@ -360,19 +364,10 @@ begin
     If Assigned(FGRID_MAESTRO) Then
       FreeAndNil(FGRID_MAESTRO);
 
-    If Assigned(FFRAME) Then
-      FreeAndNil(FFRAME);
-
   Except
     On E: Exception Do
       Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWProyecto', 'TFrIWProyecto_Enc.IWAppFormDestroy', E.Message);
   End;
-end;
-
-procedure TFrIWProyecto.IWAppFormShow(Sender: TObject);
-begin
-  If Assigned(FFRAME) Then
-    FFRAME.Sincronizar_Informacion;
 end;
 
 procedure TFrIWProyecto.NewRecordMaster(pSender: TObject);
