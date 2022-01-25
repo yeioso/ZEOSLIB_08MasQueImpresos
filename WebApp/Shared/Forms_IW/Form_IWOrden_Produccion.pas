@@ -51,6 +51,7 @@ type
     CANTIDAD: TIWDBEdit;
     ID_ACTIVO: TIWDBCheckBox;
     BTNEXPLOSION_MATERIAL: TIWButton;
+    BTNIMPRIMIR: TIWButton;
     procedure BTNBACKAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure IWAppFormCreate(Sender: TObject);
     procedure IWAppFormDestroy(Sender: TObject);
@@ -64,6 +65,7 @@ type
     procedure BTNCREARTERCEROAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNCREARPRODUCTOAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNEXPLOSION_MATERIALAsyncClick(Sender: TObject; EventParams: TStringList);
+    procedure BTNIMPRIMIRAsyncClick(Sender: TObject; EventParams: TStringList);
   private
     FCNX : TConexion;
     FINFO : String;
@@ -123,6 +125,8 @@ Uses
   TBL000.Info_Tabla,
   UtIWBasicData_ASE,
   UtilsIW.ManagerLog,
+  Report.Orden_Produccion,
+  Form_Plantilla_Documento,
   UtilsIW.Numero_Siguiente;
 
 procedure TFrIWOrden_Produccion.Resultado_BasicData(Sender: TObject; EventParams: TStringList);
@@ -683,6 +687,15 @@ end;
 procedure TFrIWOrden_Produccion.BTNEXPLOSION_MATERIALAsyncClick(Sender: TObject; EventParams: TStringList);
 begin
   UserSession.ShowForm_Explosion_Material(FCODIGO_DOCUMENTO, lbInfo.Caption, DOCUMENTO_REFERENCIA.Text, lbNombre_Proyecto.Caption, SetToInt(NUMERO.Text));
+end;
+
+procedure TFrIWOrden_Produccion.BTNIMPRIMIRAsyncClick(Sender: TObject; EventParams: TStringList);
+Var
+  lMsg : String;
+begin
+  If Report_Orden_Produccion_Reporte(UserSession.CNX, UserSession.DOCUMENTO_ORDEN_DE_PRODUCCION, SetToInt(NUMERO.Text)) Then
+    If Not Form_Plantilla_Reporte_Generico(UserSession.WebApplication, lMsg) Then
+      UserSession.SetMessage(lMsg, True);
 end;
 
 end.
