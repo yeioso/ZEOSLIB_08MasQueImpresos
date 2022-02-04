@@ -31,7 +31,7 @@ Type
       Function GetData_Enc : Boolean;
       Function GetData_Det : Boolean;
       Function PutData : Boolean;
-      Procedure SetLinea(Const pCodigo_Producto, pNombre_Producto, pNombre_Usuario, pFecha_Programada, pFecha_Registro, pHora_Registro, pCantidad  : String);
+      Procedure SetLinea(Const pCodigo_Producto, pNombre_Producto, pFecha_Programada, pFecha_Registro, pHora_Registro, pCantidad, pValor_Unitario, pTotal  : String);
     Public
       Constructor Create(pCNX: TConexion; Const pCodigo_Documento : String; Const pNumero : Integer);
       Destructor Destroy;
@@ -157,6 +157,8 @@ Begin
     FINPUT_DET.SQL.Add('          ,D.HORA_REGISTRO ');
     FINPUT_DET.SQL.Add('          ,D.NOMBRE ');
     FINPUT_DET.SQL.Add('          ,D.CANTIDAD ');
+    FINPUT_DET.SQL.Add('          ,P.VALOR_UNITARIO AS VALOR_PRODUCTO ');
+    FINPUT_DET.SQL.Add('          ,D.VALOR_UNITARIO AS VALOR_EXPLOSION ');
     FINPUT_DET.SQL.Add('   FROM ' + Info_TablaGet(Id_TBL_Explosion_Material).Name + ' D ');
     FINPUT_DET.SQL.Add('   INNER JOIN ' + Info_TablaGet(Id_TBL_Producto).Name + ' P ON D.CODIGO_PRODUCTO = P.CODIGO_PRODUCTO ');
     FINPUT_DET.SQL.Add('   INNER JOIN ' + Info_TablaGet(Id_TBL_Usuario ).Name + ' U ON D.CODIGO_USUARIO = U.CODIGO_USUARIO ');
@@ -173,18 +175,19 @@ Begin
 End;
 
 
-Procedure TReport_Orden_Produccion.SetLinea(Const pCodigo_Producto, pNombre_Producto, pNombre_Usuario, pFecha_Programada, pFecha_Registro, pHora_Registro, pCantidad  : String);
+Procedure TReport_Orden_Produccion.SetLinea(Const pCodigo_Producto, pNombre_Producto, pFecha_Programada, pFecha_Registro, pHora_Registro, pCantidad, pValor_Unitario, pTotal  : String);
 Var
   lBase : String;
 Begin
   Try
    lBase := Copy(Justificar(pCodigo_Producto , ' ', 20, 'I'), 01, 020) + ' ' +
-            Copy(Justificar(pNombre_Producto , ' ', 30, 'I'), 01, 030) + ' ' +
-            Copy(Justificar(pNombre_Usuario  , ' ', 30, 'I'), 01, 030) + ' ' +
+            Copy(Justificar(pNombre_Producto , ' ', 40, 'I'), 01, 040) + ' ' +
             Copy(Justificar(pFecha_Programada, ' ', 10, 'I'), 01, 010) + ' ' +
             Copy(Justificar(pFecha_Registro  , ' ', 11, 'I'), 01, 011) + ' ' +
             Copy(Justificar(pHora_Registro   , ' ', 11, 'I'), 01, 011) + ' ' +
-            Copy(Justificar(pCantidad        , ' ', 14, 'D'), 01, 014);
+            Copy(Justificar(pCantidad        , ' ', 10, 'D'), 01, 010) + ' ' +
+            Copy(Justificar(pValor_Unitario  , ' ', 11, 'D'), 01, 011) + ' ' +
+            Copy(Justificar(pTotal           , ' ', 15, 'D'), 01, 015);
     SaveData(lBase);
   Except
     On E: Exception Do
@@ -195,7 +198,11 @@ Begin
 End;
 
 Function TReport_Orden_Produccion.PutData : Boolean;
+Var
+  lSuma : Double;
+  lValor : Double;
 Begin
+  lSuma := 0;
   Result := False;
   Try
     If FINPUT_ENC.Active And (FINPUT_ENC.RecordCount > 0) Then
@@ -215,27 +222,51 @@ Begin
       SaveData('CANTIDAD: ' + FormatFloat('###,###,##0.#0', FINPUT_ENC.FieldByName('CANTIDAD').AsFloat));
       If FINPUT_DET.RecordCount > 0 Then
       Begin
-        SetLinea('PRODUCTO', 'NOMBRE DEL PRODUCTO', 'USUARIO', 'PROGRAMADA', 'F.REGISTRO', 'H.REGISTRO', 'CANTIDAD');
+        SetLinea('PRODUCTO', 'NOMBRE DEL PRODUCTO', 'PROGRAMADA', 'F.REGISTRO', 'H.REGISTRO', 'CANTIDAD', 'VALOR', 'TOTAL');
         SetLinea(StringOfChar('-', 20),
                  StringOfChar('-', 50),
-                 StringOfChar('-', 50),
                  StringOfChar('-', 10),
                  StringOfChar('-', 10),
                  StringOfChar('-', 10),
-                 StringOfChar('-', 14));
+                 StringOfChar('-', 14),
+                 StringOfChar('-', 14),
+                 StringOfChar('-', 20));
 
         FINPUT_DET.First;
         While Not FINPUT_DET.Eof Do
         Begin
+          lValor := FINPUT_DET.FieldByName('VALOR_EXPLOSION').AsFloat;
+          If lValor <= 0 Then
+            lValor := FINPUT_DET.FieldByName('VALOR_PRODUCTO').AsFloat;
+          lSuma := lSuma + (FINPUT_DET.FieldByName('CANTIDAD').AsFloat * lValor);
           SetLinea(FINPUT_DET.FieldByName('CODIGO_PRODUCTO' ).AsString,
                    FINPUT_DET.FieldByName('NOMBRE_PRODUCTO' ).AsString,
-                   FINPUT_DET.FieldByName('NOMBRE_USUARIO'  ).AsString,
                    FINPUT_DET.FieldByName('FECHA_PROGRAMADA').AsString,
                    FINPUT_DET.FieldByName('FECHA_REGISTRO'  ).AsString,
                    FINPUT_DET.FieldByName('HORA_REGISTRO'   ).AsString,
-                   FormatFloat('###,###,##0.#0', FINPUT_DET.FieldByName('CANTIDAD').AsFloat));
+                   FormatFloat(        '###,##0.#0', FINPUT_DET.FieldByName('CANTIDAD').AsFloat),
+                   FormatFloat(    '###,###,##0'   , lValor),
+                   FormatFloat('###,###,###,##0'   , FINPUT_DET.FieldByName('CANTIDAD').AsFloat * lValor)
+                   );
           FINPUT_DET.Next;
         End;
+
+        SetLinea(StringOfChar('=', 20),
+                 StringOfChar('=', 50),
+                 StringOfChar('=', 10),
+                 StringOfChar('=', 10),
+                 StringOfChar('=', 10),
+                 StringOfChar('=', 14),
+                 StringOfChar('=', 14),
+                 StringOfChar('=', 20));
+        SetLinea(StringOfChar(' ', 20),
+                 StringOfChar(' ', 50),
+                 StringOfChar(' ', 10),
+                 StringOfChar(' ', 10),
+                 StringOfChar(' ', 10),
+                 StringOfChar(' ', 14),
+                 'TOTAL:',
+                 FormatFloat('###,###,###,##0', lSuma));
       End;
       Result := True;
     End;

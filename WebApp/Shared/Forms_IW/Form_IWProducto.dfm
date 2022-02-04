@@ -65,7 +65,7 @@ object FrIWProducto: TFrIWProducto
       InactiveTabFont.Style = []
       ActiveTabColor = clWebDARKGRAY
       InactiveTabColor = clWebLIGHTGRAY
-      ActivePage = 1
+      ActivePage = 0
       Align = alClient
       BorderOptions.NumericWidth = 0
       BorderOptions.Style = cbsNone
@@ -82,17 +82,6 @@ object FrIWProducto: TFrIWProducto
       DesignSize = (
         1339
         533)
-      object PAG_00: TIWTabPage
-        Left = 0
-        Top = 30
-        Width = 1339
-        Height = 503
-        RenderInvisibleControls = True
-        Title = '[          Registros          ]'
-        BorderOptions.NumericWidth = 0
-        BorderOptions.Style = cbsNone
-        Color = clWebWHITE
-      end
       object PAG_01: TIWTabPage
         Left = 0
         Top = 30
@@ -120,7 +109,7 @@ object FrIWProducto: TFrIWProducto
           Caption = 'Area'
         end
         object BTNCODIGO_AREA: TIWImage
-          Left = 301
+          Left = 277
           Top = 8
           Width = 22
           Height = 21
@@ -175,7 +164,7 @@ object FrIWProducto: TFrIWProducto
           JpegOptions.Smoothing = True
         end
         object CODIGO_AREA: TIWDBLabel
-          Left = 143
+          Left = 121
           Top = 8
           Width = 148
           Height = 21
@@ -191,7 +180,7 @@ object FrIWProducto: TFrIWProducto
           FriendlyName = 'CODIGO_AREA'
         end
         object BTNCREARAREA: TIWImage
-          Left = 329
+          Left = 305
           Top = 6
           Width = 22
           Height = 21
@@ -313,7 +302,7 @@ object FrIWProducto: TFrIWProducto
         end
         object IWLabel2: TIWLabel
           Left = 10
-          Top = 118
+          Top = 102
           Width = 71
           Height = 16
           RenderSize = False
@@ -327,7 +316,7 @@ object FrIWProducto: TFrIWProducto
           Caption = 'Descripci'#243'n'
         end
         object CODIGO_PRODUCTO: TIWDBEdit
-          Left = 145
+          Left = 121
           Top = 31
           Width = 148
           Height = 24
@@ -343,7 +332,7 @@ object FrIWProducto: TFrIWProducto
           PasswordPrompt = False
         end
         object NOMBRE: TIWDBEdit
-          Left = 145
+          Left = 121
           Top = 58
           Width = 447
           Height = 24
@@ -358,7 +347,7 @@ object FrIWProducto: TFrIWProducto
           PasswordPrompt = False
         end
         object DESCRIPCION: TIWDBMemo
-          Left = 145
+          Left = 121
           Top = 85
           Width = 447
           Height = 65
@@ -395,7 +384,7 @@ object FrIWProducto: TFrIWProducto
         end
         object IWLabel3: TIWLabel
           Left = 10
-          Top = 233
+          Top = 241
           Width = 86
           Height = 16
           RenderSize = False
@@ -439,7 +428,7 @@ object FrIWProducto: TFrIWProducto
           Caption = 'Unidad de Medida'
         end
         object CODIGO_UNIDAD_MEDIDA: TIWDBLabel
-          Left = 145
+          Left = 121
           Top = 153
           Width = 148
           Height = 21
@@ -455,7 +444,7 @@ object FrIWProducto: TFrIWProducto
           FriendlyName = 'CODIGO_UNIDAD_MEDIDA'
         end
         object lbNombre_Area: TIWLabel
-          Left = 323
+          Left = 299
           Top = 35
           Width = 110
           Height = 16
@@ -469,7 +458,7 @@ object FrIWProducto: TFrIWProducto
           Caption = 'lbNombre_Area'
         end
         object BTNCODIGO_UNIDAD_MEDIDA: TIWImage
-          Left = 300
+          Left = 276
           Top = 151
           Width = 22
           Height = 21
@@ -524,7 +513,7 @@ object FrIWProducto: TFrIWProducto
           JpegOptions.Smoothing = True
         end
         object BTNCREARUNIDAD_MEDIDA: TIWImage
-          Left = 329
+          Left = 305
           Top = 150
           Width = 22
           Height = 21
@@ -615,8 +604,8 @@ object FrIWProducto: TFrIWProducto
           JpegOptions.Smoothing = True
         end
         object lbNombre_Unidad_Medida: TIWLabel
-          Left = 323
-          Top = 176
+          Left = 340
+          Top = 154
           Width = 181
           Height = 16
           RenderSize = False
@@ -629,7 +618,7 @@ object FrIWProducto: TFrIWProducto
           Caption = 'lbNombre_Unidad_Medida'
         end
         object VALOR_UNITARIO: TIWDBEdit
-          Left = 145
+          Left = 121
           Top = 179
           Width = 148
           Height = 24
@@ -645,7 +634,7 @@ object FrIWProducto: TFrIWProducto
           PasswordPrompt = False
         end
         object STOCK_MINIMO: TIWDBEdit
-          Left = 145
+          Left = 121
           Top = 207
           Width = 148
           Height = 24
@@ -661,7 +650,7 @@ object FrIWProducto: TFrIWProducto
           PasswordPrompt = False
         end
         object STOCK_MAXIMO: TIWDBEdit
-          Left = 145
+          Left = 121
           Top = 237
           Width = 148
           Height = 24
@@ -676,9 +665,27 @@ object FrIWProducto: TFrIWProducto
           DataField = 'STOCK_MAXIMO'
           PasswordPrompt = False
         end
+        object ID_SERVICIO: TIWDBCheckBox
+          Left = 314
+          Top = 202
+          Width = 121
+          Height = 21
+          Caption = 'Servicio'
+          Editable = True
+          Font.Color = clNone
+          Font.Size = 10
+          Font.Style = []
+          SubmitOnAsyncEvent = True
+          Style = stNormal
+          AutoEditable = False
+          DataField = 'ID_SERVICIO'
+          FriendlyName = 'ID_SERVICIO'
+          ValueChecked = 'S'
+          ValueUnchecked = 'N'
+        end
         object ID_ACTIVO: TIWDBCheckBox
-          Left = 10
-          Top = 266
+          Left = 314
+          Top = 237
           Width = 121
           Height = 21
           Caption = 'Activo'
@@ -694,6 +701,17 @@ object FrIWProducto: TFrIWProducto
           ValueChecked = 'S'
           ValueUnchecked = 'N'
         end
+      end
+      object PAG_00: TIWTabPage
+        Left = 0
+        Top = 30
+        Width = 1339
+        Height = 503
+        RenderInvisibleControls = True
+        Title = '[          Registros          ]'
+        BorderOptions.NumericWidth = 0
+        BorderOptions.Style = cbsNone
+        Color = clWebWHITE
       end
     end
   end

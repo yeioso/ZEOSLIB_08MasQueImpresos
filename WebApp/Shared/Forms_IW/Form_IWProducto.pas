@@ -47,6 +47,7 @@ type
     VALOR_UNITARIO: TIWDBEdit;
     STOCK_MINIMO: TIWDBEdit;
     STOCK_MAXIMO: TIWDBEdit;
+    ID_SERVICIO: TIWDBCheckBox;
     ID_ACTIVO: TIWDBCheckBox;
     procedure BTNBACKAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure IWAppFormCreate(Sender: TObject);
@@ -333,6 +334,7 @@ Begin
   VALOR_UNITARIO.Enabled   := FQRMAESTRO.Mode_Edition And Documento_Activo;
   STOCK_MINIMO.Enabled     := FQRMAESTRO.Mode_Edition And Documento_Activo;
   STOCK_MAXIMO.Enabled     := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  ID_SERVICIO.Enabled      := FQRMAESTRO.Mode_Edition And Documento_Activo;
   ID_ACTIVO.Enabled        := FQRMAESTRO.Mode_Edition And Documento_Activo;
 
   CODIGO_PRODUCTO.Editable := FQRMAESTRO.Mode_Insert  And Documento_Activo;
@@ -340,9 +342,10 @@ Begin
   VALOR_UNITARIO.Editable  := FQRMAESTRO.Mode_Edition And Documento_Activo;
   STOCK_MINIMO.Editable    := FQRMAESTRO.Mode_Edition And Documento_Activo;
   STOCK_MAXIMO.Editable    := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  ID_SERVICIO.Editable     := FQRMAESTRO.Mode_Edition And Documento_Activo;
   ID_ACTIVO.Editable       := FQRMAESTRO.Mode_Edition And Documento_Activo;
 
-  DESCRIPCION.Editable            := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  DESCRIPCION.Editable     := FQRMAESTRO.Mode_Edition And Documento_Activo;
 
   BTNCREARAREA.Visible            := FQRMAESTRO.Mode_Insert And Documento_Activo;
   BTNCREARUNIDAD_MEDIDA.Visible   := FQRMAESTRO.Mode_Insert And Documento_Activo;
@@ -479,6 +482,7 @@ begin
     VALOR_UNITARIO.DataSource       := FQRMAESTRO.DS;
     STOCK_MINIMO.DataSource         := FQRMAESTRO.DS;
     STOCK_MAXIMO.DataSource         := FQRMAESTRO.DS;
+    ID_SERVICIO.DataSource          := FQRMAESTRO.DS;
     ID_ACTIVO.DataSource            := FQRMAESTRO.DS;
 
     FGRID_MAESTRO.SetGrid(FQRMAESTRO.DS, ['CODIGO_PRODUCTO', 'NOMBRE'     ],

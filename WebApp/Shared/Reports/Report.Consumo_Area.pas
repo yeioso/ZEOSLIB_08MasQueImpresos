@@ -31,7 +31,7 @@ Type
       Procedure SaveData(Const pLine : String; pForced : Boolean = False);
       Function GetData : Boolean;
       Function PutData : Boolean;
-      Procedure SetLinea(Const pFecha, pHora, pProducto, pTipo_Documento, pNro_Documento, pUsuario, pOP, pCantidad, pValor : String);
+      Procedure SetLinea(Const pFecha, pHora, pProducto, pTipo_Documento, pNro_Documento, pOP, pCantidad, pValor, pTotal : String);
     Public
       Constructor Create(pCNX: TConexion; Const pCodigo_Area, pFecha_Ini, pFecha_Fin : String; Const pId_Fecha : Integer);
       Destructor Destroy;
@@ -154,7 +154,7 @@ Begin
 End;
 
 
-Procedure TReport_Consumo_Area.SetLinea(Const pFecha, pHora, pProducto, pTipo_Documento, pNro_Documento, pUsuario, pOP, pCantidad, pValor : String);
+Procedure TReport_Consumo_Area.SetLinea(Const pFecha, pHora, pProducto, pTipo_Documento, pNro_Documento, pOP, pCantidad, pValor, pTotal : String);
 Var
   lPos : Integer;
   lBase : String;
@@ -171,10 +171,10 @@ Begin
             Copy(Justificar(pProducto      , ' ', 40, 'I'), 01, 040) + ' ' +
             Copy(Justificar(lMovto         , ' ', 10, 'I'), 01, 010) + ' ' +
             Copy(Justificar(pNro_Documento , ' ', 10, 'I'), 01, 010) + ' ' +
-            Copy(Justificar(pUsuario       , ' ', 20, 'I'), 01, 020) + ' ' +
             Copy(Justificar(pOP            , ' ', 05, 'I'), 01, 005) + ' ' +
             Copy(Justificar(pCantidad      , ' ', 10, 'D'), 01, 010) + ' ' +
-            Copy(Justificar(pValor         , ' ', 10, 'D'), 01, 010);
+            Copy(Justificar(pValor         , ' ', 10, 'D'), 01, 010) + ' ' +
+            Copy(Justificar(pTotal         , ' ', 15, 'D'), 01, 015) ;
     SaveData(lBase);
   Except
     On E: Exception Do
@@ -185,7 +185,10 @@ Begin
 End;
 
 Function TReport_Consumo_Area.PutData : Boolean;
+Var
+  lSuma : Double;
 Begin
+  lSuma := 0;
   Result := False;
   Try
     If FINPUT.Active And (FINPUT.RecordCount > 0) Then
@@ -194,16 +197,17 @@ Begin
       SaveData('');
       If FID_FECHA = 0 Then
       Begin
-        SetLinea('FECHA', 'HORA', 'PRODUCTO', 'MOVIMIENTO', 'DOCUMENTO', 'USUARIO', 'O.P.', 'CANTIDAD', 'VALOR');
+        SetLinea('FECHA', 'HORA', 'PRODUCTO', 'MOVIMIENTO', 'DOCUMENTO', 'O.P.', 'CANTIDAD', 'VALOR', 'TOTAL');
       End
       Else
       Begin
-        SetLinea('FECHA', 'VENCIMIENT', 'PRODUCTO', 'MOVIMIENTO', 'DOCUMENTO', 'USUARIO', 'O.P.', 'CANTIDAD', 'VALOR');
+        SetLinea('FECHA', 'VENCIMIENT', 'PRODUCTO', 'MOVIMIENTO', 'DOCUMENTO', 'O.P.', 'CANTIDAD', 'VALOR', 'TOTAL');
       End;
       SetLinea(StringOfChar('-', 20), StringOfChar('-', 20), StringOfChar('-', 20), StringOfChar('-', 50), StringOfChar('-', 20), StringOfChar('-', 20), StringOfChar('-', 20), StringOfChar('-', 20), StringOfChar('-', 20));
       FINPUT.First;
       While Not FINPUT.Eof Do
       Begin
+        lSuma := lSuma + (FINPUT.FieldByName('CANTIDAD').AsFloat * FINPUT.FieldByName('VALOR_UNITARIO').AsFloat);
         If FID_FECHA = 0 Then
         Begin
           SetLinea(FINPUT.FieldByName('FECHA_REGISTRO').AsString,
@@ -211,10 +215,10 @@ Begin
                    FINPUT.FieldByName('CODIGO_PRODUCTO').AsString + ',' + FINPUT.FieldByName('NOMBRE_PRODUCTO').AsString,
                    FINPUT.FieldByName('CODIGO_DOCUMENTO').AsString,
                    FINPUT.FieldByName('DOCUMENTO').AsString,
-                   FINPUT.FieldByName('NOMBRE_USUARIO').AsString,
                    FINPUT.FieldByName('NUMERO_OP').AsString,
-                   FormatFloat('###,###.#0', FINPUT.FieldByName('CANTIDAD'      ).AsFloat),
-                   FormatFloat('###,###.#0', FINPUT.FieldByName('VALOR_UNITARIO').AsFloat));
+                   FormatFloat(        '###,##0.#0', FINPUT.FieldByName('CANTIDAD'      ).AsFloat),
+                   FormatFloat(     '##,###,##0'   , FINPUT.FieldByName('VALOR_UNITARIO').AsFloat),
+                   FormatFloat('###,###,###,##0'   , FINPUT.FieldByName('CANTIDAD').AsFloat * FINPUT.FieldByName('VALOR_UNITARIO').AsFloat));
         End
         Else
         Begin
@@ -223,14 +227,16 @@ Begin
                    FINPUT.FieldByName('CODIGO_PRODUCTO').AsString + ',' + FINPUT.FieldByName('NOMBRE_PRODUCTO').AsString,
                    FINPUT.FieldByName('CODIGO_DOCUMENTO').AsString,
                    FINPUT.FieldByName('DOCUMENTO').AsString,
-                   FINPUT.FieldByName('NOMBRE_USUARIO').AsString,
                    FINPUT.FieldByName('NUMERO_OP').AsString,
-                   FormatFloat('###,###.#0', FINPUT.FieldByName('CANTIDAD'      ).AsFloat),
-                   FormatFloat('###,###.#0', FINPUT.FieldByName('VALOR_UNITARIO').AsFloat));
+                   FormatFloat(        '###,##0.#0', FINPUT.FieldByName('CANTIDAD'      ).AsFloat),
+                   FormatFloat(     '##,###,##0'   , FINPUT.FieldByName('VALOR_UNITARIO').AsFloat),
+                   FormatFloat('###,###,###,##0'   , FINPUT.FieldByName('CANTIDAD').AsFloat * FINPUT.FieldByName('VALOR_UNITARIO').AsFloat));
         End;
         Result := True;
         FINPUT.Next;
       End;
+      SetLinea(StringOfChar('=', 20), StringOfChar('=', 20), StringOfChar('=', 20), StringOfChar('=', 50), StringOfChar('=', 20), StringOfChar('=', 20), StringOfChar('=', 20), StringOfChar('=', 20), StringOfChar('=', 20));
+      SetLinea(StringOfChar(' ', 20), StringOfChar(' ', 20), StringOfChar(' ', 20), StringOfChar(' ', 50), StringOfChar(' ', 20), StringOfChar(' ', 20), StringOfChar(' ', 20), 'TOTAL', FormatFloat('###,###,###,##0', lSuma));
     End;
   Except
     On E: Exception Do

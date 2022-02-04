@@ -268,7 +268,7 @@ object FrIWArea: TFrIWArea
     WindowTop = 200
     Autosize = False
     CloseOnClick = True
-    Left = 85
+    Left = 101
     Top = 11
   end
 end

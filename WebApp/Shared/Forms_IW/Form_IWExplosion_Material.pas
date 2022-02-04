@@ -33,6 +33,10 @@ type
     IWModalWindow1: TIWModalWindow;
     CODIGO_PRODUCTO: TIWDBLabel;
     LBINFO: TIWLabel;
+    lbValor_Unitario: TIWLabel;
+    VALOR_UNITARIO: TIWDBEdit;
+    lbExistencia: TIWLabel;
+    lbTotal: TIWLabel;
     procedure BTNEXITAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNADDAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNEDITAsyncClick(Sender: TObject; EventParams: TStringList);
@@ -91,9 +95,10 @@ Begin
     If FQRDETALLE.Mode_Edition Then
     Begin
       FQRDETALLE.QR.FieldByName('CODIGO_PRODUCTO').AsString := EventParams.Values ['CODIGO_PRODUCTO'];
-      FQRDETALLE.QR.FieldByName('NOMBRE').AsString := 'OP: ' + FormatFloat('###,###,###', FNUMERO)+ ', '+
-                                                      'REFERENCIA: ' + FREFERENCIA  +', '+
-                                                      'PROYECTO: ' + FPROYECTO;
+      FQRDETALLE.QR.FieldByName('NOMBRE').AsString := EventParams.Values ['NOMBRE'];
+//      FQRDETALLE.QR.FieldByName('NOMBRE').AsString := 'OP: ' + FormatFloat('###,###,###', FNUMERO)+ ', '+
+//                                                      'REFERENCIA: ' + FREFERENCIA  +', '+
+//                                                      'PROYECTO: ' + FPROYECTO;
     End;
   Except
    On E: Exception Do
@@ -338,6 +343,7 @@ begin
     NOMBRE.DataSource           := FQRDETALLE.DS;
     FECHA_PROGRAMADA.DataSource := FQRDETALLE.DS;
     CANTIDAD.DataSource         := FQRDETALLE.DS;
+    VALOR_UNITARIO.DataSource   := FQRDETALLE.DS;
     ID_ACTIVO.DataSource        := FQRDETALLE.DS;
 
     FGRID_MAESTRO.VisibleRowCount := 11;
@@ -453,6 +459,8 @@ Begin
     Result := FQRDETALLE.Active;
     If Result Then
     Begin
+      FQRDETALLE.SetFormatNumber('CANTIDAD');
+      FQRDETALLE.SetFormatNumber('VALOR_UNITARIO');
     End;
   Except
     On E: Exception Do
@@ -527,6 +535,7 @@ begin
     FQRDETALLE.QR.FieldByName('FECHA_REGISTRO'  ).AsString  := FormatDateTime('YYYY-MM-DD', Now);
     FQRDETALLE.QR.FieldByName('HORA_REGISTRO'   ).AsString  := FormatDateTime('HH:NN:SS.Z', Now);
     FQRDETALLE.QR.FieldByName('CODIGO_USUARIO'  ).AsString  := UserSession.USER_CODE;
+    FQRDETALLE.QR.FieldByName('CANTIDAD'        ).AsFloat   := 1;
     FQRDETALLE.QR.FieldByName('ID_ACTIVO'       ).AsString := 'S';
   Except
     On E: Exception Do
@@ -537,9 +546,23 @@ begin
 end;
 
 procedure TFrIWExplosion_Material.DsDataChangeDetalle(pSender: TObject);
+Var
+  lValor : Double;
+  lSaldo : Double;
 Begin
   Try
+    lSaldo := 0;
     lbNombre_Producto.Caption := FCNX.GetValue(Info_TablaGet(Id_TBL_Producto).Name, ['CODIGO_PRODUCTO'], [FQRDETALLE.QR.FieldByName('CODIGO_PRODUCTO').AsString], ['NOMBRE']);
+    lbValor_Unitario.Visible := FCNX.GetValue(Info_TablaGet(Id_TBL_Producto).Name, ['CODIGO_PRODUCTO'], [FQRDETALLE.QR.FieldByName('CODIGO_PRODUCTO').AsString], ['ID_SERVICIO']) = 'S';
+    VALOR_UNITARIO.Visible := lbValor_Unitario.Visible;
+    lbExistencia.Visible := Not lbValor_Unitario.Visible;
+    If lbExistencia.Visible Then
+      lSaldo := Report_Saldo_Inventario_Saldo(FCNX, FQRDETALLE.QR.FieldByName('CODIGO_PRODUCTO').AsString, FQRDETALLE.QR.FieldByName('CODIGO_PRODUCTO').AsString);
+    lbExistencia.Caption := 'Existencia: ' + FormatFloat('###,###,##0.#0', lSaldo);
+    lValor := FQRDETALLE.QR.FieldByName('VALOR_UNITARIO').AsFloat;
+    If lValor <= 0 Then
+      lValor := FCNX.GetValueDbl(Info_TablaGet(Id_TBL_Producto).Name, ['CODIGO_PRODUCTO'], [FQRDETALLE.QR.FieldByName('CODIGO_PRODUCTO').AsString], ['VALOR_UNITARIO']);
+    lbTotal.Caption := FormatFloat('###,###,##0.#0', FQRDETALLE.QR.FieldByName('CANTIDAD').AsFloat * lValor);
     Self.Title := Info_TablaGet(Id_TBL_Explosion_Material).Caption + ', ' + FNOMBRE + ', ' + lbNombre_Producto.Caption;
   Except
     On E: Exception Do
@@ -557,18 +580,20 @@ Begin
   BTNSAVE.Visible      := FQRDETALLE.Mode_Edition;
   BTNCANCEL.Visible    := FQRDETALLE.Mode_Edition;
 
-  DATO.Visible             := Not FQRDETALLE.Mode_Edition;
+  DATO.Visible               := Not FQRDETALLE.Mode_Edition;
 
   BTNCODIGO_PRODUCTO.Visible := FQRDETALLE.Mode_Insert ;
 
   FECHA_PROGRAMADA.Enabled  := FQRDETALLE.Mode_Insert ;
   NOMBRE.Enabled            := FQRDETALLE.Mode_Edition;
   CANTIDAD.Enabled          := FQRDETALLE.Mode_Edition;
+  VALOR_UNITARIO.Enabled    := FQRDETALLE.Mode_Edition;
   ID_ACTIVO.Enabled         := FQRDETALLE.Mode_Edition;
 
   FECHA_PROGRAMADA.Editable := FQRDETALLE.Mode_Insert ;
   NOMBRE.Editable           := FQRDETALLE.Mode_Edition;
   CANTIDAD.Editable         := FQRDETALLE.Mode_Edition;
+  VALOR_UNITARIO.Editable   := FQRDETALLE.Mode_Edition;
   ID_ACTIVO.Editable        := FQRDETALLE.Mode_Edition;
 End;
 

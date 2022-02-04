@@ -70,7 +70,7 @@ object FrIWOrden_Produccion: TFrIWOrden_Produccion
       InactiveTabFont.Style = []
       ActiveTabColor = clWebDARKGRAY
       InactiveTabColor = clWebLIGHTGRAY
-      ActivePage = 1
+      ActivePage = 0
       Align = alClient
       BorderOptions.NumericWidth = 0
       BorderOptions.Style = cbsNone
@@ -87,17 +87,6 @@ object FrIWOrden_Produccion: TFrIWOrden_Produccion
       DesignSize = (
         1339
         533)
-      object PAG_00: TIWTabPage
-        Left = 0
-        Top = 30
-        Width = 1339
-        Height = 503
-        RenderInvisibleControls = True
-        Title = '[          Registros          ]'
-        BorderOptions.NumericWidth = 0
-        BorderOptions.Style = cbsNone
-        Color = clWebWHITE
-      end
       object PAG_01: TIWTabPage
         Left = 0
         Top = 30
@@ -769,6 +758,17 @@ object FrIWOrden_Produccion: TFrIWOrden_Produccion
           OnAsyncClick = BTNIMPRIMIRAsyncClick
         end
       end
+      object PAG_00: TIWTabPage
+        Left = 0
+        Top = 30
+        Width = 1339
+        Height = 503
+        RenderInvisibleControls = True
+        Title = '[          Registros          ]'
+        BorderOptions.NumericWidth = 0
+        BorderOptions.Style = cbsNone
+        Color = clWebWHITE
+      end
     end
   end
   object RNAVEGADOR: TIWRegion
@@ -815,7 +815,7 @@ object FrIWOrden_Produccion: TFrIWOrden_Produccion
     end
   end
   object IWModalWindow1: TIWModalWindow
-    Left = 96
+    Left = 128
     Top = 8
   end
 end

@@ -392,7 +392,7 @@ object FrIWExplosion_Material: TFrIWExplosion_Material
   end
   object IWLabel2: TIWLabel
     Left = 11
-    Top = 208
+    Top = 207
     Width = 71
     Height = 16
     Font.Color = clNone
@@ -420,7 +420,7 @@ object FrIWExplosion_Material: TFrIWExplosion_Material
   end
   object IWLabel3: TIWLabel
     Left = 11
-    Top = 244
+    Top = 240
     Width = 55
     Height = 16
     Font.Color = clNone
@@ -434,7 +434,7 @@ object FrIWExplosion_Material: TFrIWExplosion_Material
   object CANTIDAD: TIWDBEdit
     Left = 127
     Top = 236
-    Width = 138
+    Width = 82
     Height = 24
     StyleRenderOptions.RenderBorder = False
     Alignment = taRightJustify
@@ -506,6 +506,60 @@ object FrIWExplosion_Material: TFrIWExplosion_Material
     AutoSize = False
     FriendlyName = 'LBINFO'
     Caption = 'LBINFO'
+  end
+  object lbValor_Unitario: TIWLabel
+    Left = 240
+    Top = 240
+    Width = 85
+    Height = 16
+    Font.Color = clNone
+    Font.Size = 10
+    Font.Style = []
+    NoWrap = True
+    HasTabOrder = False
+    FriendlyName = 'lbValor_Unitario'
+    Caption = 'Valor Unitario'
+  end
+  object VALOR_UNITARIO: TIWDBEdit
+    Left = 331
+    Top = 236
+    Width = 200
+    Height = 24
+    StyleRenderOptions.RenderBorder = False
+    Alignment = taRightJustify
+    Font.Color = clNone
+    Font.Size = 10
+    Font.Style = []
+    FriendlyName = 'VALOR_UNITARIO'
+    SubmitOnAsyncEvent = True
+    AutoEditable = False
+    DataField = 'VALOR_UNITARIO'
+    PasswordPrompt = False
+  end
+  object lbExistencia: TIWLabel
+    Left = 336
+    Top = 118
+    Width = 82
+    Height = 16
+    Font.Color = clWebNAVY
+    Font.Size = 10
+    Font.Style = [fsBold]
+    NoWrap = True
+    HasTabOrder = False
+    FriendlyName = 'lbExistencia'
+    Caption = 'lbExistencia'
+  end
+  object lbTotal: TIWLabel
+    Left = 565
+    Top = 240
+    Width = 47
+    Height = 16
+    Font.Color = clWebNAVY
+    Font.Size = 10
+    Font.Style = [fsBold]
+    HasTabOrder = False
+    FriendlyName = 'lbTotal'
+    Caption = 'lbTotal'
   end
   object IWModalWindow1: TIWModalWindow
     Left = 304

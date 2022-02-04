@@ -156,10 +156,14 @@ Begin
       CODIGO_AREA.BGColor := UserSession.COLOR_ERROR;
     End;
 
-    If FQRMAESTRO.Mode_Edition And Vacio(FQRMAESTRO.QR.FieldByName('NOMBRE').AsString) Then
+    If FQRMAESTRO.Mode_Edition Then
     Begin
-      lMensaje := lMensaje + IfThen(Not Vacio(lMensaje), ', ') + 'Nombre invalido';
-      NOMBRE.BGColor := UserSession.COLOR_ERROR;
+      FQRMAESTRO.QR.FieldByName('NOMBRE').AsString := AnsiUpperCase(Trim(FQRMAESTRO.QR.FieldByName('NOMBRE').AsString));
+      If Vacio(FQRMAESTRO.QR.FieldByName('NOMBRE').AsString) Then
+      Begin
+        lMensaje := lMensaje + IfThen(Not Vacio(lMensaje), ', ') + 'Nombre invalido';
+        NOMBRE.BGColor := UserSession.COLOR_ERROR;
+      End;
     End;
 
     FQRMAESTRO.ERROR := IfThen(Vacio(lMensaje), 0, -1);
