@@ -197,6 +197,9 @@ Begin
   Try
     If FINPUT.Active And (FINPUT.RecordCount > 0) Then
     Begin
+      SaveData('SALDO DE INVENTARIO');
+      SaveData('FECHA/HORA: ' + FormatDateTime('YYYY-MM-DD, HH:NN:SS', Now));
+      SaveData('USUARIO: ' + UserSession.USER_NAME);
       SetLinea('CODIGO', 'DESCRIPCION', 'MINIMO', 'MAXIMO', 'VALOR', 'EXISTENCIA', 'TOTAL');
       SetLinea(StringOfChar('-', 20), StringOfChar('-', 50), StringOfChar('-', 20), StringOfChar('-', 20), StringOfChar('-', 20), StringOfChar('-', 20), StringOfChar('-', 20));
       FINPUT.First;

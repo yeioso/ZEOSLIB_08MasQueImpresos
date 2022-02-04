@@ -193,6 +193,9 @@ Begin
   Try
     If FINPUT.Active And (FINPUT.RecordCount > 0) Then
     Begin
+      SaveData('CONSUMO POR AREA');
+      SaveData('FECHA/HORA: ' + FormatDateTime('YYYY-MM-DD, HH:NN:SS', Now));
+      SaveData('USUARIO: ' + UserSession.USER_NAME);
       SaveData('AREA: ' + Trim(FINPUT.FieldByName('NOMBRE_AREA').AsString) + ' ENTRE ' + FFECHA_INI + ' Y ' + FFECHA_FIN);
       SaveData('');
       If FID_FECHA = 0 Then

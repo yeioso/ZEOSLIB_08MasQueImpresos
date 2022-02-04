@@ -207,7 +207,9 @@ Begin
   Try
     If FINPUT_ENC.Active And (FINPUT_ENC.RecordCount > 0) Then
     Begin
-      SaveData('FECHA/HORA: ' + FormatDateTime('YYYY-MM-DD / HH:NN:SS.Z', Now));
+      SaveData('ORDEN DE PRODUCCION / EXPLOSION DE MATERIALES');
+      SaveData('FECHA/HORA: ' + FormatDateTime('YYYY-MM-DD, HH:NN:SS', Now));
+      SaveData('USUARIO: ' + UserSession.USER_NAME);
       SaveData('');
       SaveData('ORDEN DE PRODUCCION: ' + IntToStr(FNUMERO));
       SaveData('DOCUMENTO REFERENCIA: ' + Trim(FINPUT_ENC.FieldByName('DOCUMENTO_REFERENCIA').AsString));

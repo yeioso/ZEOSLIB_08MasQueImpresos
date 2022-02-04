@@ -30,6 +30,7 @@ Type
       Function GetData : Boolean;
       Function PutData : Boolean;
       Procedure SetLinea(Const pProducto, pCantidad_EDM, pCantidad_INV, pEfectividad : String);
+      Procedure Informacion_Adicional;
     Public
       Constructor Create(pCNX: TConexion; Const pCodigo_Documento : String; Const pNumero : Integer);
       Destructor Destroy;
@@ -108,7 +109,7 @@ Begin
     FINPUT.SQL.Add(' SELECT  X.CODIGO_PRODUCTO  ');
     FINPUT.SQL.Add('        ,P.NOMBRE  ');
     FINPUT.SQL.Add('        ,SUM(X.CANTIDAD_EDM) AS CANTIDAD_EDM');
-    FINPUT.SQL.Add('        , SUM(X.CANTIDAD_INV) AS CANTIDAD_INV');
+    FINPUT.SQL.Add('        ,SUM(X.CANTIDAD_INV) AS CANTIDAD_INV');
     FINPUT.SQL.Add(' FROM  ');
     FINPUT.SQL.Add(' (  ');
     FINPUT.SQL.Add('     SELECT  D.CODIGO_PRODUCTO ');
@@ -128,6 +129,7 @@ Begin
     FINPUT.SQL.Add('     GROUP BY D.CODIGO_PRODUCTO ');
     FINPUT.SQL.Add(' ) AS X ');
     FINPUT.SQL.Add(' INNER JOIN ' + Info_TablaGet(Id_TBL_Producto).Name + ' P ON X.CODIGO_PRODUCTO = P.CODIGO_PRODUCTO ');
+    FINPUT.SQL.Add(' WHERE (P.ID_SERVICIO IS NULL) Or (P.ID_SERVICIO = ' + QuotedStr('N') + ') ');
     FINPUT.SQL.Add(' GROUP BY X.CODIGO_PRODUCTO, P.NOMBRE ');
     FINPUT.SQL.Add(' ORDER BY P.NOMBRE ');
     FINPUT.Active := True;
@@ -159,6 +161,58 @@ Begin
   End;
 End;
 
+Procedure TReport_Comparativo_OP_Inventario.Informacion_Adicional;
+Begin
+  Try
+    FCNX.TMP.Active := False;
+    FCNX.TMP.SQL.Clear;
+    FCNX.TMP.SQL.Add('   SELECT ');
+    FCNX.TMP.SQL.Add('             D.CODIGO_DOCUMENTO ');
+    FCNX.TMP.SQL.Add('            ,D.NUMERO ');
+    FCNX.TMP.SQL.Add('            ,D.CODIGO_TERCERO ');
+    FCNX.TMP.SQL.Add('            ,T.NOMBRE AS NOMBRE_TERCERO ');
+    FCNX.TMP.SQL.Add('            ,D.CODIGO_PROYECTO ');
+    FCNX.TMP.SQL.Add('            ,P.NOMBRE AS NOMBRE_PROYECTO ');
+    FCNX.TMP.SQL.Add('            ,D.CODIGO_USUARIO ');
+    FCNX.TMP.SQL.Add('            ,U.NOMBRE AS NOMBRE_USUARIO ');
+    FCNX.TMP.SQL.Add('            ,D.FECHA_REGISTRO ');
+    FCNX.TMP.SQL.Add('            ,D.HORA_REGISTRO ');
+    FCNX.TMP.SQL.Add('            ,D.NOMBRE ');
+    FCNX.TMP.SQL.Add('            ,D.FECHA_INICIAL ');
+    FCNX.TMP.SQL.Add('            ,D.FECHA_FINAL ');
+    FCNX.TMP.SQL.Add('            ,D.DOCUMENTO_REFERENCIA ');
+    FCNX.TMP.SQL.Add('            ,D.DESCRIPCION ');
+    FCNX.TMP.SQL.Add('            ,D.CANTIDAD ');
+    FCNX.TMP.SQL.Add('   FROM ' + Info_TablaGet(Id_TBL_Orden_Produccion).Name + ' D ');
+    FCNX.TMP.SQL.Add('   INNER JOIN ' + Info_TablaGet(Id_TBL_Tercero ).Name + ' T ON D.CODIGO_TERCERO = T.CODIGO_TERCERO ');
+    FCNX.TMP.SQL.Add('   INNER JOIN ' + Info_TablaGet(Id_TBL_Proyecto).Name + ' P ON D.CODIGO_PROYECTO = P.CODIGO_PROYECTO ');
+    FCNX.TMP.SQL.Add('   INNER JOIN ' + Info_TablaGet(Id_TBL_Usuario).Name + ' U ON D.CODIGO_USUARIO = U.CODIGO_USUARIO ');
+    FCNX.TMP.SQL.Add('   WHERE ' + FCNX.Trim_Sentence('D.CODIGO_DOCUMENTO') + ' = ' + QuotedStr(Trim(FCODIGO_DOCUMENTO)));
+    FCNX.TMP.SQL.Add('   AND D.NUMERO  = ' + IntToStr(FNUMERO));
+    FCNX.TMP.Active := True;
+    If FCNX.TMP.Active And (FCNX.TMP.RecordCount > 0) Then
+    Begin
+      SaveData('DOCUMENTO REFERENCIA: ' + Trim(FCNX.TMP.FieldByName('DOCUMENTO_REFERENCIA').AsString));
+      SaveData('TERCERO: ' + Trim(FCNX.TMP.FieldByName('CODIGO_TERCERO').AsString) + ' ' + Trim(FCNX.TMP.FieldByName('NOMBRE_TERCERO').AsString));
+      SaveData('PROYECTO: ' + Trim(FCNX.TMP.FieldByName('CODIGO_PROYECTO').AsString) + ' ' + Trim(FCNX.TMP.FieldByName('NOMBRE_PROYECTO').AsString));
+      SaveData('USUARIO: ' + Trim(FCNX.TMP.FieldByName('CODIGO_USUARIO').AsString) + ' ' + Trim(FCNX.TMP.FieldByName('NOMBRE_USUARIO').AsString));
+      SaveData('FECHA/HORA DEL REGISTRO: ' + Trim(FCNX.TMP.FieldByName('FECHA_REGISTRO').AsString) + ' / ' + Trim(FCNX.TMP.FieldByName('HORA_REGISTRO').AsString));
+      SaveData('NOMBRE: ' + Trim(FCNX.TMP.FieldByName('NOMBRE').AsString));
+      SaveData('FECHA INICIAL: ' + Trim(FCNX.TMP.FieldByName('FECHA_INICIAL').AsString));
+      SaveData('FECHA FINAL: ' + Trim(FCNX.TMP.FieldByName('FECHA_FINAL').AsString));
+      SaveData('DESCRIPCION: ' + Trim(FCNX.TMP.FieldByName('DESCRIPCION').AsString));
+      SaveData('CANTIDAD: ' + FormatFloat('###,###,##0.#0', FCNX.TMP.FieldByName('CANTIDAD').AsFloat));
+    End;
+    FCNX.TMP.Active := False;
+    FCNX.TMP.SQL.Clear;
+  Except
+    On E: Exception Do
+    Begin
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Report.Comparativo_OP_Inventario', 'TReport_Comparativo_OP_Inventario.Informacion_Adicional', E.Message);
+    End;
+  End;
+End;
+
 Function TReport_Comparativo_OP_Inventario.PutData : Boolean;
 Var
   lEFE : Double;
@@ -171,9 +225,13 @@ Begin
   Try
     If FINPUT.Active And (FINPUT.RecordCount > 0) Then
     Begin
+      SaveData('EXPLOSION DE MATERIALES VERSUS INVENTARIO POR ORDEN DE PRODUCCION');
+      SaveData('FECHA/HORA: ' + FormatDateTime('YYYY-MM-DD, HH:NN:SS', Now));
+      SaveData('USUARIO: ' + UserSession.USER_NAME);
       SaveData('E.D.M: EXPLOSION DE MATERIALES');
       SaveData('FECHA/HORA: ' + FormatDateTime('YYYY-MM-DD / HH:NN:SS.Z', Now));
       SaveData('ORDEN DE PRODUCCION: ' + Trim(FormatFloat('###,###,#0', FNUMERO)));
+      Informacion_Adicional;
       SaveData('');
       SetLinea('PRODUCTO', 'E.D.M', 'INVENTARIO', 'EFECTIVIDAD');
       SetLinea(StringOfChar('-', 100), StringOfChar('-', 20), StringOfChar('-', 20), StringOfChar('-', 20));

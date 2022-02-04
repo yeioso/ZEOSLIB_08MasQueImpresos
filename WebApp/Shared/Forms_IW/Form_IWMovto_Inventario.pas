@@ -378,7 +378,7 @@ Begin
       CODIGO_PRODUCTO.BGColor := UserSession.COLOR_ERROR;
     End;
 
-    If FQRMAESTRO.Mode_Edition And (FQRMAESTRO.QR.FieldByName('CANTIDAD').AsInteger <= 0) Then
+    If FQRMAESTRO.Mode_Edition And (FQRMAESTRO.QR.FieldByName('CANTIDAD').AsFloat <= 0) Then
     Begin
       lMensaje := lMensaje + IfThen(Not Vacio(lMensaje), ', ') + 'Cantidad no valida';
       CANTIDAD.BGColor := UserSession.COLOR_ERROR;
@@ -406,6 +406,13 @@ Begin
   BTNCODIGO_TERCERO.Visible  := FQRMAESTRO.Mode_Edition And Documento_Activo;
   BTNCODIGO_PRODUCTO.Visible := FQRMAESTRO.Mode_Edition And Documento_Activo;
 
+  NOMBRE.Enabled             := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  FECHA_MOVIMIENTO.Enabled   := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  FECHA_VENCIMIENTO.Enabled  := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  CANTIDAD.Enabled           := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  VALOR_UNITARIO.Enabled     := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  ID_ACTIVO.Enabled          := FQRMAESTRO.Mode_Edition And Documento_Activo;
+
   NOMBRE.Editable            := FQRMAESTRO.Mode_Edition And Documento_Activo;
   FECHA_MOVIMIENTO.Editable  := FQRMAESTRO.Mode_Edition And Documento_Activo;
   FECHA_VENCIMIENTO.Editable := FQRMAESTRO.Mode_Edition And Documento_Activo;
@@ -415,9 +422,9 @@ Begin
 
   DESCRIPCION.Editable       := FQRMAESTRO.Mode_Edition And Documento_Activo;
 
-  DATO.Visible                 := (Not FQRMAESTRO.Mode_Edition);
-  PAG_00.Visible               := (Not FQRMAESTRO.Mode_Edition);
-  PAG_01.Visible               := True;
+  DATO.Visible   := (Not FQRMAESTRO.Mode_Edition);
+  PAG_00.Visible := (Not FQRMAESTRO.Mode_Edition);
+  PAG_01.Visible := True;
 End;
 
 Function TFrIWMovto_Inventario.Info_OP(Const pNumero : Integer; Const pCodigo_Documento : String) : String;
