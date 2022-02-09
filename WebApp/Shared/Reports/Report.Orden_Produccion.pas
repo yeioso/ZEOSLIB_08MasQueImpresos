@@ -211,8 +211,8 @@ Begin
       SaveData('FECHA/HORA: ' + FormatDateTime('YYYY-MM-DD, HH:NN:SS', Now));
       SaveData('USUARIO: ' + UserSession.USER_NAME);
       SaveData('');
-      SaveData('ORDEN DE PRODUCCION: ' + IntToStr(FNUMERO));
-      SaveData('DOCUMENTO REFERENCIA: ' + Trim(FINPUT_ENC.FieldByName('DOCUMENTO_REFERENCIA').AsString));
+      SaveData('NUMERO: ' + IntToStr(FNUMERO));
+      SaveData('ORDEN DE PRODUCCION: ' + Trim(FINPUT_ENC.FieldByName('DOCUMENTO_REFERENCIA').AsString));
       SaveData('TERCERO: ' + Trim(FINPUT_ENC.FieldByName('CODIGO_TERCERO').AsString) + ' ' + Trim(FINPUT_ENC.FieldByName('NOMBRE_TERCERO').AsString));
       SaveData('PROYECTO: ' + Trim(FINPUT_ENC.FieldByName('CODIGO_PROYECTO').AsString) + ' ' + Trim(FINPUT_ENC.FieldByName('NOMBRE_PROYECTO').AsString));
       SaveData('USUARIO: ' + Trim(FINPUT_ENC.FieldByName('CODIGO_USUARIO').AsString) + ' ' + Trim(FINPUT_ENC.FieldByName('NOMBRE_USUARIO').AsString));

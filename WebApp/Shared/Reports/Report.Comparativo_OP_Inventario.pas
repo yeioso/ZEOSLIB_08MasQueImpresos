@@ -192,7 +192,7 @@ Begin
     FCNX.TMP.Active := True;
     If FCNX.TMP.Active And (FCNX.TMP.RecordCount > 0) Then
     Begin
-      SaveData('DOCUMENTO REFERENCIA: ' + Trim(FCNX.TMP.FieldByName('DOCUMENTO_REFERENCIA').AsString));
+      SaveData('ORDEN DE PRODUCCION: ' + Trim(FCNX.TMP.FieldByName('DOCUMENTO_REFERENCIA').AsString));
       SaveData('TERCERO: ' + Trim(FCNX.TMP.FieldByName('CODIGO_TERCERO').AsString) + ' ' + Trim(FCNX.TMP.FieldByName('NOMBRE_TERCERO').AsString));
       SaveData('PROYECTO: ' + Trim(FCNX.TMP.FieldByName('CODIGO_PROYECTO').AsString) + ' ' + Trim(FCNX.TMP.FieldByName('NOMBRE_PROYECTO').AsString));
       SaveData('USUARIO: ' + Trim(FCNX.TMP.FieldByName('CODIGO_USUARIO').AsString) + ' ' + Trim(FCNX.TMP.FieldByName('NOMBRE_USUARIO').AsString));
@@ -230,7 +230,7 @@ Begin
       SaveData('USUARIO: ' + UserSession.USER_NAME);
       SaveData('E.D.M: EXPLOSION DE MATERIALES');
       SaveData('FECHA/HORA: ' + FormatDateTime('YYYY-MM-DD / HH:NN:SS.Z', Now));
-      SaveData('ORDEN DE PRODUCCION: ' + Trim(FormatFloat('###,###,#0', FNUMERO)));
+      SaveData('NUMERO: ' + Trim(FormatFloat('###,###,#0', FNUMERO)));
       Informacion_Adicional;
       SaveData('');
       SetLinea('PRODUCTO', 'E.D.M', 'INVENTARIO', 'EFECTIVIDAD');

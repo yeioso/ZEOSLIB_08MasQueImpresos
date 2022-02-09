@@ -144,7 +144,7 @@ object FrIWOrden_Produccion: TFrIWOrden_Produccion
           Caption = 'Proyecto'
         end
         object NUMERO: TIWDBLabel
-          Left = 113
+          Left = 121
           Top = 9
           Width = 148
           Height = 21
@@ -215,7 +215,7 @@ object FrIWOrden_Produccion: TFrIWOrden_Produccion
           JpegOptions.Smoothing = True
         end
         object CODIGO_PROYECTO: TIWDBLabel
-          Left = 113
+          Left = 121
           Top = 33
           Width = 148
           Height = 21
@@ -231,7 +231,7 @@ object FrIWOrden_Produccion: TFrIWOrden_Produccion
           FriendlyName = 'CODIGO_PROYECTO'
         end
         object lbNombre_Proyecto: TIWLabel
-          Left = 293
+          Left = 301
           Top = 35
           Width = 139
           Height = 16
@@ -315,7 +315,7 @@ object FrIWOrden_Produccion: TFrIWOrden_Produccion
           JpegOptions.Smoothing = True
         end
         object CODIGO_TERCERO: TIWDBLabel
-          Left = 113
+          Left = 121
           Top = 57
           Width = 148
           Height = 21
@@ -331,7 +331,7 @@ object FrIWOrden_Produccion: TFrIWOrden_Produccion
           FriendlyName = 'CODIGO_TERCERO'
         end
         object lbNombre_Tercero: TIWLabel
-          Left = 293
+          Left = 301
           Top = 59
           Width = 129
           Height = 16
@@ -375,7 +375,7 @@ object FrIWOrden_Produccion: TFrIWOrden_Produccion
           Caption = 'Descripci'#243'n'
         end
         object BTNCREARPROYECTO: TIWImage
-          Left = 267
+          Left = 275
           Top = 30
           Width = 22
           Height = 21
@@ -466,7 +466,7 @@ object FrIWOrden_Produccion: TFrIWOrden_Produccion
           JpegOptions.Smoothing = True
         end
         object BTNCREARTERCERO: TIWImage
-          Left = 267
+          Left = 275
           Top = 54
           Width = 22
           Height = 21
@@ -588,8 +588,8 @@ object FrIWOrden_Produccion: TFrIWOrden_Produccion
         end
         object IWLabel4: TIWLabel
           Left = 10
-          Top = 107
-          Width = 67
+          Top = 111
+          Width = 111
           Height = 16
           RenderSize = False
           StyleRenderOptions.RenderSize = False
@@ -599,7 +599,7 @@ object FrIWOrden_Produccion: TFrIWOrden_Produccion
           NoWrap = True
           HasTabOrder = False
           FriendlyName = 'IWLabel4'
-          Caption = 'Referencia'
+          Caption = 'Orden Produccion'
         end
         object IWLabel11: TIWLabel
           Left = 10
@@ -617,7 +617,7 @@ object FrIWOrden_Produccion: TFrIWOrden_Produccion
           Caption = 'Cantidad'
         end
         object NOMBRE: TIWDBEdit
-          Left = 113
+          Left = 121
           Top = 81
           Width = 447
           Height = 24
@@ -632,7 +632,7 @@ object FrIWOrden_Produccion: TFrIWOrden_Produccion
           PasswordPrompt = False
         end
         object DOCUMENTO_REFERENCIA: TIWDBEdit
-          Left = 113
+          Left = 121
           Top = 108
           Width = 200
           Height = 24
@@ -647,7 +647,7 @@ object FrIWOrden_Produccion: TFrIWOrden_Produccion
           PasswordPrompt = False
         end
         object DESCRIPCION: TIWDBMemo
-          Left = 113
+          Left = 121
           Top = 135
           Width = 447
           Height = 64
@@ -668,7 +668,7 @@ object FrIWOrden_Produccion: TFrIWOrden_Produccion
           FriendlyName = 'DESCRIPCION'
         end
         object FECHA_INICIAL: TIWDBEdit
-          Left = 113
+          Left = 121
           Top = 202
           Width = 200
           Height = 24
@@ -683,7 +683,7 @@ object FrIWOrden_Produccion: TFrIWOrden_Produccion
           PasswordPrompt = False
         end
         object FECHA_FINAL: TIWDBEdit
-          Left = 113
+          Left = 121
           Top = 229
           Width = 200
           Height = 24
@@ -698,7 +698,7 @@ object FrIWOrden_Produccion: TFrIWOrden_Produccion
           PasswordPrompt = False
         end
         object CANTIDAD: TIWDBEdit
-          Left = 113
+          Left = 121
           Top = 256
           Width = 200
           Height = 24
@@ -732,7 +732,7 @@ object FrIWOrden_Produccion: TFrIWOrden_Produccion
           ValueUnchecked = 'N'
         end
         object BTNEXPLOSION_MATERIAL: TIWButton
-          Left = 335
+          Left = 343
           Top = 213
           Width = 200
           Height = 30
@@ -745,7 +745,7 @@ object FrIWOrden_Produccion: TFrIWOrden_Produccion
           OnAsyncClick = BTNEXPLOSION_MATERIALAsyncClick
         end
         object BTNIMPRIMIR: TIWButton
-          Left = 335
+          Left = 343
           Top = 249
           Width = 200
           Height = 30
@@ -815,7 +815,7 @@ object FrIWOrden_Produccion: TFrIWOrden_Produccion
     end
   end
   object IWModalWindow1: TIWModalWindow
-    Left = 128
+    Left = 136
     Top = 8
   end
 end
