@@ -33,6 +33,7 @@ Type
  TInfo_Tablas = TList<TInfo_Tabla>;
 
 Function Info_TablaGet(Const pId : Integer) : TInfo_Tabla;
+Procedure TBL000_Info_Tabla_Init;
 
 implementation
 Uses
@@ -64,8 +65,9 @@ Begin
     lK.Fk[lI] := 'FK' + IntToStr(pId) + '_' + IntToStr(lI) + IntToStr(Random(100));
 End;
 
-Procedure Preparar_Tablas;
+Procedure TBL000_Info_Tabla_Init;
 Begin
+  gInfo_Tablas := TInfo_Tablas.Create;
   Cargar_Tablas(Id_TBL_Perfil                 , '001', 'PERFIL'       , 'Perfiles'                  , ['CODIGO_PERFIL']);
   Cargar_Tablas(Id_TBL_Permiso_App            , '002', 'PERMISO_APP'  , 'Permisos de Aplicación'    , ['CODIGO_PERFIL', 'CONSECUTIVO']);
   Cargar_Tablas(Id_TBL_Usuario                , '003', 'USUARIO'      , 'Usuario'                   , ['CODIGO_USUARIO']);
@@ -83,7 +85,6 @@ Begin
 End;
 
 Initialization
-  gInfo_Tablas := TInfo_Tablas.Create;
-  Preparar_Tablas;
+  TBL000_Info_Tabla_Init;
 
 end.

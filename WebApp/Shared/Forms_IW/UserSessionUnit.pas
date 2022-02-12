@@ -224,6 +224,7 @@ End;
 
 procedure TIWUserSession.IWUserSessionBaseCreate(Sender: TObject);
 begin
+  TBL000_Info_Tabla_Init;
   FPERMISOS_APP := TPermisos_App.Create;
   FCNX := TConexion.Create(Nil);
   FCNX.Name  := 'MQIERP_DATABASE';
