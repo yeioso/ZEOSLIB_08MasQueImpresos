@@ -189,10 +189,14 @@ Begin
     FCNX.SetPassword    (Self.DB.Password    );
     FCNX.SetDLL_DATABASE(Self.DB.DLL_DATABASE);
     Self.FCONNECTED := FCNX.Connect(True);
-    If Self.FCONNECTED And TBL001_Create_Tabla_CheckTables(FCNX) Then
+    If Self.FCONNECTED Then
     Begin
-
-    End;
+      TBL000_Info_Tabla_Init;
+      If Not TBL001_Create_Tabla_CheckTables(FCNX) Then
+        Utils_ManagerLog_Add('ServerController', 'TIWServerController', 'Prepare_Container', 'No es posible establecer el ambiente de las tablas');
+    End
+    Else
+      Utils_ManagerLog_Add('ServerController', 'TIWServerController', 'Prepare_Container', 'No es posible conectarse a la base de datos');
   Except
     On E: Exception Do
       Utils_ManagerLog_Add('ServerController', 'TIWServerController', 'Prepare_Container', E.Message);
