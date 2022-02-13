@@ -21,6 +21,7 @@ Type
     Private
       FCNX : TConexion;
       FINPUT : TQUERY;
+      FINPUT2 : TQUERY;
       FOUTPUT : TQUERY;
       FNUMERO : Integer;
       FCONTADOR : Integer;
@@ -28,8 +29,10 @@ Type
       Function Inicializar_Reporte : Boolean;
       Procedure SaveData(Const pLine : String; pForced : Boolean = False);
       Function GetData : Boolean;
+      Function GetDetail(Const pCodigo_Producto : String) : Double;
       Function PutData : Boolean;
       Procedure SetLinea(Const pProducto, pCantidad_EDM, pCantidad_INV, pEfectividad : String);
+      Procedure SetLinea2(Const pTipo_Documento, pNumero, pFecha_Movimiento, pFecha_Registro, Hora, pCantidad, pValor, pTotal : String);
       Procedure Informacion_Adicional;
     Public
       Constructor Create(pCNX: TConexion; Const pCodigo_Documento : String; Const pNumero : Integer);
@@ -42,9 +45,11 @@ Begin
   Try
     FCNX := pCNX;
     FINPUT := TQUERY.Create(Nil);
+    FINPUT2 := TQUERY.Create(Nil);
     FOUTPUT := TQUERY.Create(Nil);
     FCONTADOR := 0;
     FINPUT.Connection := pCNX;
+    FINPUT2.Connection := pCNX;
     FOUTPUT.Connection := pCNX;
     FNUMERO := pNumero;
     FCODIGO_DOCUMENTO := pCodigo_Documento;
@@ -125,7 +130,17 @@ Begin
     FINPUT.SQL.Add('            ,SUM(D.CANTIDAD) AS CANTIDAD_INV ');
     FINPUT.SQL.Add('     FROM ' + Info_TablaGet(Id_TBL_Movto_Inventario).Name + ' D  ');
     FINPUT.SQL.Add('     WHERE ' +FCNX.Trim_Sentence('D.CODIGO_DOCUMENTO') + ' = ' + QuotedStr(Trim(UserSession.DOCUMENTO_SALIDA_DE_INVENTARIO)) );
-    FINPUT.SQL.Add('     AND D.NUMERO = ' + IntToStr(FNUMERO));
+    FINPUT.SQL.Add('     AND ' +FCNX.Trim_Sentence('D.CODIGO_DOCUMENTO_OP') + ' = ' + QuotedStr(Trim(FCODIGO_DOCUMENTO)));
+    FINPUT.SQL.Add('     AND D.NUMERO_OP = ' + IntToStr(FNUMERO));
+    FINPUT.SQL.Add('     GROUP BY D.CODIGO_PRODUCTO ');
+    FINPUT.SQL.Add('   UNION ALL ');
+    FINPUT.SQL.Add('     SELECT  D.CODIGO_PRODUCTO ');
+    FINPUT.SQL.Add('            ,0 AS CANTIDAD_EDM ');
+    FINPUT.SQL.Add('            ,SUM(D.CANTIDAD * -1) AS CANTIDAD_INV ');
+    FINPUT.SQL.Add('     FROM ' + Info_TablaGet(Id_TBL_Movto_Inventario).Name + ' D  ');
+    FINPUT.SQL.Add('     WHERE ' +FCNX.Trim_Sentence('D.CODIGO_DOCUMENTO') + ' = ' + QuotedStr(Trim(UserSession.DOCUMENTO_DEVOLUCION_AL_INVENTARIO)));
+    FINPUT.SQL.Add('     AND ' +FCNX.Trim_Sentence('D.CODIGO_DOCUMENTO_OP') + ' = ' + QuotedStr(Trim(FCODIGO_DOCUMENTO)));
+    FINPUT.SQL.Add('     AND D.NUMERO_OP = ' + IntToStr(FNUMERO));
     FINPUT.SQL.Add('     GROUP BY D.CODIGO_PRODUCTO ');
     FINPUT.SQL.Add(' ) AS X ');
     FINPUT.SQL.Add(' INNER JOIN ' + Info_TablaGet(Id_TBL_Producto).Name + ' P ON X.CODIGO_PRODUCTO = P.CODIGO_PRODUCTO ');
@@ -142,6 +157,100 @@ Begin
   End;
 End;
 
+Function TReport_Comparativo_OP_Inventario.GetDetail(Const pCodigo_Producto : String) : Double;
+Begin
+  Result := 0;
+  Try
+    FINPUT2.Active := False;
+    FINPUT2.SQL.Clear;
+    FINPUT2.SQL.Add(' SELECT  D.CODIGO_PRODUCTO  ');
+    FINPUT2.SQL.Add('        ,P.NOMBRE  ');
+    FINPUT2.SQL.Add('        ,D.CODIGO_DOCUMENTO ');
+    FINPUT2.SQL.Add('        ,D.NUMERO ');
+    FINPUT2.SQL.Add('        ,D.FECHA_MOVIMIENTO ');
+    FINPUT2.SQL.Add('        ,D.FECHA_REGISTRO ');
+    FINPUT2.SQL.Add('        ,D.HORA_REGISTRO ');
+    FINPUT2.SQL.Add('        ,D.CANTIDAD ');
+    FINPUT2.SQL.Add('        ,D.VALOR_UNITARIO AS VALOR_MOVIMIENTO ');
+    FINPUT2.SQL.Add('        ,P.VALOR_UNITARIO AS VALOR_PRODUCTO ');
+    FINPUT2.SQL.Add(' FROM ' + Info_TablaGet(Id_TBL_Movto_Inventario).Name + ' D  ');
+    FINPUT2.SQL.Add(' INNER JOIN ' + Info_TablaGet(Id_TBL_Producto).Name + ' P ON D.CODIGO_PRODUCTO = P.CODIGO_PRODUCTO ');
+    FINPUT2.SQL.Add(' WHERE D.NUMERO_OP = ' + IntToStr(FNUMERO));
+    FINPUT2.SQL.Add(' AND ' + FCNX.Trim_Sentence('D.CODIGO_DOCUMENTO_OP') + ' = ' + QuotedStr(Trim(UserSession.DOCUMENTO_ORDEN_DE_PRODUCCION)));
+    FINPUT2.SQL.Add(' AND ' + FCNX.Trim_Sentence('D.CODIGO_PRODUCTO')     + ' = ' + QuotedStr(Trim(pCodigo_Producto)));
+    FINPUT2.SQL.Add(' ORDER BY P.NOMBRE ');
+    FINPUT2.Active := True;
+    If FINPUT2.RecordCount > 0 Then
+    Begin
+      SetLinea2(StringOfChar('-', 30),
+                StringOfChar('-', 30),
+                StringOfChar('-', 30),
+                StringOfChar('-', 30),
+                StringOfChar('-', 30),
+                StringOfChar('-', 30),
+                StringOfChar('-', 30),
+                StringOfChar('-', 30));
+      SetLinea2('MOVIMIENTO',
+                'NUMERO',
+                'FECHA MOVT',
+                'FECHA REG.',
+                'HORA REG.' ,
+                'CANTIDAD'  ,
+                'VLR. UNIT.',
+                'TOTAL');
+      SetLinea2(StringOfChar('-', 30),
+                StringOfChar('-', 30),
+                StringOfChar('-', 30),
+                StringOfChar('-', 30),
+                StringOfChar('-', 30),
+                StringOfChar('-', 30),
+                StringOfChar('-', 30),
+                StringOfChar('-', 30));
+      FINPUT2.First;
+      While Not FINPUT2.Eof Do
+      Begin
+        If Trim(UserSession.DOCUMENTO_SALIDA_DE_INVENTARIO) =  Trim(FINPUT2.FieldByName('CODIGO_DOCUMENTO').AsString) Then
+          Result := Result + (FINPUT2.FieldByName('CANTIDAD').AsFloat * FINPUT2.FieldByName('VALOR_MOVIMIENTO').AsFloat);
+        If Trim(UserSession.DOCUMENTO_DEVOLUCION_AL_INVENTARIO) =  Trim(FINPUT2.FieldByName('CODIGO_DOCUMENTO').AsString) Then
+          Result := Result - (FINPUT2.FieldByName('CANTIDAD').AsFloat * FINPUT2.FieldByName('VALOR_MOVIMIENTO').AsFloat);
+        SetLinea2(FINPUT2.FieldByName('CODIGO_DOCUMENTO').AsString,
+                  FINPUT2.FieldByName('NUMERO').AsString,
+                  FINPUT2.FieldByName('FECHA_MOVIMIENTO').AsString,
+                  FINPUT2.FieldByName('FECHA_REGISTRO').AsString  ,
+                  FINPUT2.FieldByName('HORA_REGISTRO').AsString   ,
+                  FormatFloat('###,##0.#0', FINPUT2.FieldByName('CANTIDAD').AsFloat)        ,
+                  FormatFloat('###,##0.#0', FINPUT2.FieldByName('VALOR_MOVIMIENTO').AsFloat),
+                  FormatFloat('#,###,###,##0.#0', FINPUT2.FieldByName('CANTIDAD').AsFloat * FINPUT2.FieldByName('VALOR_MOVIMIENTO').AsFloat));
+        FINPUT2.Next;
+      End;
+      SetLinea2(StringOfChar('=', 30),
+                StringOfChar('=', 30),
+                StringOfChar('=', 30),
+                StringOfChar('=', 30),
+                StringOfChar('=', 30),
+                StringOfChar('=', 30),
+                StringOfChar('=', 30),
+                StringOfChar('=', 30));
+      SetLinea2('',
+                '',
+                '',
+                '',
+                '',
+                '',
+                'TOTAL',
+                FormatFloat('#,###,###,##0.#0', Result));
+      SaveData('', True);
+    End;
+    FINPUT2.Active := False;
+    FINPUT2.SQL.Clear;
+  Except
+    On E: Exception Do
+    Begin
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Report.Comparativo_OP_Inventario', 'TReport_Comparativo_OP_Inventario.GetDetail', E.Message);
+    End;
+  End;
+End;
+
 
 Procedure TReport_Comparativo_OP_Inventario.SetLinea(Const pProducto, pCantidad_EDM, pCantidad_INV, pEfectividad : String);
 Var
@@ -152,6 +261,29 @@ Begin
             Copy(Justificar(pCantidad_EDM  , ' ', 014, 'D'), 01, 014) + ' ' +
             Copy(Justificar(pCantidad_INV  , ' ', 014, 'D'), 01, 014) + ' ' +
             Copy(Justificar(pEfectividad   , ' ', 014, 'D'), 01, 014);
+    SaveData(lBase);
+  Except
+    On E: Exception Do
+    Begin
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Report.Comparativo_OP_Inventario', 'TReport_Comparativo_OP_Inventario.SetLinea', E.Message);
+    End;
+  End;
+End;
+
+Procedure TReport_Comparativo_OP_Inventario.SetLinea2(Const pTipo_Documento, pNumero, pFecha_Movimiento, pFecha_Registro, Hora, pCantidad, pValor, pTotal : String);
+Var
+  lBase : String;
+Begin
+  Try
+   lBase := StringOfChar(' ', 21) +
+            Copy(Justificar(pTipo_Documento  , ' ', 025, 'I'), 01, 025) + ' ' +
+            Copy(Justificar(pNumero          , ' ', 006, 'I'), 01, 006) + ' ' +
+            Copy(Justificar(pFecha_Movimiento, ' ', 010, 'D'), 01, 010) + ' ' +
+            Copy(Justificar(pFecha_Registro  , ' ', 010, 'D'), 01, 010) + ' ' +
+            Copy(Justificar(Hora             , ' ', 010, 'D'), 01, 010) + ' ' +
+            Copy(Justificar(pCantidad        , ' ', 010, 'D'), 01, 010) + ' ' +
+            Copy(Justificar(pValor           , ' ', 010, 'D'), 01, 010) + ' ' +
+            Copy(Justificar(pTotal           , ' ', 016, 'D'), 01, 016);
     SaveData(lBase);
   Except
     On E: Exception Do
@@ -218,10 +350,12 @@ Var
   lEFE : Double;
   lSuma_EDM : Double;
   lSuma_INV : Double;
+  lValor_Costo : Double;
 Begin
   Result := False;
   lSuma_EDM := 0;
   lSuma_INV := 0;
+  lValor_Costo := 0;
   Try
     If FINPUT.Active And (FINPUT.RecordCount > 0) Then
     Begin
@@ -247,6 +381,7 @@ Begin
                  FormatFloat('###,###,###.#0', lEFE) + '%');
         lSuma_EDM := lSuma_EDM + FINPUT.FieldByName('CANTIDAD_EDM').AsFloat;
         lSuma_INV := lSuma_INV + FINPUT.FieldByName('CANTIDAD_INV').AsFloat;
+        lValor_Costo := lValor_Costo + GetDetail(FINPUT.FieldByName('CODIGO_PRODUCTO').AsString);
         Result := True;
         FINPUT.Next;
       End;
@@ -254,10 +389,14 @@ Begin
       If lSuma_EDM <> 0 Then
         lEFE := (100 * lSuma_INV)/lSuma_EDM;
       SetLinea(StringOfChar('=', 100), StringOfChar('=', 20), StringOfChar('=', 20), StringOfChar('=', 20));
-      SetLinea('TOTAL DE LA ORDEN DE PRODUCION',
+      SetLinea('TOTAL CANTIDADES DE LA ORDEN DE PRODUCION',
                FormatFloat('###,###,###.#0', lSuma_EDM),
                FormatFloat('###,###,###.#0', lSuma_INV),
                FormatFloat('###,###,###.#0', lEFE) + '%');
+      SetLinea('TOTAL DE COSTO DE LA ORDEN DE PRODUCION',
+               '',
+               '',
+               FormatFloat('###,###,###.#0', lValor_Costo));
     End;
   Except
     On E: Exception Do
