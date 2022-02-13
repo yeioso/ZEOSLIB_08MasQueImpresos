@@ -25,6 +25,7 @@ Begin
       pCnx.TMP.SQL.Add('   CREATE TABLE ' + Info_TablaGet(Id_TBL_Tercero).Name + '  '                       );
       pCnx.TMP.SQL.Add('   (  '                                                                             );
       pCnx.TMP.SQL.Add('      CODIGO_TERCERO ' + pCNX.Return_Type(TYPE_VARCHAR) + ' (020)  ' + ' NOT NULL, ');
+      pCnx.TMP.SQL.Add('      D_VERIFICACION ' + pCNX.Return_Type(TYPE_VARCHAR) + ' (001)  ' + ' NULL, '    );
       pCnx.TMP.SQL.Add('      NOMBRE '         + pCNX.Return_Type(TYPE_VARCHAR) + ' (255)  ' + ' NULL, '    );
       pCnx.TMP.SQL.Add('      CONTACTO '       + pCNX.Return_Type(TYPE_VARCHAR) + ' (255)  ' + ' NULL, '    );
       pCnx.TMP.SQL.Add('      DIRECCION '      + pCNX.Return_Type(TYPE_VARCHAR) + ' (255)  ' + ' NULL, '    );

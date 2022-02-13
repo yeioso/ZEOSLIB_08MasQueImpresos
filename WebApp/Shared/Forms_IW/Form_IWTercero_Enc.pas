@@ -41,6 +41,7 @@ type
     ID_CLIENTE: TIWDBCheckBox;
     ID_PROVEEDOR: TIWDBCheckBox;
     ID_ACTIVO: TIWDBCheckBox;
+    D_VERIFICACION: TIWDBLabel;
     procedure BTNBACKAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure IWAppFormCreate(Sender: TObject);
     procedure IWAppFormDestroy(Sender: TObject);
@@ -170,6 +171,8 @@ Begin
 
     If FQRMAESTRO.Mode_Edition Then
     Begin
+      FQRMAESTRO.QR.FieldByName('D_VERIFICACION').AsString := Digito_Verificacion(FQRMAESTRO.QR.FieldByName('CODIGO_TERCERO').AsString);
+
       If Vacio(FQRMAESTRO.QR.FieldByName('NOMBRE').AsString) Then
       Begin
         lMensaje := lMensaje + IfThen(Not Vacio(lMensaje), ', ') + 'Nombre invalido';
@@ -359,6 +362,7 @@ begin
     FQRMAESTRO.ON_BEFORE_POST  := Validar_Campos_Master;
 
     CODIGO_TERCERO.DataSource := FQRMAESTRO.DS;
+    D_VERIFICACION.DataSource := FQRMAESTRO.DS;
     NOMBRE.DataSource         := FQRMAESTRO.DS;
     CONTACTO.DataSource       := FQRMAESTRO.DS;
     DIRECCION.DataSource      := FQRMAESTRO.DS;

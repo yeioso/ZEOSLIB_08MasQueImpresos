@@ -47,8 +47,15 @@ type
     VALOR_UNITARIO: TIWDBEdit;
     STOCK_MINIMO: TIWDBEdit;
     STOCK_MAXIMO: TIWDBEdit;
+    lbFACTOR_01: TIWLabel;
+    lbFACTOR_02: TIWLabel;
+    lbFACTOR_03: TIWLabel;
+    FACTOR_01: TIWDBEdit;
+    FACTOR_02: TIWDBEdit;
+    FACTOR_03: TIWDBEdit;
     ID_SERVICIO: TIWDBCheckBox;
     ID_ACTIVO: TIWDBCheckBox;
+    ID_FACTOR: TIWDBCheckBox;
     procedure BTNBACKAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure IWAppFormCreate(Sender: TObject);
     procedure IWAppFormDestroy(Sender: TObject);
@@ -58,6 +65,7 @@ type
     procedure BTNCREARAREAAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNCODIGO_UNIDAD_MEDIDAAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNCREARUNIDAD_MEDIDAAsyncClick(Sender: TObject;  EventParams: TStringList);
+    procedure ID_FACTORAsyncClick(Sender: TObject; EventParams: TStringList);
   private
     FCNX : TConexion;
     FINFO : String;
@@ -334,6 +342,10 @@ Begin
   VALOR_UNITARIO.Enabled   := FQRMAESTRO.Mode_Edition And Documento_Activo;
   STOCK_MINIMO.Enabled     := FQRMAESTRO.Mode_Edition And Documento_Activo;
   STOCK_MAXIMO.Enabled     := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  FACTOR_01.Enabled        := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  FACTOR_02.Enabled        := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  FACTOR_03.Enabled        := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  ID_FACTOR.Enabled        := FQRMAESTRO.Mode_Edition And Documento_Activo;
   ID_SERVICIO.Enabled      := FQRMAESTRO.Mode_Edition And Documento_Activo;
   ID_ACTIVO.Enabled        := FQRMAESTRO.Mode_Edition And Documento_Activo;
 
@@ -342,6 +354,10 @@ Begin
   VALOR_UNITARIO.Editable  := FQRMAESTRO.Mode_Edition And Documento_Activo;
   STOCK_MINIMO.Editable    := FQRMAESTRO.Mode_Edition And Documento_Activo;
   STOCK_MAXIMO.Editable    := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  FACTOR_01.Editable       := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  FACTOR_02.Editable       := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  FACTOR_03.Editable       := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  ID_FACTOR.Editable       := FQRMAESTRO.Mode_Edition And Documento_Activo;
   ID_SERVICIO.Editable     := FQRMAESTRO.Mode_Edition And Documento_Activo;
   ID_ACTIVO.Editable       := FQRMAESTRO.Mode_Edition And Documento_Activo;
 
@@ -358,15 +374,24 @@ End;
 
 Procedure TFrIWProducto.SetLabel;
 Var
+  lFactor : Double;
   lExistencia : Double;
 Begin
   If Not FQRMAESTRO.Active Then
     Exit;
   Try
+    ID_FACTORAsyncClick(Nil, Nil);
     lbNombre_Area.Caption := FCNX.GetValue(Info_TablaGet(Id_TBL_Area).Name, ['CODIGO_AREA'], [FQRMAESTRO.QR.FieldByName('CODIGO_AREA').AsString], ['NOMBRE']);
     lbNombre_Unidad_Medida.Caption := FCNX.GetValue(Info_TablaGet(Id_TBL_Unidad_Medida).Name, ['CODIGO_UNIDAD_MEDIDA'], [FQRMAESTRO.QR.FieldByName('CODIGO_UNIDAD_MEDIDA').AsString], ['NOMBRE']);
     lExistencia := Report_Saldo_Inventario_Saldo(FCNX, FQRMAESTRO.QR.FieldByName('CODIGO_PRODUCTO').AsString, FQRMAESTRO.QR.FieldByName('CODIGO_PRODUCTO').AsString);
     lbNombre_Unidad_Medida.Caption := lbNombre_Unidad_Medida.Caption + ', Existencia: ' + FormatFloat('###,###,##0.#0', lExistencia);
+    If FQRMAESTRO.QR.FieldByName('ID_FACTOR').AsString = 'S' Then
+    Begin
+      lFactor := FQRMAESTRO.QR.FieldByName('FACTOR_01').AsFloat *
+                 FQRMAESTRO.QR.FieldByName('FACTOR_02').AsFloat *
+                 FQRMAESTRO.QR.FieldByName('FACTOR_03').AsFloat;
+      lbNombre_Unidad_Medida.Caption := lbNombre_Unidad_Medida.Caption + ', Conversión: ' + FormatFloat('###,###,###,##0.#0', lExistencia * lFactor);
+    End;
   Except
     On E: Exception Do
     Begin
@@ -439,7 +464,12 @@ Begin
     Result := FQRMAESTRO.Active;
     If Result Then
     Begin
-
+      FQRMAESTRO.SetFormatNumber('VALOR_UNITARIO');
+      FQRMAESTRO.SetFormatNumber('STOCK_MINIMO'  );
+      FQRMAESTRO.SetFormatNumber('STOCK_MAXIMO'  );
+      FQRMAESTRO.SetFormatNumber('FACTOR_01'     );
+      FQRMAESTRO.SetFormatNumber('FACTOR_02'     );
+      FQRMAESTRO.SetFormatNumber('FACTOR_03'     );
     End;
   Except
     On E: Exception Do
@@ -449,6 +479,23 @@ Begin
   End;
   FGRID_MAESTRO.RefreshData;
 End;
+
+procedure TFrIWProducto.ID_FACTORAsyncClick(Sender: TObject; EventParams: TStringList);
+begin
+  Try
+    FACTOR_01.Visible   := FQRMAESTRO.QR.FieldByName('ID_FACTOR').AsString = 'S';
+    FACTOR_02.Visible   := FQRMAESTRO.QR.FieldByName('ID_FACTOR').AsString = 'S';
+    FACTOR_03.Visible   := FQRMAESTRO.QR.FieldByName('ID_FACTOR').AsString = 'S';
+    lbFACTOR_01.Visible := FQRMAESTRO.QR.FieldByName('ID_FACTOR').AsString = 'S';
+    lbFACTOR_02.Visible := FQRMAESTRO.QR.FieldByName('ID_FACTOR').AsString = 'S';
+    lbFACTOR_03.Visible := FQRMAESTRO.QR.FieldByName('ID_FACTOR').AsString = 'S';
+  Except
+    On E: Exception Do
+    Begin
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWProducto', 'TFrIWProducto.ID_FACTORAsyncClick', E.Message);
+    End;
+  End;
+end;
 
 procedure TFrIWProducto.IWAppFormCreate(Sender: TObject);
 Var
@@ -482,6 +529,10 @@ begin
     VALOR_UNITARIO.DataSource       := FQRMAESTRO.DS;
     STOCK_MINIMO.DataSource         := FQRMAESTRO.DS;
     STOCK_MAXIMO.DataSource         := FQRMAESTRO.DS;
+    FACTOR_01.DataSource            := FQRMAESTRO.DS;
+    FACTOR_02.DataSource            := FQRMAESTRO.DS;
+    FACTOR_03.DataSource            := FQRMAESTRO.DS;
+    ID_FACTOR.DataSource            := FQRMAESTRO.DS;
     ID_SERVICIO.DataSource          := FQRMAESTRO.DS;
     ID_ACTIVO.DataSource            := FQRMAESTRO.DS;
 

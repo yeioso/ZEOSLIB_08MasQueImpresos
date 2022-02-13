@@ -340,6 +340,7 @@ object FrIWTercero_Enc: TFrIWTercero_Enc
           SubmitOnAsyncEvent = True
           Style = stNormal
           AutoEditable = False
+          DataField = 'ID_PROVEEDOR'
           FriendlyName = 'ID_PROVEEDOR'
           ValueChecked = 'S'
           ValueUnchecked = 'N'
@@ -361,6 +362,21 @@ object FrIWTercero_Enc: TFrIWTercero_Enc
           FriendlyName = 'ID_ACTIVO'
           ValueChecked = 'S'
           ValueUnchecked = 'N'
+        end
+        object D_VERIFICACION: TIWDBLabel
+          Left = 248
+          Top = 11
+          Width = 49
+          Height = 16
+          Alignment = taCenter
+          Font.Color = clWebNAVY
+          Font.Size = 10
+          Font.Style = [fsBold, fsUnderline]
+          NoWrap = True
+          HasTabOrder = False
+          AutoSize = False
+          DataField = 'D_VERIFICACION'
+          FriendlyName = 'D_VERIFICACION'
         end
       end
       object PAG_00: TIWTabPage
@@ -417,12 +433,10 @@ object FrIWTercero_Enc: TFrIWTercero_Enc
       Align = alLeft
       BorderOptions.NumericWidth = 0
       Color = clWebMEDIUMBLUE
-      ExplicitLeft = 1
-      ExplicitTop = 6
     end
   end
   object IWModalWindow1: TIWModalWindow
-    Left = 648
+    Left = 664
     Top = 24
   end
 end

@@ -70,9 +70,14 @@ Var
 Begin
   If (pCnx = Nil) Or (Not pCnx.Connected) Then
     Exit;
-  Actualizar_Estructura(pCnx, Info_TablaGet(Id_TBL_Usuario           ).Name, 'ID_NOTIFICA_PRODUCTO', TYPE_VARCHAR, 001);
-  Actualizar_Estructura(pCnx, Info_TablaGet(Id_TBL_Producto          ).Name, 'ID_SERVICIO'         , TYPE_VARCHAR, 001);
-  Actualizar_Estructura(pCnx, Info_TablaGet(Id_TBL_Explosion_Material).Name, 'VALOR_UNITARIO'      , TYPE_FLOAT  , 000);
+//  Actualizar_Estructura(pCnx, Info_TablaGet(Id_TBL_Usuario           ).Name, 'ID_NOTIFICA_PRODUCTO', TYPE_VARCHAR, 001);
+//  Actualizar_Estructura(pCnx, Info_TablaGet(Id_TBL_Producto          ).Name, 'ID_SERVICIO'         , TYPE_VARCHAR, 001);
+//  Actualizar_Estructura(pCnx, Info_TablaGet(Id_TBL_Tercero           ).Name, 'D_VERIFICACION'      , TYPE_VARCHAR, 001);
+//  Actualizar_Estructura(pCnx, Info_TablaGet(Id_TBL_Producto          ).Name, 'ID_FACTOR'           , TYPE_VARCHAR, 001);
+//  Actualizar_Estructura(pCnx, Info_TablaGet(Id_TBL_Producto          ).Name, 'FACTOR_01'           , TYPE_FLOAT  , 000);
+//  Actualizar_Estructura(pCnx, Info_TablaGet(Id_TBL_Producto          ).Name, 'FACTOR_02'           , TYPE_FLOAT  , 000);
+//  Actualizar_Estructura(pCnx, Info_TablaGet(Id_TBL_Producto          ).Name, 'FACTOR_03'           , TYPE_FLOAT  , 000);
+//  Actualizar_Estructura(pCnx, Info_TablaGet(Id_TBL_Explosion_Material).Name, 'VALOR_UNITARIO'      , TYPE_FLOAT  , 000);
 End;
 
 end.

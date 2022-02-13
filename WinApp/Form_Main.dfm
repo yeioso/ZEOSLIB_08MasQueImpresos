@@ -21,10 +21,17 @@ object FrMain: TFrMain
     Caption = 'RUN'
     OnClick = BTNEXECUTEClick
   end
+  object Gauge1: TGauge
+    Left = 24
+    Top = 103
+    Width = 249
+    Height = 26
+    Progress = 0
+  end
   object Origen: TADOConnection
     ConnectionString = 
       'Provider=SQLOLEDB.1;Password=0;Persist Security Info=True;User I' +
-      'D=sa;Initial Catalog=AUXILIAR;Data Source=ASE'
+      'D=sa;Initial Catalog=FERNANDO;Data Source=ASE'
     LoginPrompt = False
     Provider = 'SQLOLEDB.1'
     Left = 48

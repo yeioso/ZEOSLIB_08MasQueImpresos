@@ -130,7 +130,7 @@ object FrIWMovto_Inventario: TFrIWMovto_Inventario
         end
         object IWLabel3: TIWLabel
           Left = 10
-          Top = 253
+          Top = 238
           Width = 77
           Height = 16
           RenderSize = False
@@ -346,14 +346,14 @@ object FrIWMovto_Inventario: TFrIWMovto_Inventario
           FriendlyName = 'CODIGO_PRODUCTO'
         end
         object lbNombre_Producto: TIWLabel
-          Left = 337
+          Left = 313
           Top = 84
-          Width = 139
-          Height = 16
+          Width = 135
+          Height = 14
           RenderSize = False
           StyleRenderOptions.RenderSize = False
           Font.Color = clWebNAVY
-          Font.Size = 10
+          Font.Size = 9
           Font.Style = [fsBold]
           HasTabOrder = False
           FriendlyName = 'lbNombre_Producto'
@@ -361,7 +361,7 @@ object FrIWMovto_Inventario: TFrIWMovto_Inventario
         end
         object lbInfoRegistro: TIWLabel
           Left = 310
-          Top = 229
+          Top = 214
           Width = 101
           Height = 16
           RenderSize = False
@@ -390,7 +390,7 @@ object FrIWMovto_Inventario: TFrIWMovto_Inventario
         end
         object IWLabel11: TIWLabel
           Left = 10
-          Top = 278
+          Top = 263
           Width = 55
           Height = 16
           RenderSize = False
@@ -597,7 +597,7 @@ object FrIWMovto_Inventario: TFrIWMovto_Inventario
         end
         object lbInfoOP: TIWLabel
           Left = 311
-          Top = 256
+          Top = 241
           Width = 59
           Height = 16
           RenderSize = False
@@ -612,7 +612,7 @@ object FrIWMovto_Inventario: TFrIWMovto_Inventario
         end
         object IWLabel4: TIWLabel
           Left = 10
-          Top = 303
+          Top = 288
           Width = 85
           Height = 16
           RenderSize = False
@@ -627,7 +627,7 @@ object FrIWMovto_Inventario: TFrIWMovto_Inventario
         end
         object lbInfoTotal: TIWLabel
           Left = 311
-          Top = 308
+          Top = 293
           Width = 75
           Height = 16
           RenderSize = False
@@ -642,7 +642,7 @@ object FrIWMovto_Inventario: TFrIWMovto_Inventario
         end
         object IWLabel5: TIWLabel
           Left = 10
-          Top = 228
+          Top = 213
           Width = 71
           Height = 16
           RenderSize = False
@@ -693,7 +693,7 @@ object FrIWMovto_Inventario: TFrIWMovto_Inventario
         end
         object FECHA_MOVIMIENTO: TIWDBEdit
           Left = 157
-          Top = 224
+          Top = 209
           Width = 148
           Height = 25
           StyleRenderOptions.RenderBorder = False
@@ -708,7 +708,7 @@ object FrIWMovto_Inventario: TFrIWMovto_Inventario
         end
         object FECHA_VENCIMIENTO: TIWDBEdit
           Left = 157
-          Top = 252
+          Top = 237
           Width = 147
           Height = 24
           StyleRenderOptions.RenderBorder = False
@@ -723,7 +723,7 @@ object FrIWMovto_Inventario: TFrIWMovto_Inventario
         end
         object CANTIDAD: TIWDBEdit
           Left = 157
-          Top = 278
+          Top = 263
           Width = 148
           Height = 24
           StyleRenderOptions.RenderBorder = False
@@ -739,7 +739,7 @@ object FrIWMovto_Inventario: TFrIWMovto_Inventario
         end
         object VALOR_UNITARIO: TIWDBEdit
           Left = 157
-          Top = 305
+          Top = 290
           Width = 148
           Height = 24
           StyleRenderOptions.RenderBorder = False
@@ -755,7 +755,7 @@ object FrIWMovto_Inventario: TFrIWMovto_Inventario
         end
         object ID_ACTIVO: TIWDBCheckBox
           Left = 10
-          Top = 344
+          Top = 315
           Width = 121
           Height = 21
           Caption = 'Activo'
@@ -829,7 +829,7 @@ object FrIWMovto_Inventario: TFrIWMovto_Inventario
     end
   end
   object IWModalWindow1: TIWModalWindow
-    Left = 64
+    Left = 72
     Top = 8
   end
 end

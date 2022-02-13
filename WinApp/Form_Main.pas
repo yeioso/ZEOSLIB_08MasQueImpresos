@@ -4,13 +4,15 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Data.DB, Data.Win.ADODB, Vcl.Buttons;
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Data.DB, Data.Win.ADODB, Vcl.Buttons,
+  Vcl.Samples.Gauges;
 
 type
   TFrMain = class(TForm)
     Origen: TADOConnection;
     Destino: TADOConnection;
     BTNEXECUTE: TSpeedButton;
+    Gauge1: TGauge;
     procedure BTNEXECUTEClick(Sender: TObject);
   private
     { Private declarations }
@@ -19,7 +21,8 @@ type
     Procedure Inventario; Overload;
     Procedure Inventario(Const pCode, pName, pArea, pUnidad_Medida : String; Const pValor : Double); Overload;
     Function OP(Const pProyecto : String; Const pOP : Integer) : Integer;
-    Procedure Entrada;
+    Function Maximo : Integer;
+    Procedure Entrada(Const pTableName : String);
     Procedure Salida;
   public
     { Public declarations }
@@ -36,8 +39,9 @@ Uses
 procedure TFrMain.BTNEXECUTEClick(Sender: TObject);
 begin
   Inventario;
-  Entrada;
-  Salida;
+  Entrada('FERNANDO');
+  Entrada('RIXIBEL');
+//  Salida;
 end;
 
 Function TFrMain.GetCount(Const pTable  : String) : Integer;
@@ -92,13 +96,18 @@ Begin
   lD := TADOQuery.Create(Nil);
   lO.Connection := Origen;
   lD.Connection := Destino;
-  lO.SQL.Add(' select * from Inventario');
+  lO.SQL.Add(' select * from FERNANDO');
   lO.Active := True;
+  Gauge1.Progress := 0;
+  Gauge1.MinValue := 0;
+  Gauge1.MaxValue := lO.RecordCount;
   lO.First;
   While Not lO.Eof Do
   Begin
-    lCode := AnsiUpperCase(Justificar(lO.FieldByName('codigo').AsString, '0', 20));
-    lName := AnsiUpperCase(Set_Texto_Valido(AnsiUpperCase(Trim(lO.FieldByName('e').AsString))));
+    Gauge1.Progress := Gauge1.Progress + 1;
+    Application.ProcessMessages;
+    lCode := AnsiUpperCase(Justificar(lO.FieldByName('CODIGO').AsString, '0', 20));
+    lName := AnsiUpperCase(Set_Texto_Valido(AnsiUpperCase(Trim(lO.FieldByName('NOMBRE').AsString))));
     lD.Active := False;
     lD.SQL.Clear;
     lD.SQL.Add(' select * from TBL007_PRODUCTO ');
@@ -109,12 +118,13 @@ Begin
       lD.Append;
       lD.FieldByName('CODIGO_PRODUCTO'     ).AsString := lCode;
       lD.FieldByName('NOMBRE'              ).AsString := lName;
-      lD.FieldByName('VALOR_UNITARIO'      ).AsFloat  := lO.FieldByName('valor_unidad').AsFloat;
-      lD.FieldByName('STOCK_MINIMO'        ).AsFloat  := lO.FieldByName('Stock'       ).AsFloat;
-      lD.FieldByName('STOCK_MAXIMO'        ).AsFloat  := lO.FieldByName('Stock'       ).AsFloat;
-      lD.FieldByName('CODIGO_AREA'         ).AsString := GetMaster('TBL005_AREA'         , 'NOMBRE', Set_Texto_Valido(AnsiUpperCase(Trim(lO.FieldByName('area').AsString))), 'CODIGO_AREA');
-      lD.FieldByName('CODIGO_UNIDAD_MEDIDA').AsString := GetMaster('TBL006_UNIDAD_MEDIDA', 'NOMBRE', Set_Texto_Valido(AnsiUpperCase(Trim(lO.FieldByName('unidad_medida').AsString))), 'CODIGO_UNIDAD_MEDIDA');
+      lD.FieldByName('VALOR_UNITARIO'      ).AsFloat  := lO.FieldByName('VALOR_UNITARIO').AsFloat;
+      lD.FieldByName('STOCK_MINIMO'        ).AsFloat  := lO.FieldByName('STOCK_MINIMO'  ).AsFloat;
+      lD.FieldByName('CODIGO_AREA'         ).AsString := GetMaster('TBL005_AREA'         , 'NOMBRE', Set_Texto_Valido(AnsiUpperCase(Trim(lO.FieldByName('AREA').AsString))), 'CODIGO_AREA');
+      lD.FieldByName('CODIGO_UNIDAD_MEDIDA').AsString := GetMaster('TBL006_UNIDAD_MEDIDA', 'NOMBRE', Set_Texto_Valido(AnsiUpperCase(Trim(lO.FieldByName('UNIDAD_MEDIDA').AsString))), 'CODIGO_UNIDAD_MEDIDA');
       lD.FieldByName('ID_ACTIVO'           ).AsString := 'S';
+      lD.FieldByName('ID_SERVICIO'         ).AsString := 'N';
+      lD.FieldByName('ID_FACTOR'           ).AsString := 'N';
       lD.Post;
     End;
     lO.Next;
@@ -193,52 +203,74 @@ Begin
   FreeAndNil(lD);
 End;
 
-Procedure TFrMain.Entrada;
+Function TFrMain.Maximo : Integer;
+Var
+  lD : TADOQuery;
+Begin
+  Result := 0;
+  lD := TADOQuery.Create(Nil);
+  lD.Connection := Destino;
+  lD.SQL.Add(' select max(NUMERO) AS RESULTADO from TBL032_MOVTO_INV ');
+  lD.SQL.Add(' WHERE LTRIM(RTRIM(CODIGO_DOCUMENTO)) = ' + QuotedStr('ENTRADA DE INVENTARIO'));
+  lD.Active := True;
+  Result := lD.FieldByName('RESULTADO').AsInteger;
+  lD.Active := False;
+  FreeAndNil(lD);
+End;
+
+Procedure TFrMain.Entrada(Const pTableName : String);
 Var
   lI : Integer;
   lO : TADOQuery;
   lD : TADOQuery;
   lCode : String;
   lName : String;
-  lEmpresa : String;
 Begin
-  lI := 0;
+  lI := Maximo;
   lO := TADOQuery.Create(Nil);
   lD := TADOQuery.Create(Nil);
   lO.Connection := Origen;
   lD.Connection := Destino;
-  lO.SQL.Add(' select * from Entrada');
-  lD.SQL.Add(' select * from TBL031_MOVTO_INV ');
+  lO.SQL.Add(' select * from ' + pTableName);
+  lD.SQL.Add(' select * from TBL032_MOVTO_INV ');
   lO.Active := True;
   lD.Active := True;
+  Gauge1.Progress := 0;
+  Gauge1.MinValue := 0;
+  Gauge1.MaxValue := lO.RecordCount;
   lO.First;
   While Not lO.Eof Do
   Begin
-    If lO.FieldByName('Cantidad').AsFloat > 0 Then
+    Gauge1.Progress := Gauge1.Progress + 1;
+    Application.ProcessMessages;
+    lCode := AnsiUpperCase(Justificar(lO.FieldByName('CODIGO').AsString, '0', 20));
+    lD.Active := False;
+    lD.SQL.Clear;
+    lD.SQL.Add(' select * from TBL032_MOVTO_INV ');
+    lD.SQL.Add(' WHERE LTRIM(RTRIM(CODIGO_PRODUCTO)) = ' + QuotedStr(Trim(lCode)));
+    lD.Active := True;
+    If lD.Active And (lD.RecordCount <= 0) And ((lO.FieldByName('ENTRADA').AsFloat - lO.FieldByName('SALIDA').AsFloat) <> 0) Then
     Begin
       Inc(lI);
-      lCode := AnsiUpperCase(Justificar(lO.FieldByName('li').AsString, '0', 20));
       Inventario(lCode,
-                 lO.FieldByName('Descripcion').AsString,
-                 lO.FieldByName('Area').AsString,
-                 lO.FieldByName('Unidad').AsString,
-                 lO.FieldByName('Precio').AsFloat);
-      lEmpresa := Set_Texto_Valido(AnsiUpperCase(Trim(lO.FieldByName('Empresa').AsString)));
-
+                 lO.FieldByName('NOMBRE').AsString,
+                 lO.FieldByName('AREA').AsString,
+                 lO.FieldByName('UNIDAD_MEDIDA').AsString,
+                 lO.FieldByName('VALOR_UNITARIO').AsFloat);
       lD.Append;
       lD.FieldByName('CODIGO_DOCUMENTO'    ).AsString  := 'ENTRADA DE INVENTARIO';
       lD.FieldByName('NUMERO'              ).AsInteger := lI;
-      lD.FieldByName('CODIGO_TERCERO'      ).AsString  := GetMaster('TBL008_TERCERO', 'NOMBRE', lEmpresa, 'CODIGO_TERCERO');
+      lD.FieldByName('CODIGO_TERCERO'      ).AsString  := '00000000000000000000';
       lD.FieldByName('CODIGO_PRODUCTO'     ).AsString  := lCode;
       lD.FieldByName('CODIGO_DOCUMENTO_OP' ).AsString  := 'ORDEN DE PRODUCCION';
-      lD.FieldByName('NUMERO_OP'           ).AsInteger := 1;
-      lD.FieldByName('NOMBRE'              ).AsString  := 'CARGA DE ENTRADA AL INVENTARIO';
-      lD.FieldByName('FECHA_REGISTRO'      ).AsString  := FormatDateTime('YYYY-MM-DD', Now);
+      lD.FieldByName('NUMERO_OP'           ).AsInteger := 0;
+      lD.FieldByName('NOMBRE'              ).AsString  := 'SALDOS INICIALES - FEBRERO 2022';
+      lD.FieldByName('FECHA_REGISTRO'      ).AsString  := FormatDateTime('YYYY-MM-DD', Now + 1);
       lD.FieldByName('HORA_REGISTRO'       ).AsString  := FormatDateTime('HH:NN:SS.ZZZ', Now);
-      lD.FieldByName('FECHA_MOVIMIENTO'    ).AsString  := FormatDateTime('YYYY-MM-DD', lO.FieldByName('Fecha').AsDateTime);
+      lD.FieldByName('FECHA_MOVIMIENTO'    ).AsString  := FormatDateTime('YYYY-MM-DD', Now + 2);
       lD.FieldByName('FECHA_VENCIMIENTO'   ).AsString  := lD.FieldByName('FECHA_MOVIMIENTO').AsString;
-      lD.FieldByName('CANTIDAD'            ).AsFloat   := lO.FieldByName('Cantidad').AsFloat;
-      lD.FieldByName('VALOR_UNITARIO'      ).AsFloat   := lO.FieldByName('Precio'  ).AsFloat;
+      lD.FieldByName('CANTIDAD'            ).AsFloat   := (lO.FieldByName('ENTRADA').AsFloat - lO.FieldByName('SALIDA').AsFloat);
+      lD.FieldByName('VALOR_UNITARIO'      ).AsFloat   := lO.FieldByName('VALOR_UNITARIO').AsFloat;
       lD.FieldByName('CODIGO_USUARIO'      ).AsString  := '            15458469';
       lD.FieldByName('ID_ACTIVO'           ).AsString  := 'S';
       lD.Post;

@@ -32,6 +32,10 @@ Begin
       pCnx.TMP.SQL.Add('      STOCK_MINIMO '         + pCNX.Return_Type(TYPE_FLOAT  ) + ' '       + ' NULL, '    );
       pCnx.TMP.SQL.Add('      STOCK_MAXIMO '         + pCNX.Return_Type(TYPE_FLOAT  ) + ' '       + ' NULL, '    );
       pCnx.TMP.SQL.Add('      ID_SERVICIO '          + pCNX.Return_Type(TYPE_VARCHAR) + ' (001) ' + ' NULL, '    );
+      pCnx.TMP.SQL.Add('      ID_FACTOR '            + pCNX.Return_Type(TYPE_VARCHAR) + ' (001) ' + ' NULL, '    );
+      pCnx.TMP.SQL.Add('      FACTOR_01 '            + pCNX.Return_Type(TYPE_FLOAT  ) + ' '       + ' NULL, '    );
+      pCnx.TMP.SQL.Add('      FACTOR_02 '            + pCNX.Return_Type(TYPE_FLOAT  ) + ' '       + ' NULL, '    );
+      pCnx.TMP.SQL.Add('      FACTOR_03 '            + pCNX.Return_Type(TYPE_FLOAT  ) + ' '       + ' NULL, '    );
       pCnx.TMP.SQL.Add('      ID_ACTIVO '            + pCNX.Return_Type(TYPE_VARCHAR) + ' (001) ' + ' NULL, '    );
       pCnx.TMP.SQL.Add('      TAG_INFO  '            + pCNX.Return_Type(TYPE_INT    ) + ' '       + ' NULL, '    );
       pCnx.TMP.SQL.Add('      PRIMARY KEY (CODIGO_PRODUCTO), '                                              );

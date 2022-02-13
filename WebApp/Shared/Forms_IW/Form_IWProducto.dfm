@@ -369,7 +369,7 @@ object FrIWProducto: TFrIWProducto
         end
         object IWLabel11: TIWLabel
           Left = 10
-          Top = 209
+          Top = 211
           Width = 83
           Height = 16
           RenderSize = False
@@ -444,7 +444,7 @@ object FrIWProducto: TFrIWProducto
           FriendlyName = 'CODIGO_UNIDAD_MEDIDA'
         end
         object lbNombre_Area: TIWLabel
-          Left = 299
+          Left = 275
           Top = 35
           Width = 110
           Height = 16
@@ -453,6 +453,7 @@ object FrIWProducto: TFrIWProducto
           Font.Color = clWebNAVY
           Font.Size = 10
           Font.Style = [fsBold]
+          NoWrap = True
           HasTabOrder = False
           FriendlyName = 'lbNombre_Area'
           Caption = 'lbNombre_Area'
@@ -613,6 +614,7 @@ object FrIWProducto: TFrIWProducto
           Font.Color = clWebNAVY
           Font.Size = 10
           Font.Style = [fsBold]
+          NoWrap = True
           HasTabOrder = False
           FriendlyName = 'lbNombre_Unidad_Medida'
           Caption = 'lbNombre_Unidad_Medida'
@@ -665,10 +667,97 @@ object FrIWProducto: TFrIWProducto
           DataField = 'STOCK_MAXIMO'
           PasswordPrompt = False
         end
+        object lbFACTOR_01: TIWLabel
+          Left = 305
+          Top = 184
+          Width = 51
+          Height = 16
+          Font.Color = clNone
+          Font.Size = 10
+          Font.Style = []
+          NoWrap = True
+          HasTabOrder = False
+          FriendlyName = 'lbFACTOR_01'
+          Caption = 'Factor 1'
+        end
+        object lbFACTOR_02: TIWLabel
+          Left = 305
+          Top = 211
+          Width = 51
+          Height = 16
+          Font.Color = clNone
+          Font.Size = 10
+          Font.Style = []
+          NoWrap = True
+          HasTabOrder = False
+          FriendlyName = 'lbFACTOR_02'
+          Caption = 'Factor 2'
+        end
+        object lbFACTOR_03: TIWLabel
+          Left = 305
+          Top = 241
+          Width = 51
+          Height = 16
+          Font.Color = clNone
+          Font.Size = 10
+          Font.Style = []
+          NoWrap = True
+          HasTabOrder = False
+          FriendlyName = 'lbFACTOR_03'
+          Caption = 'Factor 3'
+        end
+        object FACTOR_01: TIWDBEdit
+          Left = 368
+          Top = 179
+          Width = 200
+          Height = 24
+          StyleRenderOptions.RenderBorder = False
+          Alignment = taRightJustify
+          Font.Color = clNone
+          Font.Size = 10
+          Font.Style = []
+          FriendlyName = 'FACTOR_01'
+          SubmitOnAsyncEvent = True
+          AutoEditable = False
+          DataField = 'FACTOR_01'
+          PasswordPrompt = False
+        end
+        object FACTOR_02: TIWDBEdit
+          Left = 368
+          Top = 209
+          Width = 200
+          Height = 24
+          StyleRenderOptions.RenderBorder = False
+          Alignment = taRightJustify
+          Font.Color = clNone
+          Font.Size = 10
+          Font.Style = []
+          FriendlyName = 'FACTOR_02'
+          SubmitOnAsyncEvent = True
+          AutoEditable = False
+          DataField = 'FACTOR_02'
+          PasswordPrompt = False
+        end
+        object FACTOR_03: TIWDBEdit
+          Left = 368
+          Top = 239
+          Width = 200
+          Height = 24
+          StyleRenderOptions.RenderBorder = False
+          Alignment = taRightJustify
+          Font.Color = clNone
+          Font.Size = 10
+          Font.Style = []
+          FriendlyName = 'FACTOR_03'
+          SubmitOnAsyncEvent = True
+          AutoEditable = False
+          DataField = 'FACTOR_03'
+          PasswordPrompt = False
+        end
         object ID_SERVICIO: TIWDBCheckBox
-          Left = 314
-          Top = 202
-          Width = 121
+          Left = 10
+          Top = 270
+          Width = 150
           Height = 21
           Caption = 'Servicio'
           Editable = True
@@ -684,9 +773,9 @@ object FrIWProducto: TFrIWProducto
           ValueUnchecked = 'N'
         end
         object ID_ACTIVO: TIWDBCheckBox
-          Left = 314
-          Top = 237
-          Width = 121
+          Left = 418
+          Top = 270
+          Width = 150
           Height = 21
           Caption = 'Activo'
           Editable = True
@@ -698,6 +787,25 @@ object FrIWProducto: TFrIWProducto
           AutoEditable = False
           DataField = 'ID_ACTIVO'
           FriendlyName = 'ID_ACTIVO'
+          ValueChecked = 'S'
+          ValueUnchecked = 'N'
+        end
+        object ID_FACTOR: TIWDBCheckBox
+          Left = 206
+          Top = 270
+          Width = 150
+          Height = 21
+          Caption = 'Factor de conversi'#243'n'
+          Editable = True
+          Font.Color = clNone
+          Font.Size = 10
+          Font.Style = []
+          SubmitOnAsyncEvent = True
+          Style = stNormal
+          OnAsyncClick = ID_FACTORAsyncClick
+          AutoEditable = False
+          DataField = 'ID_FACTOR'
+          FriendlyName = 'ID_FACTOR'
           ValueChecked = 'S'
           ValueUnchecked = 'N'
         end
@@ -761,7 +869,7 @@ object FrIWProducto: TFrIWProducto
     WindowTop = 200
     Autosize = False
     CloseOnClick = True
-    Left = 93
+    Left = 117
     Top = 11
   end
 end

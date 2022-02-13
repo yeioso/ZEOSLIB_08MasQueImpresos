@@ -109,7 +109,8 @@ Begin
   Try
     FINPUT.Active := False;
     FINPUT.SQL.Clear;
-    FINPUT.SQL.Add('   SELECT   A.NOMBRE AS NOMBRE_AREA ');
+    FINPUT.SQL.Add('   SELECT     D.CODIGO_DOCUMENTO ');
+    FINPUT.SQL.Add('             ,A.NOMBRE AS NOMBRE_AREA ');
     If FID_FECHA = 0 Then
     Begin
       FINPUT.SQL.Add('           ,D.FECHA_REGISTRO ');
@@ -133,15 +134,20 @@ Begin
     FINPUT.SQL.Add('   INNER JOIN ' + Info_TablaGet(Id_TBL_Area).Name + ' A ON P.CODIGO_AREA = A.CODIGO_AREA ');
     FINPUT.SQL.Add('   INNER JOIN ' + Info_TablaGet(Id_TBL_Usuario).Name + ' U ON D.CODIGO_USUARIO = U.CODIGO_USUARIO ');
     FINPUT.SQL.Add('   WHERE P.CODIGO_AREA = ' + QuotedStr(FCODIGO_AREA) + ' ');
+    FINPUT.SQL.Add('   AND ');
+    FINPUT.SQL.Add('       (  ');
+    FINPUT.SQL.Add('           '    + FCNX.Trim_Sentence('D.CODIGO_DOCUMENTO') + ' = ' + QuotedStr(Trim(UserSession.DOCUMENTO_SALIDA_DE_INVENTARIO    )) + ' ');
+    FINPUT.SQL.Add('         AND  ' + FCNX.Trim_Sentence('D.CODIGO_DOCUMENTO') + ' = ' + QuotedStr(Trim(UserSession.DOCUMENTO_DEVOLUCION_AL_INVENTARIO)) + ' ');
+    FINPUT.SQL.Add('       )  ');
     If FID_FECHA = 0 Then
     Begin
       FINPUT.SQL.Add('   AND D.FECHA_REGISTRO BETWEEN ' + QuotedStr(FFECHA_INI) + ' AND ' + QuotedStr(FFECHA_FIN) + ' ');
-      FINPUT.SQL.Add('   ORDER BY  A.NOMBRE, D.FECHA_REGISTRO,D.HORA_REGISTRO ');
+      FINPUT.SQL.Add('   ORDER BY  D.CODIGO_DOCUMENTO, A.NOMBRE, D.FECHA_REGISTRO,D.HORA_REGISTRO ');
     End
     Else
     Begin
       FINPUT.SQL.Add('   AND D.FECHA_MOVIMIENTO BETWEEN ' + QuotedStr(FFECHA_INI) + ' AND ' + QuotedStr(FFECHA_FIN) + ' ');
-      FINPUT.SQL.Add('   ORDER BY  A.NOMBRE, D.FECHA_MOVIMIENTO ');
+      FINPUT.SQL.Add('   ORDER BY  D.CODIGO_DOCUMENTO, A.NOMBRE, D.FECHA_MOVIMIENTO ');
     End;
     FINPUT.Active := True;
     Result := FINPUT.Active;
