@@ -124,7 +124,7 @@ procedure TFrIWReporte.BTNCOMPARATIVOAsyncClick(Sender: TObject; EventParams: TS
 Var
   lMsg : String;
 begin
-  If Vacio(OP.Text) Or (SetToInt(OP.Text) <= 0) Then
+  If Vacio(OP.Text) Or (SetToInt(OP.Text) < 0) Then
   Begin
     UserSession.SetMessage('Debe elegir una orden de produccion', True);
     Exit;

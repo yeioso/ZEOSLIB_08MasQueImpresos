@@ -125,13 +125,13 @@ begin
       Id_TBL_Orden_Produccion          ,
       Id_TBL_Movto_Inventario          : Begin
                                           Self.TABLA            := Info_TablaGet(pId).Name;
-                                          Self.TITULO_ORIGEN    := ['Numero'                 , 'Nombre'                ];
-                                          Self.CAMPOS_ORIGEN    := ['NUMERO'                 , 'NOMBRE'                ];
-                                          Self.CAMPOS_LIKE      := ['NUMERO'                 , 'NOMBRE'                ];
-                                          Self.CAMPOS_ID        := ['S'                      , 'N'                     ];
-                                          Self.CAMPOS_ALIGNMENT := [TAlignment.taRightJustify, TAlignment.taLeftJustify];
-                                          Self.SIZE_ORIGEN      := [0000000000000100         , 00000550                ];
-                                          Self.CAMPOS_DESTINO   := ['CODIGO_DOCUMENTO', 'NUMERO'];
+                                          Self.TITULO_ORIGEN    := ['O.P.'                   ,'Numero'                 , 'Nombre'                ];
+                                          Self.CAMPOS_ORIGEN    := ['DOCUMENTO_REFERENCIA'   ,'NUMERO'                 , 'NOMBRE'                ];
+                                          Self.CAMPOS_LIKE      := ['DOCUMENTO_REFERENCIA'   ,'NUMERO'                 , 'NOMBRE'                ];
+                                          Self.CAMPOS_ID        := ['N'                      ,'S'                      , 'N'                     ];
+                                          Self.CAMPOS_ALIGNMENT := [TAlignment.taRightJustify,TAlignment.taRightJustify, TAlignment.taLeftJustify];
+                                          Self.SIZE_ORIGEN      := [0000000000000100         ,0000000000000100         , 00000550                ];
+                                          Self.CAMPOS_DESTINO   := ['CODIGO_DOCUMENTO', 'NUMERO', 'DOCUMENTO_REFERENCIA'];
                                         End;
   End;
   Self.SetGrid;

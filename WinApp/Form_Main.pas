@@ -39,7 +39,7 @@ Uses
 procedure TFrMain.BTNEXECUTEClick(Sender: TObject);
 begin
   Inventario;
-  Entrada('FERNANDO');
+  Entrada('DORA');
   Entrada('RIXIBEL');
 //  Salida;
 end;
