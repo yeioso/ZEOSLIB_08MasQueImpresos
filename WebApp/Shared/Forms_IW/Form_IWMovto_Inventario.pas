@@ -400,7 +400,10 @@ Procedure TFrIWMovto_Inventario.Estado_Controles;
 Begin
   NUMERO.Enabled             := False;
   BTNOP.Visible              := FQRMAESTRO.Mode_Edition And Documento_Activo And
-                                (Trim(FCODIGO_DOCUMENTO) = Trim(UserSession.DOCUMENTO_SALIDA_DE_INVENTARIO));
+                                (
+                                  (Trim(FCODIGO_DOCUMENTO) = Trim(UserSession.DOCUMENTO_SALIDA_DE_INVENTARIO)) Or
+                                  (Trim(FCODIGO_DOCUMENTO) = Trim(UserSession.DOCUMENTO_DEVOLUCION_AL_INVENTARIO))
+                                );
   lbInfoOP.Visible           := BTNOP.Visible;
   BTNCREARTERCERO.Visible    := FQRMAESTRO.Mode_Edition And Documento_Activo;
   BTNCODIGO_TERCERO.Visible  := FQRMAESTRO.Mode_Edition And Documento_Activo;

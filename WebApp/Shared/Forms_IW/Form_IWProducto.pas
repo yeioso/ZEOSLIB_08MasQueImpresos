@@ -337,36 +337,37 @@ End;
 
 Procedure TFrIWProducto.Estado_Controles;
 Begin
-  CODIGO_PRODUCTO.Enabled  := FQRMAESTRO.Mode_Insert  And Documento_Activo;
-  NOMBRE.Enabled           := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  VALOR_UNITARIO.Enabled   := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  STOCK_MINIMO.Enabled     := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  STOCK_MAXIMO.Enabled     := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  FACTOR_01.Enabled        := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  FACTOR_02.Enabled        := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  FACTOR_03.Enabled        := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  ID_FACTOR.Enabled        := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  ID_SERVICIO.Enabled      := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  ID_ACTIVO.Enabled        := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  CODIGO_PRODUCTO.Enabled         := FQRMAESTRO.Mode_Insert  And Documento_Activo;
+  NOMBRE.Enabled                  := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  VALOR_UNITARIO.Enabled          := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  STOCK_MINIMO.Enabled            := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  STOCK_MAXIMO.Enabled            := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  FACTOR_01.Enabled               := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  FACTOR_02.Enabled               := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  FACTOR_03.Enabled               := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  ID_FACTOR.Enabled               := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  ID_SERVICIO.Enabled             := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  ID_ACTIVO.Enabled               := FQRMAESTRO.Mode_Edition And Documento_Activo;
 
-  CODIGO_PRODUCTO.Editable := FQRMAESTRO.Mode_Insert  And Documento_Activo;
-  NOMBRE.Editable          := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  VALOR_UNITARIO.Editable  := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  STOCK_MINIMO.Editable    := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  STOCK_MAXIMO.Editable    := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  FACTOR_01.Editable       := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  FACTOR_02.Editable       := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  FACTOR_03.Editable       := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  ID_FACTOR.Editable       := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  ID_SERVICIO.Editable     := FQRMAESTRO.Mode_Edition And Documento_Activo;
-  ID_ACTIVO.Editable       := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  CODIGO_PRODUCTO.Editable        := FQRMAESTRO.Mode_Insert  And Documento_Activo;
+  NOMBRE.Editable                 := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  VALOR_UNITARIO.Editable         := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  STOCK_MINIMO.Editable           := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  STOCK_MAXIMO.Editable           := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  FACTOR_01.Editable              := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  FACTOR_02.Editable              := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  FACTOR_03.Editable              := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  ID_FACTOR.Editable              := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  ID_SERVICIO.Editable            := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  ID_ACTIVO.Editable              := FQRMAESTRO.Mode_Edition And Documento_Activo;
 
-  DESCRIPCION.Editable     := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  DESCRIPCION.Editable            := FQRMAESTRO.Mode_Edition And Documento_Activo;
 
-  BTNCREARAREA.Visible            := FQRMAESTRO.Mode_Insert And Documento_Activo;
-  BTNCREARUNIDAD_MEDIDA.Visible   := FQRMAESTRO.Mode_Insert And Documento_Activo;
-  BTNCODIGO_AREA.Visible          := FQRMAESTRO.Mode_Insert And Documento_Activo;
-  BTNCODIGO_UNIDAD_MEDIDA.Visible := FQRMAESTRO.Mode_Insert And Documento_Activo;
+  BTNCREARAREA.Visible            := FQRMAESTRO.Mode_Insert  And Documento_Activo;
+  BTNCREARUNIDAD_MEDIDA.Visible   := FQRMAESTRO.Mode_Insert  And Documento_Activo;
+  BTNCODIGO_AREA.Visible          := FQRMAESTRO.Mode_Insert  And Documento_Activo;
+  BTNCODIGO_UNIDAD_MEDIDA.Visible := FQRMAESTRO.Mode_Edition And Documento_Activo;
+
   DATO.Visible                    := (Not FQRMAESTRO.Mode_Edition);
   PAG_00.Visible                  := (Not FQRMAESTRO.Mode_Edition);
   PAG_01.Visible                  := True;

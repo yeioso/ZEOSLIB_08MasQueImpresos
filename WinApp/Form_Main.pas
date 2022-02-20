@@ -22,7 +22,8 @@ type
     Procedure Inventario(Const pCode, pName, pArea, pUnidad_Medida : String; Const pValor : Double); Overload;
     Function OP(Const pProyecto : String; Const pOP : Integer) : Integer;
     Function Maximo : Integer;
-    Procedure Entrada(Const pTableName : String);
+    Function Producto_Existe(Const pCodigo_Producto : String) : Boolean;
+    Procedure Entrada(Const pTableName : String; pSoloProducto : Boolean);
     Procedure Salida;
   public
     { Public declarations }
@@ -38,9 +39,9 @@ Uses
 
 procedure TFrMain.BTNEXECUTEClick(Sender: TObject);
 begin
-  Inventario;
-  Entrada('DORA');
-  Entrada('RIXIBEL');
+//Inventario;
+  Entrada('RIXIBEL', True);
+  Entrada('FERNANDO', False);
 //  Salida;
 end;
 
@@ -218,7 +219,22 @@ Begin
   FreeAndNil(lD);
 End;
 
-Procedure TFrMain.Entrada(Const pTableName : String);
+Function TFrMain.Producto_Existe(Const pCodigo_Producto : String) : Boolean;
+Var
+  lD : TADOQuery;
+Begin
+  Result := False;
+  lD := TADOQuery.Create(Nil);
+  lD.Connection := Destino;
+  lD.SQL.Add(' select COUNT(*) AS RESULTADO from TBL007_PRODUCTO ');
+  lD.SQL.Add(' WHERE LTRIM(RTRIM(CODIGO_PRODUCTO)) = ' + QuotedStr(Trim(pCodigo_Producto)));
+  lD.Active := True;
+  Result := lD.FieldByName('RESULTADO').AsInteger > 0;
+  lD.Active := False;
+  FreeAndNil(lD);
+End;
+
+Procedure TFrMain.Entrada(Const pTableName : String; pSoloProducto : Boolean);
 Var
   lI : Integer;
   lO : TADOQuery;
@@ -244,36 +260,45 @@ Begin
     Gauge1.Progress := Gauge1.Progress + 1;
     Application.ProcessMessages;
     lCode := AnsiUpperCase(Justificar(lO.FieldByName('CODIGO').AsString, '0', 20));
-    lD.Active := False;
-    lD.SQL.Clear;
-    lD.SQL.Add(' select * from TBL032_MOVTO_INV ');
-    lD.SQL.Add(' WHERE LTRIM(RTRIM(CODIGO_PRODUCTO)) = ' + QuotedStr(Trim(lCode)));
-    lD.Active := True;
-    If lD.Active And (lD.RecordCount <= 0) And ((lO.FieldByName('ENTRADA').AsFloat - lO.FieldByName('SALIDA').AsFloat) <> 0) Then
+    If pSoloProducto Then
     Begin
-      Inc(lI);
       Inventario(lCode,
                  lO.FieldByName('NOMBRE').AsString,
                  lO.FieldByName('AREA').AsString,
                  lO.FieldByName('UNIDAD_MEDIDA').AsString,
                  lO.FieldByName('VALOR_UNITARIO').AsFloat);
-      lD.Append;
-      lD.FieldByName('CODIGO_DOCUMENTO'    ).AsString  := 'ENTRADA DE INVENTARIO';
-      lD.FieldByName('NUMERO'              ).AsInteger := lI;
-      lD.FieldByName('CODIGO_TERCERO'      ).AsString  := '00000000000000000000';
-      lD.FieldByName('CODIGO_PRODUCTO'     ).AsString  := lCode;
-      lD.FieldByName('CODIGO_DOCUMENTO_OP' ).AsString  := 'ORDEN DE PRODUCCION';
-      lD.FieldByName('NUMERO_OP'           ).AsInteger := 0;
-      lD.FieldByName('NOMBRE'              ).AsString  := 'SALDOS INICIALES - FEBRERO 2022';
-      lD.FieldByName('FECHA_REGISTRO'      ).AsString  := FormatDateTime('YYYY-MM-DD', Now + 1);
-      lD.FieldByName('HORA_REGISTRO'       ).AsString  := FormatDateTime('HH:NN:SS.ZZZ', Now);
-      lD.FieldByName('FECHA_MOVIMIENTO'    ).AsString  := FormatDateTime('YYYY-MM-DD', Now + 2);
-      lD.FieldByName('FECHA_VENCIMIENTO'   ).AsString  := lD.FieldByName('FECHA_MOVIMIENTO').AsString;
-      lD.FieldByName('CANTIDAD'            ).AsFloat   := (lO.FieldByName('ENTRADA').AsFloat - lO.FieldByName('SALIDA').AsFloat);
-      lD.FieldByName('VALOR_UNITARIO'      ).AsFloat   := lO.FieldByName('VALOR_UNITARIO').AsFloat;
-      lD.FieldByName('CODIGO_USUARIO'      ).AsString  := '            15458469';
-      lD.FieldByName('ID_ACTIVO'           ).AsString  := 'S';
-      lD.Post;
+    End
+    Else
+    Begin
+      If Producto_Existe(lCode) Then
+      Begin
+        lD.Active := False;
+        lD.SQL.Clear;
+        lD.SQL.Add(' select * from TBL032_MOVTO_INV ');
+        lD.SQL.Add(' WHERE LTRIM(RTRIM(CODIGO_PRODUCTO)) = ' + QuotedStr(Trim(lCode)));
+        lD.Active := True;
+        If lD.Active And (lD.RecordCount <= 0) And ((lO.FieldByName('ENTRADA').AsFloat - lO.FieldByName('SALIDA').AsFloat) <> 0) Then
+        Begin
+          Inc(lI);
+          lD.Append;
+          lD.FieldByName('CODIGO_DOCUMENTO'    ).AsString  := 'ENTRADA DE INVENTARIO';
+          lD.FieldByName('NUMERO'              ).AsInteger := lI;
+          lD.FieldByName('CODIGO_TERCERO'      ).AsString  := '00000000000000000000';
+          lD.FieldByName('CODIGO_PRODUCTO'     ).AsString  := lCode;
+          lD.FieldByName('CODIGO_DOCUMENTO_OP' ).AsString  := 'ORDEN DE PRODUCCION';
+          lD.FieldByName('NUMERO_OP'           ).AsInteger := 0;
+          lD.FieldByName('NOMBRE'              ).AsString  := 'SALDOS INICIALES - FEBRERO 2022';
+          lD.FieldByName('FECHA_REGISTRO'      ).AsString  := FormatDateTime('YYYY-MM-DD', Now + 1);
+          lD.FieldByName('HORA_REGISTRO'       ).AsString  := FormatDateTime('HH:NN:SS.ZZZ', Now);
+          lD.FieldByName('FECHA_MOVIMIENTO'    ).AsString  := FormatDateTime('YYYY-MM-DD', Now + 2);
+          lD.FieldByName('FECHA_VENCIMIENTO'   ).AsString  := lD.FieldByName('FECHA_MOVIMIENTO').AsString;
+          lD.FieldByName('CANTIDAD'            ).AsFloat   := (lO.FieldByName('ENTRADA').AsFloat - lO.FieldByName('SALIDA').AsFloat);
+          lD.FieldByName('VALOR_UNITARIO'      ).AsFloat   := lO.FieldByName('VALOR_UNITARIO').AsFloat;
+          lD.FieldByName('CODIGO_USUARIO'      ).AsString  := '            15458469';
+          lD.FieldByName('ID_ACTIVO'           ).AsString  := 'S';
+          lD.Post;
+        End;
+      End;
     End;
     lO.Next;
   End;
