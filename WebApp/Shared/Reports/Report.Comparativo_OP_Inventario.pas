@@ -144,7 +144,7 @@ Begin
     FINPUT.SQL.Add('     GROUP BY D.CODIGO_PRODUCTO ');
     FINPUT.SQL.Add(' ) AS X ');
     FINPUT.SQL.Add(' INNER JOIN ' + Info_TablaGet(Id_TBL_Producto).Name + ' P ON X.CODIGO_PRODUCTO = P.CODIGO_PRODUCTO ');
-    FINPUT.SQL.Add(' WHERE (P.ID_SERVICIO IS NULL) Or (P.ID_SERVICIO = ' + QuotedStr('N') + ') ');
+//  FINPUT.SQL.Add(' WHERE (P.ID_SERVICIO IS NULL) Or (P.ID_SERVICIO = ' + QuotedStr('N') + ') ');
     FINPUT.SQL.Add(' GROUP BY X.CODIGO_PRODUCTO, P.NOMBRE ');
     FINPUT.SQL.Add(' ORDER BY P.NOMBRE ');
     FINPUT.Active := True;
