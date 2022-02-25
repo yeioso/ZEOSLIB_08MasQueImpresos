@@ -151,12 +151,12 @@ Type
       Destructor Destroy; Override;
   End;
 
-  TDETAIL_ERCOL = Class(TBASE)
+  TDETAIL_MQI = Class(TBASE)
     Private
     Public
       Constructor Create(AOwner: TComponent); Override;
       Destructor Destroy; Override;
-      procedure SetLine(Const pContenido : String; Const pBold : Boolean); Overload;
+      procedure SetLine(Const pContenido : String; Const pBold : Boolean; pFontSize : Integer = 7); Overload;
       procedure SetLine_Reparacion_Conversion(Const pLabel, pValue : String);
       procedure SetLine_Novedad(Const pDescripcion, pCantidad, pValor_Unitario, pSubtotal : String; Const pBold : Boolean);
       procedure SetLine_Entrada(Const pCodigo, pDescripcion, pBuenas, pAveriadas, pTotal : String; Const pBold : Boolean);
@@ -621,28 +621,28 @@ begin
 //                                      FCLIENTE_LABEL_OPERACION.Height + 6);
 end;
 
-{ TDETAIL_ERCOL }
-constructor TDETAIL_ERCOL.Create(AOwner: TComponent);
+{ TDETAIL_MQI }
+constructor TDETAIL_MQI.Create(AOwner: TComponent);
 begin
   inherited;
-  Self.Name    := 'TDETAIL_ERCOL' + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now);
+  Self.Name    := 'TDETAIL_MQI' + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now);
   CURRENT_TOP := 3;
 end;
 
-procedure TDETAIL_ERCOL.SetLine(Const pContenido : String; Const pBold : Boolean);
+procedure TDETAIL_MQI.SetLine(Const pContenido : String; Const pBold : Boolean; pFontSize : Integer = 7);
 Var
   FCONTENIDO : TPRLabel;
 begin
   FCONTENIDO := Create_Label(Self);
-  SetLabel(FCONTENIDO, TAlignment.taLeftJustify, CURRENT_TOP, 001, Self.Width - 12, 008, Copy(pContenido  , 01, 255), pBold);
+  SetLabel(FCONTENIDO, TAlignment.taLeftJustify, CURRENT_TOP, 001, Self.Width - 12, 008, Copy(pContenido  , 01, 255), pBold, pFontSize);
   FCONTENIDO.FontName := TPRFontName.fnFixedWidth;
-  FCONTENIDO.FontSize := 7;
+  FCONTENIDO.FontSize := pFontSize;
   LAST_HEIGHT := FCONTENIDO.Height;
-  CURRENT_TOP := CURRENT_TOP + FCONTENIDO.Height;
-  Self.Height := CURRENT_TOP + 1;
+  CURRENT_TOP := CURRENT_TOP + FCONTENIDO.Height + 02;
+  Self.Height := CURRENT_TOP + 02;
 end;
 
-procedure TDETAIL_ERCOL.SetLine_Reparacion_Conversion(Const pLabel, pValue : String);
+procedure TDETAIL_MQI.SetLine_Reparacion_Conversion(Const pLabel, pValue : String);
 Const
   Const_Space = 6;
 Var
@@ -663,7 +663,7 @@ begin
   FCUADRO.Printable := False;
 end;
 
-procedure TDETAIL_ERCOL.SetLine_Novedad(Const pDescripcion, pCantidad, pValor_Unitario, pSubtotal : String; Const pBold : Boolean);
+procedure TDETAIL_MQI.SetLine_Novedad(Const pDescripcion, pCantidad, pValor_Unitario, pSubtotal : String; Const pBold : Boolean);
 Const
   Const_Space = 6;
 Var
@@ -692,7 +692,7 @@ begin
   Self.Height := CURRENT_TOP + 1;
 end;
 
-procedure TDETAIL_ERCOL.SetLine_Entrada(Const pCodigo, pDescripcion, pBuenas, pAveriadas, pTotal : String; Const pBold : Boolean);
+procedure TDETAIL_MQI.SetLine_Entrada(Const pCodigo, pDescripcion, pBuenas, pAveriadas, pTotal : String; Const pBold : Boolean);
 Var
   FCUADRO      : TPRRect ;
   FCODIGO      : TPRLabel;
@@ -724,7 +724,7 @@ begin
   Self.Height := CURRENT_TOP + 1;
 end;
 
-procedure TDETAIL_ERCOL.SetLine_Salida(Const pCodigo, pDescripcion, pCantidad : String; Const pBold : Boolean);
+procedure TDETAIL_MQI.SetLine_Salida(Const pCodigo, pDescripcion, pCantidad : String; Const pBold : Boolean);
 Var
   FCUADRO      : TPRRect ;
   FCODIGO      : TPRLabel;
@@ -744,7 +744,7 @@ begin
   Self.Height := CURRENT_TOP + 1;
 end;
 
-procedure TDETAIL_ERCOL.SetLine_Factura_Alquiler(Const pItems, pDesde, pHasta, pDescripcion, pCantidad, pSaldo, pUnidad_Medida, pTarifa, pDias, pValor_Unitario, pPorcentaje_IVA, pSubtotal : String; Const pBold : Boolean);
+procedure TDETAIL_MQI.SetLine_Factura_Alquiler(Const pItems, pDesde, pHasta, pDescripcion, pCantidad, pSaldo, pUnidad_Medida, pTarifa, pDias, pValor_Unitario, pPorcentaje_IVA, pSubtotal : String; Const pBold : Boolean);
 Const
   Const_Space = 6;
 Var
@@ -798,7 +798,7 @@ begin
   Self.Height := CURRENT_TOP + 1;
 end;
 
-procedure TDETAIL_ERCOL.SetLine_Factura_Servicio(Const pItems, pFecha, pDescripcion, pCantidad, pUnidad_Medida, pValor_Unitario, pPorcentaje_IVA, pSubtotal : String; Const pBold : Boolean);
+procedure TDETAIL_MQI.SetLine_Factura_Servicio(Const pItems, pFecha, pDescripcion, pCantidad, pUnidad_Medida, pValor_Unitario, pPorcentaje_IVA, pSubtotal : String; Const pBold : Boolean);
 Const
   Const_Space = 6;
 Var
@@ -840,7 +840,7 @@ begin
   Self.Height := CURRENT_TOP + 1;
 end;
 
-destructor TDETAIL_ERCOL.Destroy;
+destructor TDETAIL_MQI.Destroy;
 begin
 
   inherited;

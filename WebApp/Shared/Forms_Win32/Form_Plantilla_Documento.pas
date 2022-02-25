@@ -373,11 +373,15 @@ Var
   lURL : String;
   lTop : Integer;
   lTITLE  : TTITLE;
-  lDETAIL : TDETAIL_ERCOL;
+  lDETAIL : TDETAIL_MQI;
   lFOOT   : TFOOT_FINAL;
   lPagina : TPRPage;
   lDestino : String;
 Begin
+  lTITLE  := Nil;
+  lDETAIL := Nil;
+  lFOOT   := Nil;
+  lPagina := Nil;
   Result := False;
   pError := '';
   lDestino := TIWAppCache.NewTempFileName('.pdf');
@@ -394,12 +398,14 @@ Begin
       lF := TFrPlantilla_Documento.Create(Nil);
       lPagina := TPRPage.Create(lF);
       lPagina.Parent := lF;
+      lPagina.Width := PDF_DEFAULT_PAGE_HEIGHT;
+      lPagina.Height := PDF_DEFAULT_PAGE_WIDTH;
       lF.FPages.Add(lPagina);
 
       lTITLE := TTITLE.Create(lPagina);
       lTITLE.Parent := lPagina;
 
-      lDETAIL        := TDETAIL_ERCOL.Create(lPagina);
+      lDETAIL        := TDETAIL_MQI.Create(lPagina);
       lDETAIL.Parent := lPagina;
 
       lTop := lTITLE.Height + lTITLE.Top;
@@ -416,14 +422,18 @@ Begin
       lDETAIL.Top    := lTITLE.Height;
 
       lTop := lTITLE.Height + lTITLE.Top + lTITLE.Height;
+      lTop := lTITLE.Height + lTITLE.Top;
 
       lM.First;
       While Not lM.Eof Do
       Begin
-        lDETAIL.SetLine(lM.FieldByName('CONTENIDO').AsString, False);
-        If (lTop + lDETAIL.CURRENT_TOP + lDETAIL.LAST_HEIGHT) > (lPagina.Height) Then
+        lDETAIL.SetLine(lM.FieldByName('CONTENIDO').AsString, False, 09);
+        lM.Next;
+        If ((lTop + lDETAIL.CURRENT_TOP + (lDETAIL.LAST_HEIGHT * 2)) > (lPagina.Height)) And (Not lM.Eof) Then
         Begin
           lPagina := TPRPage.Create(lF);
+          lPagina.Width := PDF_DEFAULT_PAGE_HEIGHT;
+          lPagina.Height := PDF_DEFAULT_PAGE_WIDTH;
           lPagina.Parent := lF;
           lF.FPages.Add(lPagina);
 
@@ -434,21 +444,26 @@ Begin
           lTITLE.Width := lPagina.Width - 2;
           lF.SetHead(lTITLE, lM, -1, '', pError);
 
-          lDETAIL        := TDETAIL_ERCOL.Create(lPagina);
+          lDETAIL        := TDETAIL_MQI.Create(lPagina);
           lDETAIL.Parent := lPagina;
           lDETAIL.Left   := 007 + lF.FCURRENT_LEFT;
           lDETAIL.Width  := lPagina.Width - 2;
           lDETAIL.Top    := lTITLE.Height + lTITLE.Top;
           lTop := lTITLE.Height + lTITLE.Top;
         End;
-        lM.Next;
       End;
 
-      lFOOT        := TFOOT_FINAL.Create(lPagina);
-      lFOOT.Parent := lPagina;
-      lFOOT.Top    := lPagina.Height - lFOOT.Height;
-      lFOOT.Left   := 007;
-      lFOOT.Width  := lPagina.Width - 2;
+      If (lTop + lDETAIL.CURRENT_TOP + (lDETAIL.LAST_HEIGHT * 3)) < (lPagina.Height) Then
+      Begin
+        lFOOT        := TFOOT_FINAL.Create(lPagina);
+        lFOOT.Parent := lPagina;
+        lFOOT.Top    := lPagina.Height - lFOOT.Height;
+        lFOOT.Left   := 007;
+        lFOOT.Width  := lPagina.Width - 2;
+        lFOOT.LABEL01.Width := lFOOT.Width - 30;
+        lFOOT.LABEL02.Width := lFOOT.LABEL01.Width;
+        lFOOT.SetRect(lFOOT.LINEA_TOP, 001, 006, lFOOT.LABEL01.Width, 001);
+      End;
 
       lF.SetPages;
       lF.PReport1.FileName := lDestino;
@@ -458,7 +473,8 @@ Begin
         lF.PReport1.Print(lF.FPages[lI]);
       End;
       lF.PReport1.EndDoc;
-      FreeAndNil(lFOOT);
+      If Assigned(lFOOT) Then
+        FreeAndNil(lFOOT);
       FreeAndNil(lDETAIL);
       FreeAndNil(lTITLE);
       FreeAndNil(lF);

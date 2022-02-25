@@ -176,12 +176,12 @@ Var
 Begin
   Try
    lBase := Copy(Justificar(pCodigo    , ' ', 20, 'D'), 01, 020) + ' ' +
-            Copy(Justificar(pNombre    , ' ', 40, 'I'), 01, 040) + ' ' +
+            Copy(Justificar(pNombre    , ' ', 50, 'I'), 01, 050) + ' ' +
             Copy(Justificar(pMinimo    , ' ', 10, 'D'), 01, 010) + ' ' +
             Copy(Justificar(pMaximo    , ' ', 10, 'D'), 01, 010) + ' ' +
-            Copy(Justificar(pValor     , ' ', 10, 'D'), 01, 010) + ' ' +
+            Copy(Justificar(pValor     , ' ', 15, 'D'), 01, 015) + ' ' +
             Copy(Justificar(pExistencia, ' ', 10, 'D'), 01, 010) + ' ' +
-            Copy(Justificar(pTotal     , ' ', 20, 'D'), 01, 020);
+            Copy(Justificar(pTotal     , ' ', 25, 'D'), 01, 025);
     SaveData(lBase);
   Except
     On E: Exception Do

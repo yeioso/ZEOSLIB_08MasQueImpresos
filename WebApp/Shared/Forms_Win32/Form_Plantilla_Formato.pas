@@ -388,7 +388,7 @@ Var
   lURL : String;
   lTop : Integer;
   lTITLE  : TTITLE;
-  lDETAIL : TDETAIL_ERCOL;
+  lDETAIL : TDETAIL_MQI;
   lFOOT   : TFOOT_FINAL;
   lPagina : TPRPage;
   lDestino : String;
@@ -414,7 +414,7 @@ Begin
       lTITLE := TTITLE.Create(lPagina);
       lTITLE.Parent := lPagina;
 
-      lDETAIL        := TDETAIL_ERCOL.Create(lPagina);
+      lDETAIL        := TDETAIL_MQI.Create(lPagina);
       lDETAIL.Parent := lPagina;
 
       lTop := lTITLE.Height + lTITLE.Top;
@@ -436,7 +436,7 @@ Begin
       lM.First;
       While Not lM.Eof Do
       Begin
-        lDETAIL.SetLine(lM.FieldByName('CONTENIDO').AsString, False);
+        lDETAIL.SetLine(lM.FieldByName('CONTENIDO').AsString, False, 9);
         If (lTop + lDETAIL.CURRENT_TOP + lDETAIL.LAST_HEIGHT) > (lPagina.Height) Then
         Begin
           lPagina := TPRPage.Create(lF);
@@ -450,7 +450,7 @@ Begin
           lTITLE.Width := lPagina.Width - 2;
           lF.SetHead(lTITLE, lM, -1, '', pError);
 
-          lDETAIL        := TDETAIL_ERCOL.Create(lPagina);
+          lDETAIL        := TDETAIL_MQI.Create(lPagina);
           lDETAIL.Parent := lPagina;
           lDETAIL.Left   := 007 + lF.FCURRENT_LEFT;
           lDETAIL.Width  := lPagina.Width - 2;

@@ -22,6 +22,7 @@ Type
       FCNX : TConexion;
       FINPUT : TQUERY;
       FINPUT2 : TQUERY;
+      FINPUT3 : TQUERY;
       FOUTPUT : TQUERY;
       FNUMERO : Integer;
       FCONTADOR : Integer;
@@ -30,9 +31,11 @@ Type
       Procedure SaveData(Const pLine : String; pForced : Boolean = False);
       Function GetData : Boolean;
       Function GetDetail(Const pCodigo_Producto : String) : Double;
+      Function GetService : Double;
       Function PutData : Boolean;
       Procedure SetLinea(Const pProducto, pCantidad_EDM, pCantidad_INV, pEfectividad : String);
       Procedure SetLinea2(Const pTipo_Documento, pNumero, pFecha_Movimiento, pFecha_Registro, Hora, pCantidad, pValor, pTotal : String);
+      Procedure SetLinea3(Const pCodigo_Producto, pNombre, pCantidad, pValor, pTotal : String);
       Procedure Informacion_Adicional;
     Public
       Constructor Create(pCNX: TConexion; Const pCodigo_Documento : String; Const pNumero : Integer);
@@ -46,10 +49,12 @@ Begin
     FCNX := pCNX;
     FINPUT := TQUERY.Create(Nil);
     FINPUT2 := TQUERY.Create(Nil);
+    FINPUT3 := TQUERY.Create(Nil);
     FOUTPUT := TQUERY.Create(Nil);
     FCONTADOR := 0;
     FINPUT.Connection := pCNX;
     FINPUT2.Connection := pCNX;
+    FINPUT3.Connection := pCNX;
     FOUTPUT.Connection := pCNX;
     FNUMERO := pNumero;
     FCODIGO_DOCUMENTO := pCodigo_Documento;
@@ -144,7 +149,7 @@ Begin
     FINPUT.SQL.Add('     GROUP BY D.CODIGO_PRODUCTO ');
     FINPUT.SQL.Add(' ) AS X ');
     FINPUT.SQL.Add(' INNER JOIN ' + Info_TablaGet(Id_TBL_Producto).Name + ' P ON X.CODIGO_PRODUCTO = P.CODIGO_PRODUCTO ');
-//  FINPUT.SQL.Add(' WHERE (P.ID_SERVICIO IS NULL) Or (P.ID_SERVICIO = ' + QuotedStr('N') + ') ');
+    FINPUT.SQL.Add(' WHERE (P.ID_SERVICIO IS NULL) Or (P.ID_SERVICIO = ' + QuotedStr('N') + ') ');
     FINPUT.SQL.Add(' GROUP BY X.CODIGO_PRODUCTO, P.NOMBRE ');
     FINPUT.SQL.Add(' ORDER BY P.NOMBRE ');
     FINPUT.Active := True;
@@ -251,13 +256,64 @@ Begin
   End;
 End;
 
+Function TReport_Comparativo_OP_Inventario.GetService : Double;
+Var
+  lSuma : Double;
+Begin
+  lSuma := 0;
+  Result := 0;
+  Try
+    FINPUT3.Active := False;
+    FINPUT3.SQL.Clear;
+    FINPUT3.SQL.Add('     SELECT  D.CODIGO_PRODUCTO ');
+    FINPUT3.SQL.Add('            ,P.NOMBRE ');
+    FINPUT3.SQL.Add('            ,D.CANTIDAD ');
+    FINPUT3.SQL.Add('            ,D.VALOR_UNITARIO ');
+    FINPUT3.SQL.Add('     FROM ' + Info_TablaGet(Id_TBL_Explosion_Material).Name + ' D ');
+    FINPUT3.SQL.Add('     INNER JOIN ' + Info_TablaGet(Id_TBL_Producto).Name + ' P ');
+    FINPUT3.SQL.Add('     ON D.CODIGO_PRODUCTO = P.CODIGO_PRODUCTO');
+    FINPUT3.SQL.Add('     WHERE ' +FCNX.Trim_Sentence('D.CODIGO_DOCUMENTO') + ' = ' + QuotedStr(Trim(FCODIGO_DOCUMENTO)) );
+    FINPUT3.SQL.Add('     AND D.NUMERO = ' + IntToStr(FNUMERO));
+    FINPUT3.SQL.Add('     AND (P.ID_SERVICIO = ' + QuotedStr('S') + ') ');
+    FINPUT3.Active := True;
+    If FINPUT3.RecordCount > 0 Then
+    Begin
+      SaveData('', True);
+      SaveData('SERVICIOS');
+      SetLinea3(StringOfChar('-', 50), StringOfChar('-', 60), StringOfChar('-', 50), StringOfChar('-', 50), StringOfChar('-', 50));
+      SetLinea3('CODIGO', 'NOMBRE','CANTIDAD','VALOR UNITARIO', 'TOTAL');
+      SetLinea3(StringOfChar('-', 50), StringOfChar('-', 60), StringOfChar('-', 50), StringOfChar('-', 50), StringOfChar('-', 50));
+      FINPUT3.First;
+      While Not FINPUT3.Eof Do
+      Begin
+        lSuma := lSuma + FINPUT3.FieldByName('CANTIDAD').AsFloat * FINPUT3.FieldByName('VALOR_UNITARIO').AsFloat;
+        Result := Result + FINPUT3.FieldByName('CANTIDAD').AsFloat * FINPUT3.FieldByName('VALOR_UNITARIO').AsFloat;
+        SetLinea3(FINPUT3.FieldByName('CODIGO_PRODUCTO').AsString,
+                  FINPUT3.FieldByName('NOMBRE').AsString,
+                  FormatFloat('###,###,##0.#0', FINPUT3.FieldByName('CANTIDAD').AsFloat),
+                  FormatFloat('###,###,##0.#0', FINPUT3.FieldByName('VALOR_UNITARIO').AsFloat),
+                  FormatFloat('###,###,##0.#0', FINPUT3.FieldByName('CANTIDAD').AsFloat * FINPUT3.FieldByName('VALOR_UNITARIO').AsFloat));
+        FINPUT3.Next;
+      End;
+      SetLinea3(StringOfChar('=', 50), StringOfChar('=', 60), StringOfChar('=', 50), StringOfChar('=', 50), StringOfChar('=', 50));
+      SetLinea3('', '','','TOTAL', FormatFloat('###,###,##0.#0', lSuma));
+    End;
+    SaveData('', True);
+  Except
+    On E: Exception Do
+    Begin
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Report.Comparativo_OP_Inventario', 'TReport_Comparativo_OP_Inventario.GetService', E.Message);
+    End;
+  End;
+End;
+
 
 Procedure TReport_Comparativo_OP_Inventario.SetLinea(Const pProducto, pCantidad_EDM, pCantidad_INV, pEfectividad : String);
 Var
   lBase : String;
 Begin
   Try
-   lBase := Copy(Justificar(pProducto      , ' ', 080, 'I'), 01, 080) + ' ' +
+   lBase := Copy(Justificar(pProducto      , ' ', 099, 'I'), 01, 099) + ' ' +
             Copy(Justificar(pCantidad_EDM  , ' ', 014, 'D'), 01, 014) + ' ' +
             Copy(Justificar(pCantidad_INV  , ' ', 014, 'D'), 01, 014) + ' ' +
             Copy(Justificar(pEfectividad   , ' ', 014, 'D'), 01, 014);
@@ -275,7 +331,7 @@ Var
   lBase : String;
 Begin
   Try
-   lBase := StringOfChar(' ', 21) +
+   lBase := StringOfChar(' ', 40) +
             Copy(Justificar(pTipo_Documento  , ' ', 025, 'I'), 01, 025) + ' ' +
             Copy(Justificar(pNumero          , ' ', 006, 'I'), 01, 006) + ' ' +
             Copy(Justificar(pFecha_Movimiento, ' ', 010, 'D'), 01, 010) + ' ' +
@@ -284,6 +340,26 @@ Begin
             Copy(Justificar(pCantidad        , ' ', 010, 'D'), 01, 010) + ' ' +
             Copy(Justificar(pValor           , ' ', 010, 'D'), 01, 010) + ' ' +
             Copy(Justificar(pTotal           , ' ', 016, 'D'), 01, 016);
+    SaveData(lBase);
+  Except
+    On E: Exception Do
+    Begin
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Report.Comparativo_OP_Inventario', 'TReport_Comparativo_OP_Inventario.SetLinea', E.Message);
+    End;
+  End;
+End;
+
+Procedure TReport_Comparativo_OP_Inventario.SetLinea3(Const pCodigo_Producto, pNombre, pCantidad, pValor, pTotal : String);
+Var
+  lBase : String;
+Begin
+  Try
+   lBase := StringOfChar(' ', 10) +
+            Copy(Justificar(pCodigo_Producto, ' ', 020, 'I'), 01, 020) + ' ' +
+            Copy(Justificar(pNombre         , ' ', 055, 'I'), 01, 055) + ' ' +
+            Copy(Justificar(pCantidad       , ' ', 010, 'D'), 01, 010) + ' ' +
+            Copy(Justificar(pValor          , ' ', 020, 'D'), 01, 020) + ' ' +
+            Copy(Justificar(pTotal          , ' ', 025, 'D'), 01, 025);
     SaveData(lBase);
   Except
     On E: Exception Do
@@ -366,7 +442,7 @@ Begin
       SaveData('FECHA/HORA: ' + FormatDateTime('YYYY-MM-DD / HH:NN:SS.Z', Now));
       SaveData('NUMERO: ' + Trim(FormatFloat('###,###,#0', FNUMERO)));
       Informacion_Adicional;
-      SaveData('');
+      SaveData('', True);
       SetLinea('PRODUCTO', 'E.D.M', 'INVENTARIO', 'EFECTIVIDAD');
       SetLinea(StringOfChar('-', 100), StringOfChar('-', 20), StringOfChar('-', 20), StringOfChar('-', 20));
       FINPUT.First;
@@ -388,15 +464,19 @@ Begin
       lEFE := 0;
       If lSuma_EDM <> 0 Then
         lEFE := (100 * lSuma_INV)/lSuma_EDM;
+      lValor_Costo := lValor_Costo + GetService;
+      SaveData('', True);
       SetLinea(StringOfChar('=', 100), StringOfChar('=', 20), StringOfChar('=', 20), StringOfChar('=', 20));
+      SetLinea('', 'E.D.M', 'INVENTARIO', 'EFECTIVIDAD');
+      SetLinea(StringOfChar('-', 100), StringOfChar('-', 20), StringOfChar('-', 20), StringOfChar('-', 20));
       SetLinea('TOTAL CANTIDADES DE LA ORDEN DE PRODUCION',
                FormatFloat('###,###,###.#0', lSuma_EDM),
                FormatFloat('###,###,###.#0', lSuma_INV),
                FormatFloat('###,###,###.#0', lEFE) + '%');
-      SetLinea('TOTAL DE COSTO DE LA ORDEN DE PRODUCION',
-               '',
-               '',
-               FormatFloat('###,###,###.#0', lValor_Costo));
+      SaveData('', True);
+      SetLinea(StringOfChar('*', 100), StringOfChar('*', 20), StringOfChar('*', 20), StringOfChar('*', 20));
+      SetLinea('TOTAL DE COSTO DE LA ORDEN DE PRODUCION', '', '', FormatFloat('###,###,###.#0', lValor_Costo));
+      SetLinea(StringOfChar('*', 100), StringOfChar('*', 20), StringOfChar('*', 20), StringOfChar('*', 20));
     End;
   Except
     On E: Exception Do
@@ -413,6 +493,18 @@ Begin
     Begin
       FOUTPUT.Active := False;
       FreeAndNil(FOUTPUT);
+    End;
+
+    If Assigned(FINPUT3) Then
+    Begin
+      FINPUT3.Active := False;
+      FreeAndNil(FINPUT3);
+    End;
+
+    If Assigned(FINPUT2) Then
+    Begin
+      FINPUT2.Active := False;
+      FreeAndNil(FINPUT2);
     End;
 
     If Assigned(FINPUT) Then

@@ -66,6 +66,7 @@ type
     procedure BTNCREARTERCEROAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNCREARPRODUCTOAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNOPAsyncClick(Sender: TObject; EventParams: TStringList);
+    procedure CANTIDADAsyncExit(Sender: TObject; EventParams: TStringList);
   private
     FCNX : TConexion;
     FINFO : String;
@@ -77,6 +78,9 @@ type
     FGRID_MAESTRO : TGRID_JQ;
 
     FCODIGO_ACTUAL : String;
+
+    Function Cantidad_Valida: Boolean;
+    Procedure Info_Calculated(pDataset : TDataSet);
 
     Procedure Preparar_Numero_Cero;
     Procedure Localizar_Registro(Sender: TObject; EventParams: TStringList);
@@ -131,6 +135,8 @@ Uses
   UtilsIW.ManagerLog,
   Report.Saldo_Inventario,
   UtilsIW.Numero_Siguiente;
+
+
 
 Procedure TFrIWMovto_Inventario.Preparar_Numero_Cero;
 Begin
@@ -266,6 +272,7 @@ Begin
     Begin
       FQRMAESTRO.QR.FieldByName('CODIGO_PRODUCTO').AsString := EventParams.Values ['CODIGO_PRODUCTO'];
       FQRMAESTRO.QR.FieldByName('VALOR_UNITARIO' ).AsFloat  := FCNX.GetValueDbl(Info_TablaGet(Id_TBL_Producto).Name, ['CODIGO_PRODUCTO'], [EventParams.Values ['CODIGO_PRODUCTO']], ['VALOR_UNITARIO']);
+      Cantidad_Valida;
     End;
   Except
    On E: Exception Do
@@ -328,6 +335,59 @@ Begin
   Result := FCNX.Record_Exist(Info_TablaGet(Id_TBL_Movto_Inventario).Name, ['CODIGO_DOCUMENTO', 'NUMERO'], [FCODIGO_DOCUMENTO, pNumero]);
 End;
 
+procedure TFrIWMovto_Inventario.CANTIDADAsyncExit(Sender: TObject; EventParams: TStringList);
+begin
+  Cantidad_Valida;
+end;
+
+Function TFrIWMovto_Inventario.Cantidad_Valida: Boolean;
+Var
+  lEDM : Double;
+  lINV : Double;
+Begin
+  Result := True;
+  If (Trim(FCODIGO_DOCUMENTO) <> Trim(UserSession.DOCUMENTO_SALIDA_DE_INVENTARIO)) Or Vacio(FQRMAESTRO.QR.FieldByName('CODIGO_PRODUCTO').AsString) Then
+    Exit;
+
+  lEDM := 0;
+  lINV := 0;
+  Try
+    FCNX.TMP.Active := False;
+    FCNX.TMP.SQL.Clear;
+    FCNX.TMP.SQL.Add(' SELECT SUM(CANTIDAD) AS RESULTADO FROM ' + Info_TablaGet(Id_TBL_Explosion_Material).Name + ' ' + FCNX.No_Lock);
+    FCNX.TMP.SQL.Add(' WHERE ' + FCNX.Trim_Sentence('CODIGO_DOCUMENTO') + ' = ' + QuotedStr(Trim(FQRMAESTRO.QR.FieldByName('CODIGO_DOCUMENTO_OP').AsString)));
+    FCNX.TMP.SQL.Add(' AND NUMERO = ' + IntToStr(FQRMAESTRO.QR.FieldByName('NUMERO_OP').AsInteger));
+    FCNX.TMP.SQL.Add(' AND ' + FCNX.Trim_Sentence('CODIGO_PRODUCTO') + ' = ' + QuotedStr(Trim(FQRMAESTRO.QR.FieldByName('CODIGO_PRODUCTO').AsString)));
+    FCNX.TMP.Active := True;
+    lEDM := FCNX.TMP.FieldByName('RESULTADO').AsFloat;
+
+    FCNX.TMP.Active := False;
+    FCNX.TMP.SQL.Clear;
+    FCNX.TMP.SQL.Add(' SELECT SUM(CANTIDAD) AS RESULTADO FROM ' + Info_TablaGet(Id_TBL_Movto_Inventario).Name + ' ' + FCNX.No_Lock);
+    FCNX.TMP.SQL.Add(' WHERE ' + FCNX.Trim_Sentence('CODIGO_DOCUMENTO_OP') + ' = ' + QuotedStr(Trim(FQRMAESTRO.QR.FieldByName('CODIGO_DOCUMENTO_OP').AsString)));
+    FCNX.TMP.SQL.Add(' AND NUMERO_OP = ' + IntToStr(FQRMAESTRO.QR.FieldByName('NUMERO_OP').AsInteger));
+    FCNX.TMP.SQL.Add(' AND ' + FCNX.Trim_Sentence('CODIGO_PRODUCTO') + ' = ' + QuotedStr(Trim(FQRMAESTRO.QR.FieldByName('CODIGO_PRODUCTO').AsString)));
+    FCNX.TMP.SQL.Add(' AND ' + FCNX.Trim_Sentence('CODIGO_DOCUMENTO') + ' = ' + QuotedStr(Trim(FCODIGO_DOCUMENTO)));
+    FCNX.TMP.SQL.Add(' AND NUMERO <> ' + IntToStr(FQRMAESTRO.QR.FieldByName('NUMERO').AsInteger));
+    FCNX.TMP.Active := True;
+    lINV := FCNX.TMP.FieldByName('RESULTADO').AsFloat;
+
+    FCNX.TMP.Active := False;
+    FCNX.TMP.SQL.Clear;
+
+    Result := lEDM >= (lINV + FQRMAESTRO.QR.FieldByName('CANTIDAD').AsFloat);
+    If Not Result Then
+    Begin
+      UserSession.SetMessage('Explosion de Materiales: ' + FormatFloat('###,###,##0.#0', lEDM), False);
+      UserSession.SetMessage('Salidas Realizadas: ' + FormatFloat('###,###,##0.#0', lINV), True);
+      UserSession.SetMessage('Cantidad Solicitada: ' + FormatFloat('###,###,##0.#0', FQRMAESTRO.QR.FieldByName('CANTIDAD').AsFloat), True);
+    End;
+  Except
+    On E: Exception Do
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWMovto_Inventario', 'TFrIWMovto_Inventario.Cantidad_Valida', E.Message);
+  End;
+End;
+
 Procedure TFrIWMovto_Inventario.Validar_Campos_Master(pSender: TObject);
 Var
   lMensaje: String;
@@ -378,10 +438,22 @@ Begin
       CODIGO_PRODUCTO.BGColor := UserSession.COLOR_ERROR;
     End;
 
-    If FQRMAESTRO.Mode_Edition And (FQRMAESTRO.QR.FieldByName('CANTIDAD').AsFloat <= 0) Then
+    If FQRMAESTRO.Mode_Edition Then
     Begin
-      lMensaje := lMensaje + IfThen(Not Vacio(lMensaje), ', ') + 'Cantidad no valida';
-      CANTIDAD.BGColor := UserSession.COLOR_ERROR;
+      If (FQRMAESTRO.QR.FieldByName('CANTIDAD').AsFloat <= 0) Then
+      Begin
+        lMensaje := lMensaje + IfThen(Not Vacio(lMensaje), ', ') + 'Cantidad no valida';
+        CANTIDAD.BGColor := UserSession.COLOR_ERROR;
+      End
+      Else
+      Begin
+        Cantidad_Valida;
+//        If Not Cantidad_Valida Then
+//        Begin
+////          lMensaje := lMensaje + IfThen(Not Vacio(lMensaje), ', ') + 'Cantidad no disponible segun lo estipulado en la explosion de materiales, ' + #13 + lResult;
+////          CANTIDAD.BGColor := UserSession.COLOR_ERROR;
+//        End;
+      End;
     End;
 
     FQRMAESTRO.ERROR := IfThen(Vacio(lMensaje), 0, -1);
@@ -549,6 +621,8 @@ begin
   SetLabel;
 
   Try
+    If FQRMAESTRO.Mode_Edition Then
+       Cantidad_Valida;
     If (FCODIGO_ACTUAL <> FQRMAESTRO.QR.FieldByName('NUMERO').AsString) And (Not FQRMAESTRO.Mode_Edition) Then
     Begin
       FCODIGO_ACTUAL := FQRMAESTRO.QR.FieldByName('NUMERO').AsString;
@@ -578,6 +652,23 @@ Begin
   End;
 End;
 
+Procedure TFrIWMovto_Inventario.Info_Calculated(pDataset : TDataSet);
+Begin
+  Try
+    If FQRMAESTRO.QR.FindField('CALC_OP') <> Nil Then
+      FQRMAESTRO.QR.FieldByName('CALC_OP').AsString := FCNX.GetValue(Info_TablaGet(Id_TBL_Orden_Produccion).Name, ['CODIGO_DOCUMENTO', 'NUMERO'], [FQRMAESTRO.QR.FieldByName('CODIGO_DOCUMENTO_OP').AsString, FQRMAESTRO.QR.FieldByName('NUMERO_OP').AsString], ['DOCUMENTO_REFERENCIA']);
+
+    If FQRMAESTRO.QR.FindField('CALC_NOMBRE_PRODUCTO') <> Nil Then
+      FQRMAESTRO.QR.FieldByName('CALC_NOMBRE_PRODUCTO').AsString := FCNX.GetValue(Info_TablaGet(Id_TBL_Producto).Name, ['CODIGO_PRODUCTO'], [FQRMAESTRO.QR.FieldByName('CODIGO_PRODUCTO').AsString], ['NOMBRE']);
+
+  Except
+    On E: Exception Do
+    Begin
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWMovto_Inventario', 'TFrIWMovto_Inventario.Info_Calculated', E.Message);
+    End;
+  End;
+End;
+
 Function TFrIWMovto_Inventario.AbrirMaestro(Const pDato: String = ''): Boolean;
 Begin
   FGRID_MAESTRO.Caption := Info_TablaGet(Id_TBL_Movto_Inventario).Caption;
@@ -601,6 +692,9 @@ Begin
       FQRMAESTRO.WHERE := FQRMAESTRO.WHERE + ' ) ';
     End;
     FQRMAESTRO.ORDER := ' ORDER BY NUMERO DESC ';
+    FQRMAESTRO.SetFields;
+    FQRMAESTRO.SetCalcField('CALC_OP', 20, TFieldType.ftString);
+    FQRMAESTRO.SetCalcField('CALC_NOMBRE_PRODUCTO', 50, TFieldType.ftString);
     FQRMAESTRO.Active := True;
     Result := FQRMAESTRO.Active;
     If Result Then
@@ -654,10 +748,10 @@ begin
   Try
     FGRID_MAESTRO        := TGRID_JQ.Create(PAG_00);
     FGRID_MAESTRO.Parent := PAG_00;
-    FGRID_MAESTRO.Top    := 010;
-    FGRID_MAESTRO.Left   := 010;
-    FGRID_MAESTRO.Width  := 700;
-    FGRID_MAESTRO.Height := 500;
+    FGRID_MAESTRO.Top    := 0010;
+    FGRID_MAESTRO.Left   := 0010;
+    FGRID_MAESTRO.Width  := 1000;
+    FGRID_MAESTRO.Height := 0500;
 
     FQRMAESTRO := UserSession.Create_Manager_Data(Info_TablaGet(Id_TBL_Movto_Inventario).Name, Info_TablaGet(Id_TBL_Movto_Inventario).Caption);
 
@@ -666,6 +760,7 @@ begin
     FQRMAESTRO.ON_DATA_CHANGE  := DsDataChangeMaster;
     FQRMAESTRO.ON_STATE_CHANGE := DsStateMaster;
     FQRMAESTRO.ON_BEFORE_POST  := Validar_Campos_Master;
+    FQRMAESTRO.QR.OnCalcFields := Info_Calculated;
 
     NUMERO.DataSource              := FQRMAESTRO.DS;
     CODIGO_DOCUMENTO_OP.DataSource := FQRMAESTRO.DS;
@@ -680,11 +775,11 @@ begin
     VALOR_UNITARIO.DataSource      := FQRMAESTRO.DS;
     ID_ACTIVO.DataSource           := FQRMAESTRO.DS;
 
-    FGRID_MAESTRO.SetGrid(FQRMAESTRO.DS, ['NUMERO'        , 'NOMBRE'     , 'CODIGO_PRODUCTO', 'FECHA_REGISTRO', 'FECHA_MOVIMIENTO'],
-                                         ['numero'        , 'Nombre'     , 'Producto'       , 'Registro'      , 'Movimiento'      ],
-                                         ['S'             , 'N'          , 'N'              , 'N'             , 'N'               ],
-                                         [080             , 150          , 150              , 100             , 100               ],
-                                         [taRightJustify  , taLeftJustify, taRightJustify   , taRightJustify  , taRightJustify    ]);
+    FGRID_MAESTRO.SetGrid(FQRMAESTRO.DS, ['NUMERO'       , 'NOMBRE'     , 'CALC_NOMBRE_PRODUCTO', 'CALC_OP'       , 'FECHA_REGISTRO', 'FECHA_MOVIMIENTO'],
+                                         ['numero'       , 'Nombre'     , 'Producto'            , 'O.P.'          , 'Registro'      , 'Movimiento'      ],
+                                         ['S'            , 'N'          , 'N'                   , 'N'             , 'N'             , 'N'               ],
+                                         [080            , 200          , 350                   , 100             , 100             , 100               ],
+                                         [taRightJustify , taLeftJustify, taLeftJustify         , taRightJustify  , taRightJustify  , taRightJustify    ]);
     FNAVEGADOR               := TNavegador_ASE.Create(IWRegion_Navegador);
     FNAVEGADOR.Parent        := IWRegion_Navegador;
     FNAVEGADOR.SetNavegador(FQRMAESTRO, WebApplication, FGRID_MAESTRO);

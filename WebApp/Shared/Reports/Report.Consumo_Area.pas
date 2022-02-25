@@ -170,8 +170,8 @@ Begin
             Copy(Justificar(pNro_Documento , ' ', 10, 'I'), 01, 010) + ' ' +
             Copy(Justificar(pOP            , ' ', 05, 'I'), 01, 005) + ' ' +
             Copy(Justificar(pCantidad      , ' ', 10, 'D'), 01, 010) + ' ' +
-            Copy(Justificar(pValor         , ' ', 10, 'D'), 01, 010) + ' ' +
-            Copy(Justificar(pTotal         , ' ', 15, 'D'), 01, 015) ;
+            Copy(Justificar(pValor         , ' ', 20, 'D'), 01, 020) + ' ' +
+            Copy(Justificar(pTotal         , ' ', 25, 'D'), 01, 025) ;
     SaveData(lBase);
   Except
     On E: Exception Do
@@ -211,7 +211,7 @@ Begin
         Begin
           SetLinea('FECHA', 'VENCIMIENT', 'PRODUCTO', 'DOCUMENTO', 'O.P.', 'CANTIDAD', 'VALOR', 'TOTAL');
         End;
-        SetLinea(StringOfChar('-', 20), StringOfChar('-', 20), StringOfChar('-', 50), StringOfChar('-', 50), StringOfChar('-', 20), StringOfChar('-', 20), StringOfChar('-', 20), StringOfChar('-', 20));
+        SetLinea(StringOfChar('-', 20), StringOfChar('-', 20), StringOfChar('-', 50), StringOfChar('-', 50), StringOfChar('-', 20), StringOfChar('-', 30), StringOfChar('-', 30), StringOfChar('-', 30));
         While (Not FINPUT.Eof) And (Trim(lDocumento) = Trim(FINPUT.FieldByName('CODIGO_DOCUMENTO').AsString)) Do
         Begin
           If Trim(UserSession.DOCUMENTO_SALIDA_DE_INVENTARIO) = Trim(FINPUT.FieldByName('CODIGO_DOCUMENTO').AsString) Then
@@ -248,14 +248,15 @@ Begin
           Result := True;
           FINPUT.Next;
         End;
-        SetLinea(StringOfChar('_', 20), StringOfChar('_', 20), StringOfChar('_', 50), StringOfChar('_', 50), StringOfChar('_', 20), StringOfChar('_', 20), StringOfChar('_', 20), StringOfChar('_', 20));
+        SetLinea(StringOfChar('_', 20), StringOfChar('_', 20), StringOfChar('_', 50), StringOfChar('_', 50), StringOfChar('_', 20), StringOfChar('_', 30), StringOfChar('_', 30), StringOfChar('_', 30));
         If Trim(UserSession.DOCUMENTO_SALIDA_DE_INVENTARIO) = Trim(lDocumento) Then
-          SetLinea(StringOfChar(' ', 20), StringOfChar(' ', 20), StringOfChar(' ', 50), StringOfChar(' ', 50), StringOfChar(' ', 20), StringOfChar(' ', 20), 'TOTAL', FormatFloat('###,###,###,##0', lSalida));
+          SetLinea(StringOfChar(' ', 20), StringOfChar(' ', 20), StringOfChar(' ', 50), StringOfChar(' ', 50), StringOfChar(' ', 20), StringOfChar(' ', 20), 'TOTAL SALIDA', FormatFloat('###,###,###,##0', lSalida));
         If Trim(UserSession.DOCUMENTO_DEVOLUCION_AL_INVENTARIO) = Trim(lDocumento) Then
-          SetLinea(StringOfChar(' ', 20), StringOfChar(' ', 20), StringOfChar(' ', 50), StringOfChar(' ', 50), StringOfChar(' ', 20), StringOfChar(' ', 20), 'TOTAL', FormatFloat('###,###,###,##0', lDevolucion));
+          SetLinea(StringOfChar(' ', 20), StringOfChar(' ', 20), StringOfChar(' ', 50), StringOfChar(' ', 50), StringOfChar(' ', 20), StringOfChar(' ', 20), 'TOTAL DEVOLUCION', FormatFloat('###,###,###,##0', lDevolucion));
       End;
-      SetLinea(StringOfChar('=', 20), StringOfChar('=', 20), StringOfChar('=', 50), StringOfChar('=', 50), StringOfChar('=', 20), StringOfChar('=', 20), StringOfChar('=', 20), StringOfChar('=', 20));
-      SetLinea(StringOfChar(' ', 20), StringOfChar(' ', 20), StringOfChar(' ', 50), StringOfChar(' ', 50), StringOfChar(' ', 20), StringOfChar(' ', 20), 'TOTAL', FormatFloat('###,###,###,##0', lSalida - lDevolucion));
+      SetLinea(StringOfChar('=', 20), StringOfChar('=', 20), StringOfChar('=', 50), StringOfChar('=', 50), StringOfChar('=', 20), StringOfChar('=', 30), StringOfChar('=', 30), StringOfChar('=', 30));
+      SaveData('', True);
+      SetLinea(StringOfChar(' ', 20), StringOfChar(' ', 20), StringOfChar(' ', 50), StringOfChar(' ', 50), StringOfChar(' ', 20), StringOfChar(' ', 20), 'TOTAL GENERAL', FormatFloat('###,###,###,##0', lSalida - lDevolucion));
     End;
   Except
     On E: Exception Do

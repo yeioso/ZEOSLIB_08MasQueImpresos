@@ -255,6 +255,7 @@ object FrIWMovto_Inventario: TFrIWMovto_Inventario
           Font.Color = clWebNAVY
           Font.Size = 10
           Font.Style = [fsBold]
+          NoWrap = True
           HasTabOrder = False
           FriendlyName = 'lbNombre_Tercero'
           Caption = 'lbNombre_Tercero'
@@ -348,13 +349,14 @@ object FrIWMovto_Inventario: TFrIWMovto_Inventario
         object lbNombre_Producto: TIWLabel
           Left = 313
           Top = 84
-          Width = 135
-          Height = 14
+          Width = 123
+          Height = 13
           RenderSize = False
           StyleRenderOptions.RenderSize = False
           Font.Color = clWebNAVY
-          Font.Size = 9
+          Font.Size = 8
           Font.Style = [fsBold]
+          NoWrap = True
           HasTabOrder = False
           FriendlyName = 'lbNombre_Producto'
           Caption = 'lbNombre_Producto'
@@ -733,6 +735,7 @@ object FrIWMovto_Inventario: TFrIWMovto_Inventario
           Font.Style = []
           FriendlyName = 'CANTIDAD'
           SubmitOnAsyncEvent = True
+          OnAsyncExit = CANTIDADAsyncExit
           AutoEditable = False
           DataField = 'CANTIDAD'
           PasswordPrompt = False
@@ -829,7 +832,7 @@ object FrIWMovto_Inventario: TFrIWMovto_Inventario
     end
   end
   object IWModalWindow1: TIWModalWindow
-    Left = 72
+    Left = 104
     Top = 8
   end
 end

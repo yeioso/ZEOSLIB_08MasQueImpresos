@@ -186,8 +186,8 @@ Begin
             Copy(Justificar(pFecha_Registro  , ' ', 11, 'I'), 01, 011) + ' ' +
             Copy(Justificar(pHora_Registro   , ' ', 11, 'I'), 01, 011) + ' ' +
             Copy(Justificar(pCantidad        , ' ', 10, 'D'), 01, 010) + ' ' +
-            Copy(Justificar(pValor_Unitario  , ' ', 11, 'D'), 01, 011) + ' ' +
-            Copy(Justificar(pTotal           , ' ', 15, 'D'), 01, 015);
+            Copy(Justificar(pValor_Unitario  , ' ', 15, 'D'), 01, 015) + ' ' +
+            Copy(Justificar(pTotal           , ' ', 25, 'D'), 01, 025);
     SaveData(lBase);
   Except
     On E: Exception Do
@@ -231,8 +231,8 @@ Begin
                  StringOfChar('-', 10),
                  StringOfChar('-', 10),
                  StringOfChar('-', 14),
-                 StringOfChar('-', 14),
-                 StringOfChar('-', 20));
+                 StringOfChar('-', 20),
+                 StringOfChar('-', 30));
 
         FINPUT_DET.First;
         While Not FINPUT_DET.Eof Do
@@ -259,14 +259,14 @@ Begin
                  StringOfChar('=', 10),
                  StringOfChar('=', 10),
                  StringOfChar('=', 14),
-                 StringOfChar('=', 14),
-                 StringOfChar('=', 20));
+                 StringOfChar('=', 20),
+                 StringOfChar('=', 30));
         SetLinea(StringOfChar(' ', 20),
                  StringOfChar(' ', 50),
                  StringOfChar(' ', 10),
                  StringOfChar(' ', 10),
                  StringOfChar(' ', 10),
-                 StringOfChar(' ', 14),
+                 StringOfChar(' ', 20),
                  'TOTAL:',
                  FormatFloat('###,###,###,##0', lSuma));
       End;
