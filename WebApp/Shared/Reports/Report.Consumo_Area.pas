@@ -130,7 +130,7 @@ Begin
     FINPUT.SQL.Add('           ,D.VALOR_UNITARIO ');
     FINPUT.SQL.Add('   FROM ' + Info_TablaGet(Id_TBL_Movto_Inventario).Name + ' D ');
     FINPUT.SQL.Add('   INNER JOIN ' + Info_TablaGet(Id_TBL_Producto).Name + ' P ON D.CODIGO_PRODUCTO = P.CODIGO_PRODUCTO ');
-    FINPUT.SQL.Add('   INNER JOIN ' + Info_TablaGet(Id_TBL_Area).Name + ' A ON P.CODIGO_AREA = A.CODIGO_AREA ');
+    FINPUT.SQL.Add('   INNER JOIN ' + Info_TablaGet(Id_TBL_Area).Name + ' A ON D.CODIGO_AREA = A.CODIGO_AREA ');
     FINPUT.SQL.Add('   INNER JOIN ' + Info_TablaGet(Id_TBL_Usuario).Name + ' U ON D.CODIGO_USUARIO = U.CODIGO_USUARIO ');
     FINPUT.SQL.Add('   WHERE P.CODIGO_AREA = ' + QuotedStr(FCODIGO_AREA) + ' ');
     FINPUT.SQL.Add('   AND ');

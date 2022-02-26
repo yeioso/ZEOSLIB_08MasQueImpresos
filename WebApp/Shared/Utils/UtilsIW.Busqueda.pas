@@ -100,7 +100,7 @@ begin
                                           Self.CAMPOS_ID        := ['S'                      , 'N'                     ];
                                           Self.CAMPOS_ALIGNMENT := [TAlignment.taRightJustify, TAlignment.taLeftJustify];
                                           Self.SIZE_ORIGEN      := [0000000000000150         , 00000450                ];
-                                          Self.CAMPOS_DESTINO   := ['CODIGO_PRODUCTO', 'NOMBRE'];
+                                          Self.CAMPOS_DESTINO   := ['CODIGO_PRODUCTO', 'NOMBRE', 'CODIGO_AREA'];
                                         End;
       Id_TBL_Tercero                  : Begin
                                           Self.TABLA            := Info_TablaGet(pId).Name;

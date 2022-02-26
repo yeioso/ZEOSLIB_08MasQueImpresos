@@ -55,6 +55,10 @@ type
     CANTIDAD: TIWDBEdit;
     VALOR_UNITARIO: TIWDBEdit;
     ID_ACTIVO: TIWDBCheckBox;
+    IWLabel7: TIWLabel;
+    CODIGO_AREA: TIWDBLabel;
+    BTNCODIGO_AREA: TIWImage;
+    lbNombre_Area: TIWLabel;
     procedure BTNBACKAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure IWAppFormCreate(Sender: TObject);
     procedure IWAppFormDestroy(Sender: TObject);
@@ -67,6 +71,8 @@ type
     procedure BTNCREARPRODUCTOAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNOPAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure CANTIDADAsyncExit(Sender: TObject; EventParams: TStringList);
+    procedure BTNCODIGO_AREAAsyncClick(Sender: TObject;
+      EventParams: TStringList);
   private
     FCNX : TConexion;
     FINFO : String;
@@ -88,6 +94,7 @@ type
 
     Procedure Resultado_Orden_Produccion(Sender: TObject; EventParams: TStringList);
     Procedure Resultado_Producto(Sender: TObject; EventParams: TStringList);
+    Procedure Resultado_Area(Sender: TObject; EventParams: TStringList);
     Procedure Resultado_Tercero(Sender: TObject; EventParams: TStringList);
 
     Procedure Release_Me;
@@ -271,12 +278,26 @@ Begin
     If FQRMAESTRO.Mode_Edition Then
     Begin
       FQRMAESTRO.QR.FieldByName('CODIGO_PRODUCTO').AsString := EventParams.Values ['CODIGO_PRODUCTO'];
+      FQRMAESTRO.QR.FieldByName('CODIGO_AREA'    ).AsString := EventParams.Values ['CODIGO_AREA'    ];
       FQRMAESTRO.QR.FieldByName('VALOR_UNITARIO' ).AsFloat  := FCNX.GetValueDbl(Info_TablaGet(Id_TBL_Producto).Name, ['CODIGO_PRODUCTO'], [EventParams.Values ['CODIGO_PRODUCTO']], ['VALOR_UNITARIO']);
       Cantidad_Valida;
     End;
   Except
    On E: Exception Do
      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWMovto_Inventario', 'TFrIWMovto_Inventario.Resultado_Producto', E.Message);
+  End;
+End;
+
+Procedure TFrIWMovto_Inventario.Resultado_Area(Sender: TObject; EventParams: TStringList);
+Begin
+  Try
+    If FQRMAESTRO.Mode_Edition Then
+    Begin
+      FQRMAESTRO.QR.FieldByName('CODIGO_AREA').AsString := EventParams.Values ['CODIGO_AREA'];
+    End;
+  Except
+   On E: Exception Do
+     Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWMovto_Inventario', 'TFrIWMovto_Inventario.Resultado_Area', E.Message);
   End;
 End;
 
@@ -349,38 +370,42 @@ Begin
   If (Trim(FCODIGO_DOCUMENTO) <> Trim(UserSession.DOCUMENTO_SALIDA_DE_INVENTARIO)) Or Vacio(FQRMAESTRO.QR.FieldByName('CODIGO_PRODUCTO').AsString) Then
     Exit;
 
-  lEDM := 0;
-  lINV := 0;
   Try
-    FCNX.TMP.Active := False;
-    FCNX.TMP.SQL.Clear;
-    FCNX.TMP.SQL.Add(' SELECT SUM(CANTIDAD) AS RESULTADO FROM ' + Info_TablaGet(Id_TBL_Explosion_Material).Name + ' ' + FCNX.No_Lock);
-    FCNX.TMP.SQL.Add(' WHERE ' + FCNX.Trim_Sentence('CODIGO_DOCUMENTO') + ' = ' + QuotedStr(Trim(FQRMAESTRO.QR.FieldByName('CODIGO_DOCUMENTO_OP').AsString)));
-    FCNX.TMP.SQL.Add(' AND NUMERO = ' + IntToStr(FQRMAESTRO.QR.FieldByName('NUMERO_OP').AsInteger));
-    FCNX.TMP.SQL.Add(' AND ' + FCNX.Trim_Sentence('CODIGO_PRODUCTO') + ' = ' + QuotedStr(Trim(FQRMAESTRO.QR.FieldByName('CODIGO_PRODUCTO').AsString)));
-    FCNX.TMP.Active := True;
-    lEDM := FCNX.TMP.FieldByName('RESULTADO').AsFloat;
-
-    FCNX.TMP.Active := False;
-    FCNX.TMP.SQL.Clear;
-    FCNX.TMP.SQL.Add(' SELECT SUM(CANTIDAD) AS RESULTADO FROM ' + Info_TablaGet(Id_TBL_Movto_Inventario).Name + ' ' + FCNX.No_Lock);
-    FCNX.TMP.SQL.Add(' WHERE ' + FCNX.Trim_Sentence('CODIGO_DOCUMENTO_OP') + ' = ' + QuotedStr(Trim(FQRMAESTRO.QR.FieldByName('CODIGO_DOCUMENTO_OP').AsString)));
-    FCNX.TMP.SQL.Add(' AND NUMERO_OP = ' + IntToStr(FQRMAESTRO.QR.FieldByName('NUMERO_OP').AsInteger));
-    FCNX.TMP.SQL.Add(' AND ' + FCNX.Trim_Sentence('CODIGO_PRODUCTO') + ' = ' + QuotedStr(Trim(FQRMAESTRO.QR.FieldByName('CODIGO_PRODUCTO').AsString)));
-    FCNX.TMP.SQL.Add(' AND ' + FCNX.Trim_Sentence('CODIGO_DOCUMENTO') + ' = ' + QuotedStr(Trim(FCODIGO_DOCUMENTO)));
-    FCNX.TMP.SQL.Add(' AND NUMERO <> ' + IntToStr(FQRMAESTRO.QR.FieldByName('NUMERO').AsInteger));
-    FCNX.TMP.Active := True;
-    lINV := FCNX.TMP.FieldByName('RESULTADO').AsFloat;
-
-    FCNX.TMP.Active := False;
-    FCNX.TMP.SQL.Clear;
-
-    Result := lEDM >= (lINV + FQRMAESTRO.QR.FieldByName('CANTIDAD').AsFloat);
-    If Not Result Then
+    If FCNX.Record_Exist(Info_TablaGet(Id_TBL_Explosion_Material).Name, ['CODIGO_DOCUMENTO', 'NUMERO', 'CODIGO_PRODUCTO'],
+                                                                         [FQRMAESTRO.QR.FieldByName('CODIGO_DOCUMENTO_OP').AsString, IntToStr(FQRMAESTRO.QR.FieldByName('NUMERO_OP').AsInteger), FQRMAESTRO.QR.FieldByName('CODIGO_PRODUCTO').AsString]) Then
     Begin
-      UserSession.SetMessage('Explosion de Materiales: ' + FormatFloat('###,###,##0.#0', lEDM), False);
-      UserSession.SetMessage('Salidas Realizadas: ' + FormatFloat('###,###,##0.#0', lINV), True);
-      UserSession.SetMessage('Cantidad Solicitada: ' + FormatFloat('###,###,##0.#0', FQRMAESTRO.QR.FieldByName('CANTIDAD').AsFloat), True);
+      lEDM := 0;
+      lINV := 0;
+      FCNX.TMP.Active := False;
+      FCNX.TMP.SQL.Clear;
+      FCNX.TMP.SQL.Add(' SELECT SUM(CANTIDAD) AS RESULTADO FROM ' + Info_TablaGet(Id_TBL_Explosion_Material).Name + ' ' + FCNX.No_Lock);
+      FCNX.TMP.SQL.Add(' WHERE ' + FCNX.Trim_Sentence('CODIGO_DOCUMENTO') + ' = ' + QuotedStr(Trim(FQRMAESTRO.QR.FieldByName('CODIGO_DOCUMENTO_OP').AsString)));
+      FCNX.TMP.SQL.Add(' AND NUMERO = ' + IntToStr(FQRMAESTRO.QR.FieldByName('NUMERO_OP').AsInteger));
+      FCNX.TMP.SQL.Add(' AND ' + FCNX.Trim_Sentence('CODIGO_PRODUCTO') + ' = ' + QuotedStr(Trim(FQRMAESTRO.QR.FieldByName('CODIGO_PRODUCTO').AsString)));
+      FCNX.TMP.Active := True;
+      lEDM := FCNX.TMP.FieldByName('RESULTADO').AsFloat;
+
+      FCNX.TMP.Active := False;
+      FCNX.TMP.SQL.Clear;
+      FCNX.TMP.SQL.Add(' SELECT SUM(CANTIDAD) AS RESULTADO FROM ' + Info_TablaGet(Id_TBL_Movto_Inventario).Name + ' ' + FCNX.No_Lock);
+      FCNX.TMP.SQL.Add(' WHERE ' + FCNX.Trim_Sentence('CODIGO_DOCUMENTO_OP') + ' = ' + QuotedStr(Trim(FQRMAESTRO.QR.FieldByName('CODIGO_DOCUMENTO_OP').AsString)));
+      FCNX.TMP.SQL.Add(' AND NUMERO_OP = ' + IntToStr(FQRMAESTRO.QR.FieldByName('NUMERO_OP').AsInteger));
+      FCNX.TMP.SQL.Add(' AND ' + FCNX.Trim_Sentence('CODIGO_PRODUCTO') + ' = ' + QuotedStr(Trim(FQRMAESTRO.QR.FieldByName('CODIGO_PRODUCTO').AsString)));
+      FCNX.TMP.SQL.Add(' AND ' + FCNX.Trim_Sentence('CODIGO_DOCUMENTO') + ' = ' + QuotedStr(Trim(FCODIGO_DOCUMENTO)));
+      FCNX.TMP.SQL.Add(' AND NUMERO <> ' + IntToStr(FQRMAESTRO.QR.FieldByName('NUMERO').AsInteger));
+      FCNX.TMP.Active := True;
+      lINV := FCNX.TMP.FieldByName('RESULTADO').AsFloat;
+
+      FCNX.TMP.Active := False;
+      FCNX.TMP.SQL.Clear;
+
+      Result := lEDM >= (lINV + FQRMAESTRO.QR.FieldByName('CANTIDAD').AsFloat);
+      If Not Result Then
+      Begin
+        UserSession.SetMessage('Explosion de Materiales: ' + FormatFloat('###,###,##0.#0', lEDM), False);
+        UserSession.SetMessage('Salidas Realizadas: ' + FormatFloat('###,###,##0.#0', lINV), True);
+        UserSession.SetMessage('Cantidad Solicitada: ' + FormatFloat('###,###,##0.#0', FQRMAESTRO.QR.FieldByName('CANTIDAD').AsFloat), True);
+      End;
     End;
   Except
     On E: Exception Do
@@ -398,6 +423,7 @@ Begin
     NUMERO.BGColor := UserSession.COLOR_OK;
     NOMBRE.BGColor := UserSession.COLOR_OK;
     CANTIDAD.BGColor := UserSession.COLOR_OK;
+    CODIGO_AREA.BGColor := UserSession.COLOR_OK;
     CODIGO_TERCERO.BGColor := UserSession.COLOR_OK;
     CODIGO_PRODUCTO.BGColor := UserSession.COLOR_OK;
 
@@ -424,6 +450,12 @@ Begin
     Begin
       lMensaje := lMensaje + IfThen(Not Vacio(lMensaje), ', ') + 'Nombre invalido';
       NOMBRE.BGColor := UserSession.COLOR_ERROR;
+    End;
+
+    If FQRMAESTRO.Mode_Edition And Vacio(FQRMAESTRO.QR.FieldByName('CODIGO_AREA').AsString) Then
+    Begin
+      lMensaje := lMensaje + IfThen(Not Vacio(lMensaje), ', ') + 'Area invalida';
+      CODIGO_AREA.BGColor := UserSession.COLOR_ERROR;
     End;
 
     If FQRMAESTRO.Mode_Edition And Vacio(FQRMAESTRO.QR.FieldByName('CODIGO_TERCERO').AsString) Then
@@ -480,6 +512,7 @@ Begin
   BTNCREARTERCERO.Visible    := FQRMAESTRO.Mode_Edition And Documento_Activo;
   BTNCODIGO_TERCERO.Visible  := FQRMAESTRO.Mode_Edition And Documento_Activo;
   BTNCODIGO_PRODUCTO.Visible := FQRMAESTRO.Mode_Edition And Documento_Activo;
+  BTNCODIGO_AREA.Visible     := FQRMAESTRO.Mode_Edition And Documento_Activo;
 
   NOMBRE.Enabled             := FQRMAESTRO.Mode_Edition And Documento_Activo;
   FECHA_MOVIMIENTO.Enabled   := FQRMAESTRO.Mode_Edition And Documento_Activo;
@@ -582,6 +615,7 @@ Begin
   Try
     lbInfoOP.Caption := Info_OP(FQRMAESTRO.QR.FieldByName('NUMERO_OP').AsInteger, FQRMAESTRO.QR.FieldByName('CODIGO_DOCUMENTO_OP').AsString);
     lbInfoTotal.Caption := 'TOTAL: ' + FormatFloat('###,###,###,##0.#0', FQRMAESTRO.QR.FieldByName('CANTIDAD').AsFloat * FQRMAESTRO.QR.FieldByName('VALOR_UNITARIO').AsFloat);
+    lbNombre_Area.Caption := FCNX.GetValue(Info_TablaGet(Id_TBL_Area).Name, ['CODIGO_AREA'], [FQRMAESTRO.QR.FieldByName('CODIGO_AREA').AsString], ['NOMBRE']);
     lbNombre_Tercero.Caption := FCNX.GetValue(Info_TablaGet(Id_TBL_Tercero).Name, ['CODIGO_TERCERO'], [FQRMAESTRO.QR.FieldByName('CODIGO_TERCERO').AsString], ['NOMBRE']);
     lbNombre_Producto.Caption := Info_Producto(FQRMAESTRO.QR.FieldByName('CODIGO_PRODUCTO').AsString);
     lbInfoRegistro.Caption := 'Usuario: ' + FCNX.GetValue(Info_TablaGet(Id_TBL_Usuario).Name, ['CODIGO_USUARIO'], [FQRMAESTRO.QR.FieldByName('CODIGO_USUARIO').AsString], ['NOMBRE']);
@@ -768,6 +802,7 @@ begin
     NOMBRE.DataSource              := FQRMAESTRO.DS;
     CODIGO_TERCERO.DataSource      := FQRMAESTRO.DS;
     CODIGO_PRODUCTO.DataSource     := FQRMAESTRO.DS;
+    CODIGO_AREA.DataSource         := FQRMAESTRO.DS;
     DESCRIPCION.DataSource         := FQRMAESTRO.DS;
     FECHA_MOVIMIENTO.DataSource    := FQRMAESTRO.DS;
     FECHA_VENCIMIENTO.DataSource   := FQRMAESTRO.DS;
@@ -901,6 +936,11 @@ end;
 procedure TFrIWMovto_Inventario.BTNOPAsyncClick(Sender: TObject; EventParams: TStringList);
 begin
   Buscar_Info(Id_TBL_Orden_Produccion, Resultado_Orden_Produccion);
+end;
+
+procedure TFrIWMovto_Inventario.BTNCODIGO_AREAAsyncClick(Sender: TObject;EventParams: TStringList);
+begin
+  Buscar_Info(Id_TBL_Area, Resultado_Area);
 end;
 
 procedure TFrIWMovto_Inventario.BTNCODIGO_PRODUCTOAsyncClick(Sender: TObject; EventParams: TStringList);
