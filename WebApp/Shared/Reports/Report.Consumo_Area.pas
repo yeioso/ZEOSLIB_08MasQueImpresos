@@ -132,11 +132,11 @@ Begin
     FINPUT.SQL.Add('   INNER JOIN ' + Info_TablaGet(Id_TBL_Producto).Name + ' P ON D.CODIGO_PRODUCTO = P.CODIGO_PRODUCTO ');
     FINPUT.SQL.Add('   INNER JOIN ' + Info_TablaGet(Id_TBL_Area).Name + ' A ON D.CODIGO_AREA = A.CODIGO_AREA ');
     FINPUT.SQL.Add('   INNER JOIN ' + Info_TablaGet(Id_TBL_Usuario).Name + ' U ON D.CODIGO_USUARIO = U.CODIGO_USUARIO ');
-    FINPUT.SQL.Add('   WHERE P.CODIGO_AREA = ' + QuotedStr(FCODIGO_AREA) + ' ');
+    FINPUT.SQL.Add('   WHERE D.CODIGO_AREA = ' + QuotedStr(FCODIGO_AREA) + ' ');
     FINPUT.SQL.Add('   AND ');
     FINPUT.SQL.Add('       (  ');
     FINPUT.SQL.Add('           '    + FCNX.Trim_Sentence('D.CODIGO_DOCUMENTO') + ' = ' + QuotedStr(Trim(UserSession.DOCUMENTO_SALIDA_DE_INVENTARIO    )) + ' ');
-    FINPUT.SQL.Add('         OR  ' + FCNX.Trim_Sentence('D.CODIGO_DOCUMENTO') + ' = ' + QuotedStr(Trim(UserSession.DOCUMENTO_DEVOLUCION_AL_INVENTARIO)) + ' ');
+    FINPUT.SQL.Add('         OR  '  + FCNX.Trim_Sentence('D.CODIGO_DOCUMENTO') + ' = ' + QuotedStr(Trim(UserSession.DOCUMENTO_DEVOLUCION_AL_INVENTARIO)) + ' ');
     FINPUT.SQL.Add('       )  ');
     If FID_FECHA = 0 Then
     Begin
