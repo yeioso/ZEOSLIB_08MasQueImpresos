@@ -113,6 +113,7 @@ begin
   Self.Title := 'Reportes';
   FECHA_INI.Text := FormatDateTime('YYYY-MM-DD', Now);
   FECHA_FIN.Text := FormatDateTime('YYYY-MM-DD', Now);
+  IWProgressIndicator1.ProgressTextSettings.Text := LowerCase(UserSession.USER_NAME) + ', espera por favor..';
 end;
 
 procedure TFrIWReporte.BTNCODIGO_PRODUCTO_INIAsyncClick(Sender: TObject; EventParams: TStringList);

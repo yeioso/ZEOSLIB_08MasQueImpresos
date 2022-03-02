@@ -149,7 +149,7 @@ Begin
     FINPUT.SQL.Add('     GROUP BY D.CODIGO_PRODUCTO ');
     FINPUT.SQL.Add(' ) AS X ');
     FINPUT.SQL.Add(' INNER JOIN ' + Info_TablaGet(Id_TBL_Producto).Name + ' P ON X.CODIGO_PRODUCTO = P.CODIGO_PRODUCTO ');
-    FINPUT.SQL.Add(' WHERE (P.ID_SERVICIO IS NULL) Or (P.ID_SERVICIO = ' + QuotedStr('N') + ') ');
+//  FINPUT.SQL.Add(' WHERE (P.ID_SERVICIO IS NULL) Or (P.ID_SERVICIO = ' + QuotedStr('N') + ') ');
     FINPUT.SQL.Add(' GROUP BY X.CODIGO_PRODUCTO, P.NOMBRE ');
     FINPUT.SQL.Add(' ORDER BY P.NOMBRE ');
     FINPUT.Active := True;
@@ -274,12 +274,12 @@ Begin
     FINPUT3.SQL.Add('     ON D.CODIGO_PRODUCTO = P.CODIGO_PRODUCTO');
     FINPUT3.SQL.Add('     WHERE ' +FCNX.Trim_Sentence('D.CODIGO_DOCUMENTO') + ' = ' + QuotedStr(Trim(FCODIGO_DOCUMENTO)) );
     FINPUT3.SQL.Add('     AND D.NUMERO = ' + IntToStr(FNUMERO));
-    FINPUT3.SQL.Add('     AND (P.ID_SERVICIO = ' + QuotedStr('S') + ') ');
+//  FINPUT3.SQL.Add('     AND (P.ID_SERVICIO = ' + QuotedStr('S') + ') ');
     FINPUT3.Active := True;
     If FINPUT3.RecordCount > 0 Then
     Begin
       SaveData('', True);
-      SaveData('SERVICIOS');
+      SaveData('EXPLOSION DE MATERIALES');
       SetLinea3(StringOfChar('-', 50), StringOfChar('-', 60), StringOfChar('-', 50), StringOfChar('-', 50), StringOfChar('-', 50));
       SetLinea3('CODIGO', 'NOMBRE','CANTIDAD','VALOR UNITARIO', 'TOTAL');
       SetLinea3(StringOfChar('-', 50), StringOfChar('-', 60), StringOfChar('-', 50), StringOfChar('-', 50), StringOfChar('-', 50));
@@ -464,7 +464,8 @@ Begin
       lEFE := 0;
       If lSuma_EDM <> 0 Then
         lEFE := (100 * lSuma_INV)/lSuma_EDM;
-      lValor_Costo := lValor_Costo + GetService;
+//    lValor_Costo := lValor_Costo + GetService;
+      GetService;
       SaveData('', True);
       SetLinea(StringOfChar('=', 100), StringOfChar('=', 20), StringOfChar('=', 20), StringOfChar('=', 20));
       SetLinea('', 'E.D.M', 'INVENTARIO', 'EFECTIVIDAD');
