@@ -70,7 +70,7 @@ object FrIWMovto_Inventario: TFrIWMovto_Inventario
       InactiveTabFont.Style = []
       ActiveTabColor = clWebDARKGRAY
       InactiveTabColor = clWebLIGHTGRAY
-      ActivePage = 1
+      ActivePage = 0
       Align = alClient
       BorderOptions.NumericWidth = 0
       BorderOptions.Style = cbsNone
@@ -87,17 +87,6 @@ object FrIWMovto_Inventario: TFrIWMovto_Inventario
       DesignSize = (
         1339
         533)
-      object PAG_00: TIWTabPage
-        Left = 0
-        Top = 30
-        Width = 1339
-        Height = 503
-        RenderInvisibleControls = True
-        Title = '[          Registros          ]'
-        BorderOptions.NumericWidth = 0
-        BorderOptions.Style = cbsNone
-        Color = clWebWHITE
-      end
       object PAG_01: TIWTabPage
         Left = 0
         Top = 30
@@ -883,6 +872,17 @@ object FrIWMovto_Inventario: TFrIWMovto_Inventario
           FriendlyName = 'lbNombre_Area'
           Caption = 'lbNombre_Area'
         end
+      end
+      object PAG_00: TIWTabPage
+        Left = 0
+        Top = 30
+        Width = 1339
+        Height = 503
+        RenderInvisibleControls = True
+        Title = '[          Registros          ]'
+        BorderOptions.NumericWidth = 0
+        BorderOptions.Style = cbsNone
+        Color = clWebWHITE
       end
     end
   end

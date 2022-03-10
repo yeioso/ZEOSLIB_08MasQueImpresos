@@ -6,7 +6,7 @@ uses
   Classes, SysUtils, IWAppForm, IWApplication, IWColor, IWTypes,
   UtConexion, Vcl.Controls, Vcl.Forms, IWVCLBaseContainer,
   IWContainer, IWHTMLContainer, IWHTML40Container, IWRegion, IWVCLBaseControl,
-  IWBaseControl, IWBaseHTMLControl, IWControl, UtGrid_JQ, IWCompButton;
+  IWBaseControl, IWBaseHTMLControl, IWControl, UtGrid_JQ, Data.DB, IWCompButton;
 
 Type
   TGRID_JQ_NP = Class(TGRID_JQ)
@@ -30,6 +30,7 @@ Type
     FQRDETALLE : TMANAGER_DATA;
     FREFERENCIA : String;
     FGRID_MAESTRO : TGRID_JQ_NP;
+    Procedure Info_Calculated(pDataset : TDataSet);
     Function AbrirDetalle(Const pDato : String  = '') : Boolean;
     Procedure Update_Record(pSender : TObject);
   public
@@ -73,6 +74,19 @@ Begin
   End;
 End;
 
+Procedure TFrIWNotificacion_Producto.Info_Calculated(pDataset : TDataSet);
+Begin
+  Try
+    If FQRDETALLE.QR.FindField('CALC_NOMBRE_PRODUCTO') <> Nil Then
+      FQRDETALLE.QR.FieldByName('CALC_NOMBRE_PRODUCTO').AsString := FCNX.GetValue(Info_TablaGet(Id_TBL_Producto).Name, ['CODIGO_PRODUCTO'], [FQRDETALLE.QR.FieldByName('CODIGO_PRODUCTO').AsString], ['NOMBRE']);
+  Except
+    On E: Exception Do
+    Begin
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWNotificacion_Producto', 'TFrIWNotificacion_Producto.Info_Calculated', E.Message);
+    End;
+  End;
+End;
+
 Function TFrIWNotificacion_Producto.AbrirDetalle(Const pDato : String  = '') : Boolean;
 Begin
   Result := False;
@@ -81,6 +95,8 @@ Begin
     FQRDETALLE.SENTENCE := ' SELECT * FROM ' + Info_TablaGet(Id_TBL_Notificacion_Producto).Name + FCNX.No_Lock;
     FQRDETALLE.WHERE    := ' WHERE ' + FCNX.Trim_Sentence('CODIGO_USUARIO') + ' = ' + QuotedStr(Trim(UserSession.USER_CODE));
     FQRDETALLE.WHERE := FQRDETALLE.WHERE + ' AND ID_ACTIVO = ' + QuotedStr('S');
+    FQRDETALLE.SetFields;
+    FQRDETALLE.SetCalcField('CALC_NOMBRE_PRODUCTO', 50, TFieldType.ftString);
     FQRDETALLE.Active := True;
     Result := FQRDETALLE.Active;
     If Result Then
@@ -116,17 +132,19 @@ begin
     FGRID_MAESTRO.Update_Record := Self.Update_Record;
 
     FGRID_MAESTRO.Top    := IWRegion_Head.Top + IWRegion_Head.Height + 3;
-    FGRID_MAESTRO.Left   := 010;
-    FGRID_MAESTRO.Width  := 850;
-    FGRID_MAESTRO.Height := 400;
-    FQRDETALLE := UserSession.Create_Manager_Data(Info_TablaGet(Id_TBL_Explosion_Material).Name, Info_TablaGet(Id_TBL_Explosion_Material).Caption);
+    FGRID_MAESTRO.Left   := 0010;
+    FGRID_MAESTRO.Width  := 1150;
+    FGRID_MAESTRO.Height := 0400;
+    FQRDETALLE := UserSession.Create_Manager_Data(Info_TablaGet(Id_TBL_Notificacion_Producto).Name, Info_TablaGet(Id_TBL_Notificacion_Producto).Caption);
+    FQRDETALLE.QR.OnCalcFields := Info_Calculated;
 
     FGRID_MAESTRO.VisibleRowCount := 15;
-    FGRID_MAESTRO.SetGrid(FQRDETALLE.DS, ['CODIGO_PRODUCTO', 'FECHA_REGISTRO', 'HORA_REGISTRO', 'NOMBRE'     , 'CANTIDAD'    , 'ID_ACTIVO'   ],
-                                         ['Producto'       , 'Fecha Registro', 'Hora Registro', 'Nombre'     , 'Cantidad'    , 'Pendiente'   ],
-                                         ['S'              , 'S'             , 'S'            , 'N'          , 'N'           , 'N'           ],
-                                         [150              , 100             , 100            , 250          , 100           , 100           ],
-                                         [taRightJustify   , taLeftJustify   , taLeftJustify  , taLeftJustify, taRightJustify, taCenter      ]);
+
+    FGRID_MAESTRO.SetGrid(FQRDETALLE.DS, ['FECHA_REGISTRO', 'CODIGO_PRODUCTO', 'CALC_NOMBRE_PRODUCTO',  'HORA_REGISTRO', 'NOMBRE'     , 'CANTIDAD'    , 'ID_ACTIVO'   ],
+                                         ['Fecha Registro', 'Producto'       , 'Descripción'         ,  'Hora Registro', 'Nombre'     , 'Cantidad'    , 'Pendiente'   ],
+                                         ['S'             , 'S'              , 'N'                   ,  'N'            , 'N'          , 'N'           , 'N'           ],
+                                         [100             , 150              , 300                   ,  100            , 250          , 100           , 100           ],
+                                         [taLeftJustify   , taRightJustify   , taLeftJustify         ,  taLeftJustify  , taLeftJustify, taRightJustify, taCenter      ]);
     AbrirDetalle;
   Except
     On E: Exception Do
