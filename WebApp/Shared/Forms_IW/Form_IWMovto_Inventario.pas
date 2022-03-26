@@ -10,7 +10,7 @@ uses
   IWCompTabControl, IWBaseComponent, IWBaseHTMLComponent, IWBaseHTML40Component,
   UtConexion, Data.DB, IWCompGrids, IWDBStdCtrls, IWCompEdit,
   IWCompCheckbox, IWCompMemo, IWDBExtCtrls, IWCompButton, IWCompListbox,
-  UtGrid_JQ, UtNavegador_ASE;
+  UtGrid_JQ, UtNavegador_ASE, Utils.IWSelect_ASE;
 
 type
   TFrIWMovto_Inventario = class(TIWAppForm)
@@ -25,7 +25,6 @@ type
     IWLabel8: TIWLabel;
     DATO: TIWEdit;
     IWLabel3: TIWLabel;
-    IWModalWindow1: TIWModalWindow;
     NUMERO: TIWDBLabel;
     IWRegion_Navegador: TIWRegion;
     lbTercero: TIWLabel;
@@ -59,6 +58,7 @@ type
     CODIGO_AREA: TIWDBLabel;
     BTNCODIGO_AREA: TIWImage;
     lbNombre_Area: TIWLabel;
+    IWModalWindow1: TIWModalWindow;
     procedure BTNBACKAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure IWAppFormCreate(Sender: TObject);
     procedure IWAppFormDestroy(Sender: TObject);
@@ -71,8 +71,7 @@ type
     procedure BTNCREARPRODUCTOAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNOPAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure CANTIDADAsyncExit(Sender: TObject; EventParams: TStringList);
-    procedure BTNCODIGO_AREAAsyncClick(Sender: TObject;
-      EventParams: TStringList);
+    procedure BTNCODIGO_AREAAsyncClick(Sender: TObject; EventParams: TStringList);
   private
     FCNX : TConexion;
     FINFO : String;
@@ -85,12 +84,20 @@ type
 
     FCODIGO_ACTUAL : String;
 
+    FBusqueda_OP : TSelect_ASE;
+    FBusqueda_Area : TSelect_ASE;
+    FBusqueda_Tercero : TSelect_ASE;
+    FBusqueda_Producto : TSelect_ASE;
+
+    Procedure Cargar_Productos;
+    Procedure Cargar_Terceros;
+    Procedure Cargar_Areas;
+    Procedure Cargar_OP;
     Function Cantidad_Valida: Boolean;
     Procedure Info_Calculated(pDataset : TDataSet);
 
     Procedure Preparar_Numero_Cero;
     Procedure Localizar_Registro(Sender: TObject; EventParams: TStringList);
-    procedure Buscar_Info(pSD : Integer; pEvent : TIWAsyncEvent);
 
     Procedure Resultado_Orden_Produccion(Sender: TObject; EventParams: TStringList);
     Procedure Resultado_Producto(Sender: TObject; EventParams: TStringList);
@@ -136,13 +143,11 @@ Uses
   System.UITypes,
   System.StrUtils,
   ServerController,
-  UtilsIW.Busqueda,
   TBL000.Info_Tabla,
   UtIWBasicData_ASE,
   UtilsIW.ManagerLog,
   Report.Saldo_Inventario,
   UtilsIW.Numero_Siguiente;
-
 
 
 Procedure TFrIWMovto_Inventario.Preparar_Numero_Cero;
@@ -278,8 +283,8 @@ Begin
     If FQRMAESTRO.Mode_Edition Then
     Begin
       FQRMAESTRO.QR.FieldByName('CODIGO_PRODUCTO').AsString := EventParams.Values ['CODIGO_PRODUCTO'];
-      FQRMAESTRO.QR.FieldByName('CODIGO_AREA'    ).AsString := EventParams.Values ['CODIGO_AREA'    ];
-      FQRMAESTRO.QR.FieldByName('VALOR_UNITARIO' ).AsFloat  := FCNX.GetValueDbl(Info_TablaGet(Id_TBL_Producto).Name, ['CODIGO_PRODUCTO'], [EventParams.Values ['CODIGO_PRODUCTO']], ['VALOR_UNITARIO']);
+      FQRMAESTRO.QR.FieldByName('CODIGO_AREA'    ).AsString := FCNX.GetValue(Info_TablaGet(Id_TBL_Producto).Name, ['CODIGO_PRODUCTO'], [FQRMAESTRO.QR.FieldByName('CODIGO_PRODUCTO').AsString], ['CODIGO_AREA']);
+      FQRMAESTRO.QR.FieldByName('VALOR_UNITARIO' ).AsFloat  := FCNX.GetValueDbl(Info_TablaGet(Id_TBL_Producto).Name, ['CODIGO_PRODUCTO'], [FQRMAESTRO.QR.FieldByName('CODIGO_PRODUCTO').AsString], ['VALOR_UNITARIO']);
       Cantidad_Valida;
     End;
   Except
@@ -314,37 +319,6 @@ Begin
   End;
 End;
 
-procedure TFrIWMovto_Inventario.Buscar_Info(pSD : Integer; pEvent : TIWAsyncEvent);
-Var
-  lBusqueda : TBusqueda_MQI_WjQDBGrid;
-begin
-  Try
-    lBusqueda := TBusqueda_MQI_WjQDBGrid.Create(Self);
-    lBusqueda.Parent := Self;
-    lBusqueda.SetComponents(FCNX, pEvent);
-    lBusqueda.SetTSD(pSD);
-    If lBusqueda.Abrir_Tabla Then
-    Begin
-      IWModalWindow1.Reset;
-      IWModalWindow1.Buttons.CommaText := '&Cancelar';
-      IWModalWindow1.Title := 'Busqueda de datos';
-      IWModalWindow1.ContentElement := lBusqueda;
-      IWModalWindow1.Autosize := True;
-      IWModalWindow1.Draggable := True;
-      IWModalWindow1.WindowTop := 10;
-      IWModalWindow1.WindowLeft := 10;
-      IWModalWindow1.WindowWidth := lBusqueda.Width + 20;
-      IWModalWindow1.WindowHeight := lBusqueda.Height + 200;
-      IWModalWindow1.OnAsyncClick := lBusqueda.Finish_Manager;
-      IWModalWindow1.OnAsyncClose := lBusqueda.Finish_Manager;
-      IWModalWindow1.SizeUnit := suPixel;
-      IWModalWindow1.Show;
-    End;
-  Except
-    On E: Exception Do
-      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWMovto_Inventario', 'TFrIWMovto_Inventario.Buscar_Info', E.Message);
-  End;
-End;
 
 Procedure TFrIWMovto_Inventario.Release_Me;
 Begin
@@ -771,11 +745,129 @@ begin
   End;
 end;
 
+Procedure TFrIWMovto_Inventario.Cargar_Productos;
+Begin
+  Try
+    FCNX.TMP.Active := False;
+    FCNX.TMP.SQL.Clear;
+    FCNX.TMP.SQL.Add(' SELECT * FROM ' + Info_TablaGet(Id_TBL_Producto).Name + FCNX.No_Lock);
+    FCNX.TMP.SQL.Add(' WHERE (ID_SERVICIO IS NULL) OR (ID_SERVICIO = ' + QuotedStr('N') + ') ');
+    FCNX.TMP.SQL.Add(' ORDER BY NOMBRE ');
+    FCNX.TMP.Active := True;
+    FCNX.TMP.First;
+    While Not FCNX.TMP.Eof Do
+    Begin
+      FBusqueda_Producto.Add_Item(['CODIGO_PRODUCTO'], [FCNX.TMP.FieldByName('CODIGO_PRODUCTO').AsString], FCNX.TMP.FieldByName('CODIGO_PRODUCTO').AsString + ' - ' + FCNX.TMP.FieldByName('NOMBRE').AsString);
+      FCNX.TMP.Next;
+    End;
+
+    FCNX.TMP.Active := False;
+    FCNX.TMP.SQL.Clear;
+  Except
+    On E: Exception Do
+    Begin
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWMovto_Inventario', 'TFrIWMovto_Inventario.Cargar_Productos', E.Message);
+    End;
+  End;
+End;
+
+Procedure TFrIWMovto_Inventario.Cargar_Terceros;
+Begin
+  Try
+    FCNX.TMP.Active := False;
+    FCNX.TMP.SQL.Clear;
+    FCNX.TMP.SQL.Add(' SELECT * FROM ' + Info_TablaGet(Id_TBL_Tercero).Name + FCNX.No_Lock);
+    FCNX.TMP.SQL.Add(' ORDER BY NOMBRE ');
+    FCNX.TMP.Active := True;
+    FCNX.TMP.First;
+    While Not FCNX.TMP.Eof Do
+    Begin
+      FBusqueda_Tercero.Add_Item(['CODIGO_TERCERO'], [FCNX.TMP.FieldByName('CODIGO_TERCERO').AsString], FCNX.TMP.FieldByName('CODIGO_TERCERO').AsString + ' - ' + FCNX.TMP.FieldByName('NOMBRE').AsString);
+      FCNX.TMP.Next;
+    End;
+
+    FCNX.TMP.Active := False;
+    FCNX.TMP.SQL.Clear;
+  Except
+    On E: Exception Do
+    Begin
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWMovto_Inventario', 'TFrIWMovto_Inventario.Cargar_Terceros', E.Message);
+    End;
+  End;
+End;
+
+Procedure TFrIWMovto_Inventario.Cargar_Areas;
+Begin
+  Try
+    FCNX.TMP.Active := False;
+    FCNX.TMP.SQL.Clear;
+    FCNX.TMP.SQL.Add(' SELECT * FROM ' + Info_TablaGet(Id_TBL_Area).Name + FCNX.No_Lock);
+    FCNX.TMP.SQL.Add(' ORDER BY NOMBRE ');
+    FCNX.TMP.Active := True;
+    FCNX.TMP.First;
+    While Not FCNX.TMP.Eof Do
+    Begin
+      FBusqueda_Area.Add_Item(['CODIGO_AREA'], [FCNX.TMP.FieldByName('CODIGO_AREA').AsString], FCNX.TMP.FieldByName('CODIGO_AREA').AsString + ' - ' + FCNX.TMP.FieldByName('NOMBRE').AsString);
+      FCNX.TMP.Next;
+    End;
+
+    FCNX.TMP.Active := False;
+    FCNX.TMP.SQL.Clear;
+  Except
+    On E: Exception Do
+    Begin
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWMovto_Inventario', 'TFrIWMovto_Inventario.Cargar_Areas', E.Message);
+    End;
+  End;
+End;
+
+Procedure TFrIWMovto_Inventario.Cargar_OP;
+Begin
+  Try
+    FCNX.TMP.Active := False;
+    FCNX.TMP.SQL.Clear;
+    FCNX.TMP.SQL.Add(' SELECT * FROM ' + Info_TablaGet(Id_TBL_Orden_Produccion).Name + FCNX.No_Lock);
+    FCNX.TMP.SQL.Add(' ORDER BY NOMBRE ');
+    FCNX.TMP.Active := True;
+    FCNX.TMP.First;
+    While Not FCNX.TMP.Eof Do
+    Begin
+      FBusqueda_OP.Add_Item(['CODIGO_DOCUMENTO', 'NUMERO', 'DOCUMENTO_REFERENCIA'],
+                            [FCNX.TMP.FieldByName('CODIGO_DOCUMENTO').AsString, FCNX.TMP.FieldByName('NUMERO').AsString, FCNX.TMP.FieldByName('DOCUMENTO_REFERENCIA').AsString],
+                            FCNX.TMP.FieldByName('DOCUMENTO_REFERENCIA').AsString + ' - ' + FCNX.TMP.FieldByName('NUMERO').AsString + ' - ' + FCNX.TMP.FieldByName('NOMBRE').AsString);
+      FCNX.TMP.Next;
+    End;
+
+    FCNX.TMP.Active := False;
+    FCNX.TMP.SQL.Clear;
+  Except
+    On E: Exception Do
+    Begin
+      Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWMovto_Inventario', 'TFrIWMovto_Inventario.Cargar_OP', E.Message);
+    End;
+  End;
+End;
+
 procedure TFrIWMovto_Inventario.IWAppFormCreate(Sender: TObject);
 begin
   Randomize;
   Self.Name := 'TFrIWMovto_Inventario' + FormatDateTime('YYYYMMDDHHNNSSZZZ', Now) + IntToStr(Random(1000));
   FCNX := UserSession.CNX;
+
+  FBusqueda_OP  := TSelect_ASE.Create(Self, Resultado_Orden_Produccion, 'Busqueda de orden de producción');
+  FBusqueda_Area  := TSelect_ASE.Create(Self, Resultado_Area, 'Busqueda de area');
+  FBusqueda_Tercero  := TSelect_ASE.Create(Self, Resultado_Tercero, 'Busqueda de tercero');
+  FBusqueda_Producto := TSelect_ASE.Create(Self, Resultado_Producto, 'Busqueda de producto');
+
+  FBusqueda_OP.Parent := Self;
+  FBusqueda_Area.Parent := Self;
+  FBusqueda_Tercero.Parent := Self;
+  FBusqueda_Producto.Parent := Self;
+
+  Cargar_Productos;
+  Cargar_Terceros;
+  Cargar_Areas;
+  Cargar_OP;
   Self.Title := Info_TablaGet(Id_TBL_Movto_Inventario).Caption + ', ' + lbInfo.Caption;
   FCODIGO_ACTUAL := '';
   FINFO := UserSession.FULL_INFO + ', ' +  Info_TablaGet(Id_TBL_Movto_Inventario).Caption;
@@ -842,6 +934,18 @@ begin
       FQRMAESTRO.Active := False;
       FreeAndNil(FQRMAESTRO);
     End;
+
+    If Assigned(FBusqueda_Producto) Then
+      FreeAndNil(FBusqueda_Producto);
+
+    If Assigned(FBusqueda_Tercero) Then
+      FreeAndNil(FBusqueda_Tercero);
+
+    If Assigned(FBusqueda_Area) Then
+      FreeAndNil(FBusqueda_Area);
+
+    If Assigned(FBusqueda_OP) Then
+      FreeAndNil(FBusqueda_OP);
 
     If Assigned(FGRID_MAESTRO) Then
       FreeAndNil(FGRID_MAESTRO);
@@ -919,14 +1023,7 @@ End;
 procedure TFrIWMovto_Inventario.BTNBUSCARAsyncClick(Sender: TObject;  EventParams: TStringList);
 begin
   Try
-    If Vacio(DATO.Text) Then
-    Begin
-      Buscar_Info(Id_TBL_Movto_Inventario, Localizar_Registro);
-    End
-    Else
-    Begin
-      AbrirMaestro(DATO.Text);
-    End;
+    AbrirMaestro(DATO.Text);
   Except
     On E: Exception Do
       Utils_ManagerLog_Add(UserSession.USER_CODE, 'Form_IWMovto_Inventario', 'TFrIWMovto_Inventario.BTNBUSCARAsyncClick', E.Message);
@@ -935,22 +1032,23 @@ end;
 
 procedure TFrIWMovto_Inventario.BTNOPAsyncClick(Sender: TObject; EventParams: TStringList);
 begin
-  Buscar_Info(Id_TBL_Orden_Produccion, Resultado_Orden_Produccion);
+  FBusqueda_OP.Buscar_Info;
 end;
 
 procedure TFrIWMovto_Inventario.BTNCODIGO_AREAAsyncClick(Sender: TObject;EventParams: TStringList);
 begin
-  Buscar_Info(Id_TBL_Area, Resultado_Area);
+  FBusqueda_Area.Buscar_Info;
 end;
 
 procedure TFrIWMovto_Inventario.BTNCODIGO_PRODUCTOAsyncClick(Sender: TObject; EventParams: TStringList);
 begin
-  Buscar_Info(Id_TBL_Producto, Resultado_Producto);
+  FBusqueda_Producto.Buscar_Info;
+//  Buscar_Info(Id_TBL_Producto, Resultado_Producto);
 end;
 
 procedure TFrIWMovto_Inventario.BTNCODIGO_TERCEROAsyncClick(Sender: TObject; EventParams: TStringList);
 begin
-  Buscar_Info(Id_TBL_Tercero, Resultado_Tercero);
+  FBusqueda_Tercero.Buscar_Info;
 end;
 
 procedure TFrIWMovto_Inventario.BTNCREARPRODUCTOAsyncClick(Sender: TObject; EventParams: TStringList);

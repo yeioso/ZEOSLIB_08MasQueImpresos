@@ -14,7 +14,7 @@ object FrIWMovto_Inventario: TFrIWMovto_Inventario
   LockUntilLoaded = True
   LockOnSubmit = True
   ShowHint = True
-  DesignLeft = 2
+  DesignLeft = -101
   DesignTop = 2
   object RINFO: TIWRegion
     Left = 0
@@ -512,7 +512,7 @@ object FrIWMovto_Inventario: TFrIWMovto_Inventario
           Caption = 'Orden de Producci'#243'n'
         end
         object BTNOP: TIWImage
-          Left = 611
+          Left = 587
           Top = 33
           Width = 22
           Height = 21
@@ -930,7 +930,7 @@ object FrIWMovto_Inventario: TFrIWMovto_Inventario
     end
   end
   object IWModalWindow1: TIWModalWindow
-    Left = 104
-    Top = 8
+    Left = 160
+    Top = 16
   end
 end

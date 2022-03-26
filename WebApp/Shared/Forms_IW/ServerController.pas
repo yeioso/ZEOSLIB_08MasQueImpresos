@@ -22,6 +22,8 @@ Type
     procedure IWServerControllerBaseException(AApplication: TIWApplication;  AException: Exception; var Handled: Boolean);
     procedure IWServerControllerBaseCloseSession(aSession: TIWApplication);
     procedure IWServerControllerBaseDestroy(Sender: TObject);
+    procedure IWServerControllerBaseBind(const aHttpBindings,
+      aHttpsBindings: TStrings);
   private
      FDB : TDB;
      FCNX : TConexion;
@@ -82,6 +84,11 @@ begin
     On E: Exception Do
       Utils_ManagerLog_Add('ServerController', 'UserSession', 'TIWUserSession', E.Message);
   End;
+end;
+
+procedure TIWServerController.IWServerControllerBaseBind(const aHttpBindings, aHttpsBindings: TStrings);
+begin
+  aHttpBindings.Add('http://+:8888/MQIERP/');
 end;
 
 procedure TIWServerController.IWServerControllerBaseCloseSession(aSession: TIWApplication);

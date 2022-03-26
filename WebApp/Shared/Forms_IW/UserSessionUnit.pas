@@ -237,6 +237,7 @@ end;
 
 procedure TIWUserSession.IWUserSessionBaseDestroy(Sender: TObject);
 begin
+  Utils_ManagerLog_Add('UserSessionUnit', 'TIWUserSession', 'IWUserSessionBaseDestroy', 'Finalizado');
   If Assigned(FCNX) Then
     FreeAndNil(FCNX);
 

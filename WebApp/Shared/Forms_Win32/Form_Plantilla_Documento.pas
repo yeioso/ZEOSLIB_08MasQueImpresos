@@ -9,6 +9,16 @@ uses
   UtPowerPDF, UtilsIW.PowerPDF, UtConexion, IWApplication;
 
 type
+  TFOOT_FINAL_MQI = class(TFOOT_FINAL)
+    Private
+      FLINEA_TOP : TPRRect ;
+    Public
+      Property LINEA_TOP : TPRRect  Read FLINEA_TOP Write FLINEA_TOP;
+      Constructor Create(AOwner: TComponent); Override;
+      Destructor Destroy; Override;
+  End;
+
+
   TFrPlantilla_Documento = class(TForm)
     PAGINA: TPRPage;
     HEAD: TPRLayoutPanel;
@@ -374,7 +384,7 @@ Var
   lTop : Integer;
   lTITLE  : TTITLE;
   lDETAIL : TDETAIL_MQI;
-  lFOOT   : TFOOT_FINAL;
+  lFOOT   : TFOOT_FINAL_MQI;
   lPagina : TPRPage;
   lDestino : String;
 Begin
@@ -455,7 +465,7 @@ Begin
 
       If (lTop + lDETAIL.CURRENT_TOP + (lDETAIL.LAST_HEIGHT * 3)) < (lPagina.Height) Then
       Begin
-        lFOOT        := TFOOT_FINAL.Create(lPagina);
+        lFOOT        := TFOOT_FINAL_MQI.Create(lPagina);
         lFOOT.Parent := lPagina;
         lFOOT.Top    := lPagina.Height - lFOOT.Height;
         lFOOT.Left   := 007;
@@ -520,6 +530,21 @@ begin
     lPage.Free;
   FPages.Clear;
   FreeAndNil(FPages);
+end;
+
+{ TFOOT_FINAL_MQI }
+
+constructor TFOOT_FINAL_MQI.Create(AOwner: TComponent);
+begin
+  inherited;
+  FLINEA_TOP  := Create_Rect (Self);
+  SetRect(FLINEA_TOP, 001, 006, 564, 001);
+end;
+
+destructor TFOOT_FINAL_MQI.Destroy;
+begin
+  Release_Component(FLINEA_TOP);
+  inherited;
 end;
 
 end.

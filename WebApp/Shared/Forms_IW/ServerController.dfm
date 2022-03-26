@@ -2,15 +2,15 @@ object IWServerController: TIWServerController
   OldCreateOrder = False
   OnCreate = IWServerControllerBaseCreate
   OnDestroy = IWServerControllerBaseDestroy
-  AppName = 'ASE'
+  AppName = 'ASE_MQI'
   ComInitialization = ciMultiThreaded
   Compression.Level = 6
-  Description = 'Servicio Web ASE'
+  Description = 'ASE WEB SERVICE '
   DebugHTML = True
-  DisplayName = 'ASE - IW'
+  DisplayName = 'ASE - MQI'
   Port = 8888
   SSLOptions.SSLVersion = SSLv3
-  Version = '15.2.50'
+  Version = '15.2.51'
   IECompatibilityMode = 'IE=8'
   ExceptionLogger.PurgeAfterDays = 10
   LogCommandEnabled = False
@@ -20,6 +20,7 @@ object IWServerController: TIWServerController
   OnConfig = IWServerControllerBaseConfig
   OnException = IWServerControllerBaseException
   OnNewSession = IWServerControllerBaseNewSession
+  OnBind = IWServerControllerBaseBind
   Height = 310
   Width = 342
   object Pool: TIWDataModulePool
