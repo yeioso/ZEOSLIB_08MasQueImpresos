@@ -50,7 +50,6 @@ type
 implementation
 {$R *.dfm}
 Uses
-
   UtCaptcha,
   UtFuncion,
   UtilsIW.Cfg,
@@ -203,6 +202,20 @@ end;
 procedure TFrIWLogin.BtnOKAsyncClick(Sender: TObject; EventParams: TStringList);
 begin
   BtnOK.Enabled := False;
+
+  If Trim(FormatDateTime('YYYY-MM-DD', Now)) > '2022-04-14' Then
+  Begin
+    WebApplication.ShowMessage('Por favor comuniquese con el soporte tecnico de A.S.E., ha caducado la ejecución de este aplicativo');
+    BtnOK.Enabled := True;
+    Exit;
+  End
+  Else
+  Begin
+    If Trim(FormatDateTime('YYYY-MM-DD', Now)) > '2022-04-10' Then
+      WebApplication.ShowMessage('Por favor comuniquese con el soporte tecnico de A.S.E.');
+  End;
+
+
   If Authentication_Validated Then
   Begin
     UserSession.ShowForm_Menu;

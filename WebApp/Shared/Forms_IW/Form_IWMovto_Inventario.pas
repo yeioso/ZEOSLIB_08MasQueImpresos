@@ -751,7 +751,7 @@ Begin
     FCNX.TMP.Active := False;
     FCNX.TMP.SQL.Clear;
     FCNX.TMP.SQL.Add(' SELECT * FROM ' + Info_TablaGet(Id_TBL_Producto).Name + FCNX.No_Lock);
-    FCNX.TMP.SQL.Add(' WHERE (ID_SERVICIO IS NULL) OR (ID_SERVICIO = ' + QuotedStr('N') + ') ');
+//  FCNX.TMP.SQL.Add(' WHERE (ID_SERVICIO IS NULL) OR (ID_SERVICIO = ' + QuotedStr('N') + ') ');
     FCNX.TMP.SQL.Add(' ORDER BY NOMBRE ');
     FCNX.TMP.Active := True;
     FCNX.TMP.First;

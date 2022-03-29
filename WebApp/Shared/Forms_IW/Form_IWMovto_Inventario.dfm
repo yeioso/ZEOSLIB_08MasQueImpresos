@@ -14,7 +14,7 @@ object FrIWMovto_Inventario: TFrIWMovto_Inventario
   LockUntilLoaded = True
   LockOnSubmit = True
   ShowHint = True
-  DesignLeft = -101
+  DesignLeft = 2
   DesignTop = 2
   object RINFO: TIWRegion
     Left = 0

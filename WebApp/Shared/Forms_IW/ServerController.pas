@@ -10,7 +10,7 @@ uses
   Generics.Collections;
 
 Const
-  Const_Version = 'Versión 2022.03.27 Rev 1.0 - Delphi Syndey 10.4 (Community) - Intraweb 15.2.51';
+  Const_Version = 'Versión 2022.03.28 Rev 1.0 - Delphi Syndey 10.4 (Community) - Intraweb 15.2.51';
   Const_Max_Record = 2000;
 
 Type
