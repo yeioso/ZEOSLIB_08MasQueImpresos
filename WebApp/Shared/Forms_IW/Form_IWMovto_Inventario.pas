@@ -13,6 +13,13 @@ uses
   UtGrid_JQ, UtNavegador_ASE, Utils.IWSelect_ASE;
 
 type
+  TItem_Select = Class
+    Public
+      CODE : TStringList;
+      Constructor Create;
+      Destructor Destroy;
+  End;
+
   TFrIWMovto_Inventario = class(TIWAppForm)
     RINFO: TIWRegion;
     lbInfo: TIWLabel;
@@ -72,6 +79,7 @@ type
     procedure BTNOPAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure CANTIDADAsyncExit(Sender: TObject; EventParams: TStringList);
     procedure BTNCODIGO_AREAAsyncClick(Sender: TObject; EventParams: TStringList);
+    procedure ITEMS_OPAsyncChange(Sender: TObject; EventParams: TStringList);
   private
     FCNX : TConexion;
     FINFO : String;
@@ -149,6 +157,17 @@ Uses
   Report.Saldo_Inventario,
   UtilsIW.Numero_Siguiente;
 
+{ TItem_Select }
+Constructor TItem_Select.Create;
+Begin
+  CODE := TStringList.Create;
+End;
+
+Destructor TItem_Select.Destroy;
+Begin
+  CODE.Clear;
+  FreeAndNil(CODE);
+End;
 
 Procedure TFrIWMovto_Inventario.Preparar_Numero_Cero;
 Begin
@@ -582,6 +601,11 @@ Begin
   Result := AnsiUpperCase(Result);
 End;
 
+procedure TFrIWMovto_Inventario.ITEMS_OPAsyncChange(Sender: TObject; EventParams: TStringList);
+begin
+  Resultado_Orden_Produccion(Sender, EventParams);
+end;
+
 Procedure TFrIWMovto_Inventario.SetLabel;
 Begin
   If Not FQRMAESTRO.Active Then
@@ -618,7 +642,6 @@ End;
 
 procedure TFrIWMovto_Inventario.DsDataChangeMaster(pSender: TObject);
 begin
-
   FNAVEGADOR.UpdateState;
   If (Not FQRMAESTRO.Active)Then
     Exit;

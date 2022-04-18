@@ -192,7 +192,10 @@ Begin
 End;
 
 Function TReport_Saldo_Inventario.PutData : Boolean;
+Var
+  lSuma : Double;
 Begin
+  lSuma := 0;
   Result := False;
   Try
     If FINPUT.Active And (FINPUT.RecordCount > 0) Then
@@ -205,6 +208,7 @@ Begin
       FINPUT.First;
       While Not FINPUT.Eof Do
       Begin
+        lSuma := lSuma + ((FINPUT.FieldByName('ENTRADA').AsFloat - FINPUT.FieldByName('SALIDA').AsFloat) * FINPUT.FieldByName('VALOR_UNITARIO').AsFloat);
         SetLinea(FINPUT.FieldByName('CODIGO_PRODUCTO').AsString,
                  FINPUT.FieldByName('NOMBRE_PRODUCTO').AsString,
                  FormatFloat('###,###.#0', FINPUT.FieldByName('STOCK_MINIMO'   ).AsFloat),
@@ -215,6 +219,13 @@ Begin
         Result := True;
         FINPUT.Next;
       End;
+      SetLinea(StringOfChar('=', 030),
+               StringOfChar('=', 090),
+               StringOfChar('=', 030),
+               StringOfChar('=', 030),
+               StringOfChar('=', 030),
+               'TOTAL: ',
+               FormatFloat('###,###.#0', lSuma));
     End;
   Except
     On E: Exception Do

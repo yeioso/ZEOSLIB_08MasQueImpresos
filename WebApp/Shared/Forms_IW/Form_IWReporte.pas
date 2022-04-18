@@ -49,8 +49,7 @@ type
     procedure IWAppFormCreate(Sender: TObject);
     procedure BTNCODIGO_AREAAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNAREAAsyncClick(Sender: TObject; EventParams: TStringList);
-    procedure BTNCOMPARATIVOAsyncClick(Sender: TObject;
-      EventParams: TStringList);
+    procedure BTNCOMPARATIVOAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNOPAsyncClick(Sender: TObject; EventParams: TStringList);
   private
     Procedure Resultado_Codigo_Producto_Ini(Sender: TObject; EventParams: TStringList);
