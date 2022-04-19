@@ -1544,4 +1544,12 @@ object FrIWLogin: TFrIWLogin
       end
     end
   end
+  object IWTimer1: TIWTimer
+    Enabled = True
+    Interval = 5000
+    ShowAsyncLock = False
+    OnAsyncTimer = IWTimer1AsyncTimer
+    Left = 242
+    Top = 133
+  end
 end

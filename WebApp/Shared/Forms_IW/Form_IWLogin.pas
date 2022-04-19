@@ -7,7 +7,8 @@ uses
   Vcl.Imaging.pngimage, IWCompExtCtrls, IWCompButton, IWCompEdit,
   IWVCLBaseControl, IWBaseControl, IWBaseHTMLControl, IWControl, IWCompLabel,
   Vcl.Controls, Vcl.Forms, IWVCLBaseContainer, IWContainer, IWHTMLContainer,
-  IWHTML40Container, IWRegion, IWCompListbox, IWHTMLControls, UtConexion;
+  IWHTML40Container, IWRegion, IWCompListbox, IWHTMLControls, UtConexion,
+  IWBaseComponent, IWBaseHTMLComponent, IWBaseHTML40Component;
 
 type
 
@@ -31,14 +32,17 @@ type
     IWURL1: TIWURL;
     LBVERION: TIWLabel;
     IWFONDO: TIWImage;
+    IWTimer1: TIWTimer;
     procedure IWImage3AsyncClick(Sender: TObject; EventParams: TStringList);
     procedure IWAppFormCreate(Sender: TObject);
     procedure BtnOKAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BtnCancelAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNRECUPERARAsyncClick(Sender: TObject; EventParams: TStringList);
+    procedure IWTimer1AsyncTimer(Sender: TObject; EventParams: TStringList);
   private
     FCNX : TConexion;
     FCaptcha : String;
+    Procedure Mostrar_Mensaje_vencimiento;
     procedure Recuperar_Password(EventParams: TStringList);
     Procedure Verificar_Notificacion;
     Function Usuario_Valido : Boolean;
@@ -61,6 +65,27 @@ Uses
   IW.Browser.Browser,
   UtilsIW.ManagerLog,
   UtilsIW.Permisos_App;
+
+Const
+//  Const_Fecha_Aviso = '2022-04-23';
+  Const_Fecha_Aviso = '2022-04-19 10:00:00';
+  Const_Fecha_Vencimiento = '2022-04-25';
+
+
+Procedure TFrIWLogin.Mostrar_Mensaje_vencimiento;
+Begin
+  If Trim(FormatDateTime('YYYY-MM-DD HH:NN:SS', Now)) > Const_Fecha_Vencimiento Then
+  Begin
+    UserSession.SetMessage('Por favor comuniquese con el soporte tecnico de A.S.E., ha caducado la ejecución de este aplicativo', True);
+  End
+  Else
+  Begin
+    If Trim(FormatDateTime('YYYY-MM-DD HH:NN:SS', Now)) >= Const_Fecha_Aviso  Then
+    Begin
+      UserSession.SetMessage('Por favor comuniquese con el soporte tecnico de A.S.E.', True);
+    End;
+  End;
+End;
 
 
 Procedure TFrIWLogin.Recuperar_Password(EventParams: TStringList);
@@ -203,7 +228,7 @@ procedure TFrIWLogin.BtnOKAsyncClick(Sender: TObject; EventParams: TStringList);
 begin
   BtnOK.Enabled := False;
 
-  If Trim(FormatDateTime('YYYY-MM-DD', Now)) > '2022-04-14' Then
+  If Trim(FormatDateTime('YYYY-MM-DD HH:NN:SS', Now)) > Const_Fecha_Vencimiento Then
   Begin
     WebApplication.ShowMessage('Por favor comuniquese con el soporte tecnico de A.S.E., ha caducado la ejecución de este aplicativo');
     BtnOK.Enabled := True;
@@ -211,8 +236,10 @@ begin
   End
   Else
   Begin
-    If Trim(FormatDateTime('YYYY-MM-DD', Now)) > '2022-04-10' Then
-      WebApplication.ShowMessage('Por favor comuniquese con el soporte tecnico de A.S.E.');
+    If Trim(FormatDateTime('YYYY-MM-DD HH:NN:SS', Now)) >= Const_Fecha_Aviso  Then
+    Begin
+      UserSession.SetMessage('Por favor comuniquese con el soporte tecnico de A.S.E.', True);
+    End;
   End;
 
 
@@ -255,6 +282,11 @@ End;
 procedure TFrIWLogin.IWImage3AsyncClick(Sender: TObject; EventParams: TStringList);
 begin
   UtCaptcha_Generate(FCaptcha, IWImageCaptcha);
+end;
+
+procedure TFrIWLogin.IWTimer1AsyncTimer(Sender: TObject; EventParams: TStringList);
+begin
+  Mostrar_Mensaje_vencimiento;
 end;
 
 end.
