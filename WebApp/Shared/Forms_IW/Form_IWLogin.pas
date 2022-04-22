@@ -68,8 +68,8 @@ Uses
 
 Const
 //  Const_Fecha_Aviso = '2022-04-23';
-  Const_Fecha_Aviso = '2022-04-19 10:00:00';
-  Const_Fecha_Vencimiento = '2022-04-25';
+  Const_Fecha_Aviso = '2022-04-22';
+  Const_Fecha_Vencimiento = '2022-04-26';
 
 
 Procedure TFrIWLogin.Mostrar_Mensaje_vencimiento;

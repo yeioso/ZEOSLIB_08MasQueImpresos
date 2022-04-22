@@ -143,6 +143,7 @@ Uses
   Math,
   UtType,
   UtFecha,
+  IWjQGrid,
   Variants,
   UtFuncion,
   Vcl.Graphics,
@@ -722,7 +723,7 @@ Begin
       FQRMAESTRO.WHERE := FQRMAESTRO.WHERE + ' OR HORA_REGISTRO LIKE '   + QuotedStr('%' + Trim(pDato) + '%') + #13;
       FQRMAESTRO.WHERE := FQRMAESTRO.WHERE + ' ) ';
     End;
-    FQRMAESTRO.ORDER := ' ORDER BY NUMERO DESC ';
+    FQRMAESTRO.ORDER := ' ORDER BY FECHA_REGISTRO DESC, HORA_REGISTRO DESC ';
     FQRMAESTRO.SetFields;
     FQRMAESTRO.SetCalcField('CALC_OP', 20, TFieldType.ftString);
     FQRMAESTRO.SetCalcField('CALC_NOMBRE_PRODUCTO', 50, TFieldType.ftString);
@@ -925,11 +926,14 @@ begin
     VALOR_UNITARIO.DataSource      := FQRMAESTRO.DS;
     ID_ACTIVO.DataSource           := FQRMAESTRO.DS;
 
-    FGRID_MAESTRO.SetGrid(FQRMAESTRO.DS, ['NUMERO'       , 'NOMBRE'     , 'CALC_NOMBRE_PRODUCTO', 'CALC_OP'       , 'FECHA_REGISTRO', 'FECHA_MOVIMIENTO'],
-                                         ['numero'       , 'Nombre'     , 'Producto'            , 'O.P.'          , 'Registro'      , 'Movimiento'      ],
-                                         ['S'            , 'N'          , 'N'                   , 'N'             , 'N'             , 'N'               ],
-                                         [080            , 200          , 350                   , 100             , 100             , 100               ],
-                                         [taRightJustify , taLeftJustify, taLeftJustify         , taRightJustify  , taRightJustify  , taRightJustify    ]);
+    FGRID_MAESTRO.SetGrid(FQRMAESTRO.DS, ['NUMERO'        , 'NOMBRE'        , 'CALC_NOMBRE_PRODUCTO', 'CALC_OP'       , 'FECHA_REGISTRO', 'HORA_REGISTRO' , 'FECHA_MOVIMIENTO'],
+                                         ['numero'        , 'Nombre'        , 'Producto'            , 'O.P.'          , 'F. Registro'   , 'H. Registro'   , 'Movimiento'      ],
+                                         ['S'             , 'N'             , 'N'                   , 'N'             , 'N'             , 'N'             , 'N'               ],
+                                         ['N'             , 'N'             , 'N'                   , 'N'             , 'N'             , 'N'             , 'N'               ],
+                                         [070             , 200             , 350                   , 050             , 090             , 090             , 090               ],
+                                         [taRightJustify  , taLeftJustify   , taLeftJustify         , taRightJustify  , taRightJustify  , taRightJustify  , taRightJustify    ],
+                                         [TEditType.etNone, TEditType.etNone, TEditType.etNone      , TEditType.etNone, TEditType.etNone, TEditType.etNone, TEditType.etNone  ],
+                                         [TDataType.dtInt , TDataType.dtText, TDataType.dtText      , TDataType.dtText, TDataType.dtText, TDataType.dtText, TDataType.dtText  ]);
     FNAVEGADOR               := TNavegador_ASE.Create(IWRegion_Navegador);
     FNAVEGADOR.Parent        := IWRegion_Navegador;
     FNAVEGADOR.SetNavegador(FQRMAESTRO, WebApplication, FGRID_MAESTRO);
