@@ -11,6 +11,7 @@ implementation
 
 Uses
   UtFuncion,
+  System.Math,
   System.SysUtils,
   ServerController,
   TBL000.Info_Tabla,
@@ -259,6 +260,7 @@ End;
 Function TReport_Comparativo_OP_Inventario.GetService : Double;
 Var
   lSuma : Double;
+  lValor_Unitario : Double;
 Begin
   lSuma := 0;
   Result := 0;
@@ -268,7 +270,8 @@ Begin
     FINPUT3.SQL.Add('     SELECT  D.CODIGO_PRODUCTO ');
     FINPUT3.SQL.Add('            ,P.NOMBRE ');
     FINPUT3.SQL.Add('            ,D.CANTIDAD ');
-    FINPUT3.SQL.Add('            ,D.VALOR_UNITARIO ');
+    FINPUT3.SQL.Add('            ,D.VALOR_UNITARIO AS VALOR_EDM ');
+    FINPUT3.SQL.Add('            ,P.VALOR_UNITARIO AS VALOR_PRO ');
     FINPUT3.SQL.Add('     FROM ' + Info_TablaGet(Id_TBL_Explosion_Material).Name + ' D ');
     FINPUT3.SQL.Add('     INNER JOIN ' + Info_TablaGet(Id_TBL_Producto).Name + ' P ');
     FINPUT3.SQL.Add('     ON D.CODIGO_PRODUCTO = P.CODIGO_PRODUCTO');
@@ -286,13 +289,14 @@ Begin
       FINPUT3.First;
       While Not FINPUT3.Eof Do
       Begin
-        lSuma := lSuma + FINPUT3.FieldByName('CANTIDAD').AsFloat * FINPUT3.FieldByName('VALOR_UNITARIO').AsFloat;
-        Result := Result + FINPUT3.FieldByName('CANTIDAD').AsFloat * FINPUT3.FieldByName('VALOR_UNITARIO').AsFloat;
+        lValor_Unitario :=  IfThen(FINPUT3.FieldByName('VALOR_EDM').AsFloat > 0, FINPUT3.FieldByName('VALOR_EDM').AsFloat, FINPUT3.FieldByName('VALOR_PRO').AsFloat);
+        lSuma := lSuma + (FINPUT3.FieldByName('CANTIDAD').AsFloat * lValor_Unitario);
+        Result := Result + (FINPUT3.FieldByName('CANTIDAD').AsFloat * lValor_Unitario);
         SetLinea3(FINPUT3.FieldByName('CODIGO_PRODUCTO').AsString,
                   FINPUT3.FieldByName('NOMBRE').AsString,
                   FormatFloat('###,###,##0.#0', FINPUT3.FieldByName('CANTIDAD').AsFloat),
-                  FormatFloat('###,###,##0.#0', FINPUT3.FieldByName('VALOR_UNITARIO').AsFloat),
-                  FormatFloat('###,###,##0.#0', FINPUT3.FieldByName('CANTIDAD').AsFloat * FINPUT3.FieldByName('VALOR_UNITARIO').AsFloat));
+                  FormatFloat('###,###,##0.#0', lValor_Unitario),
+                  FormatFloat('###,###,##0.#0', FINPUT3.FieldByName('CANTIDAD').AsFloat * lValor_Unitario));
         FINPUT3.Next;
       End;
       SetLinea3(StringOfChar('=', 50), StringOfChar('=', 60), StringOfChar('=', 50), StringOfChar('=', 50), StringOfChar('=', 50));

@@ -32,13 +32,11 @@ type
     IWURL1: TIWURL;
     LBVERION: TIWLabel;
     IWFONDO: TIWImage;
-    IWTimer1: TIWTimer;
     procedure IWImage3AsyncClick(Sender: TObject; EventParams: TStringList);
     procedure IWAppFormCreate(Sender: TObject);
     procedure BtnOKAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BtnCancelAsyncClick(Sender: TObject; EventParams: TStringList);
     procedure BTNRECUPERARAsyncClick(Sender: TObject; EventParams: TStringList);
-    procedure IWTimer1AsyncTimer(Sender: TObject; EventParams: TStringList);
   private
     FCNX : TConexion;
     FCaptcha : String;
@@ -74,17 +72,17 @@ Const
 
 Procedure TFrIWLogin.Mostrar_Mensaje_vencimiento;
 Begin
-  If Trim(FormatDateTime('YYYY-MM-DD HH:NN:SS', Now)) > Const_Fecha_Vencimiento Then
-  Begin
-    UserSession.SetMessage('Por favor comuniquese con el soporte tecnico de A.S.E., ha caducado la ejecución de este aplicativo', True);
-  End
-  Else
-  Begin
-    If Trim(FormatDateTime('YYYY-MM-DD HH:NN:SS', Now)) >= Const_Fecha_Aviso  Then
-    Begin
-      UserSession.SetMessage('Por favor comuniquese con el soporte tecnico de A.S.E.', True);
-    End;
-  End;
+//  If Trim(FormatDateTime('YYYY-MM-DD HH:NN:SS', Now)) > Const_Fecha_Vencimiento Then
+//  Begin
+//    UserSession.SetMessage('Por favor comuniquese con el soporte tecnico de A.S.E., ha caducado la ejecución de este aplicativo', True);
+//  End
+//  Else
+//  Begin
+//    If Trim(FormatDateTime('YYYY-MM-DD HH:NN:SS', Now)) >= Const_Fecha_Aviso  Then
+//    Begin
+//      UserSession.SetMessage('Por favor comuniquese con el soporte tecnico de A.S.E.', True);
+//    End;
+//  End;
 End;
 
 
@@ -228,19 +226,19 @@ procedure TFrIWLogin.BtnOKAsyncClick(Sender: TObject; EventParams: TStringList);
 begin
   BtnOK.Enabled := False;
 
-  If Trim(FormatDateTime('YYYY-MM-DD HH:NN:SS', Now)) > Const_Fecha_Vencimiento Then
-  Begin
-    WebApplication.ShowMessage('Por favor comuniquese con el soporte tecnico de A.S.E., ha caducado la ejecución de este aplicativo');
-    BtnOK.Enabled := True;
-    Exit;
-  End
-  Else
-  Begin
-    If Trim(FormatDateTime('YYYY-MM-DD HH:NN:SS', Now)) >= Const_Fecha_Aviso  Then
-    Begin
-      UserSession.SetMessage('Por favor comuniquese con el soporte tecnico de A.S.E.', True);
-    End;
-  End;
+//  If Trim(FormatDateTime('YYYY-MM-DD HH:NN:SS', Now)) > Const_Fecha_Vencimiento Then
+//  Begin
+//    WebApplication.ShowMessage('Por favor comuniquese con el soporte tecnico de A.S.E., ha caducado la ejecución de este aplicativo');
+//    BtnOK.Enabled := True;
+//    Exit;
+//  End
+//  Else
+//  Begin
+//    If Trim(FormatDateTime('YYYY-MM-DD HH:NN:SS', Now)) >= Const_Fecha_Aviso  Then
+//    Begin
+//      UserSession.SetMessage('Por favor comuniquese con el soporte tecnico de A.S.E.', True);
+//    End;
+//  End;
 
 
   If Authentication_Validated Then
@@ -282,11 +280,6 @@ End;
 procedure TFrIWLogin.IWImage3AsyncClick(Sender: TObject; EventParams: TStringList);
 begin
   UtCaptcha_Generate(FCaptcha, IWImageCaptcha);
-end;
-
-procedure TFrIWLogin.IWTimer1AsyncTimer(Sender: TObject; EventParams: TStringList);
-begin
-  Mostrar_Mensaje_vencimiento;
 end;
 
 end.

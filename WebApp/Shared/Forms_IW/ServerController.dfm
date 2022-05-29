@@ -10,7 +10,7 @@ object IWServerController: TIWServerController
   DisplayName = 'ASE - MQI'
   Port = 8888
   SSLOptions.SSLVersion = SSLv3
-  Version = '15.2.53'
+  Version = '15.2.54'
   IECompatibilityMode = 'IE=8'
   ExceptionLogger.PurgeAfterDays = 10
   LogCommandEnabled = False
